@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo, memo, type ReactNode
 import type { Task } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
+import { formatDuration, tagColor, tagBgColor } from '../utils/format';
 import './TaskList.css';
 
 interface TaskListProps {
@@ -18,31 +19,6 @@ interface TaskListProps {
   onRescheduleTask?: (taskId: string, newDate: string) => void;
   onMoveAllToTomorrow?: () => void;
 }
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}min`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}min` : `${h}h`;
-}
-
-/** Deterministic hue from a tag string */
-function tagHue(tag: string): number {
-  let hash = 0;
-  for (let i = 0; i < tag.length; i++) {
-    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return ((hash % 360) + 360) % 360;
-}
-
-export function tagColor(tag: string): string {
-  return `hsl(${tagHue(tag)}, var(--tag-saturation, 55%), var(--tag-text-lightness, 40%))`;
-}
-
-export function tagBgColor(tag: string): string {
-  return `hsl(${tagHue(tag)}, var(--tag-saturation, 55%), var(--tag-bg-lightness, 92%))`;
-}
-
 
 /** Lightweight markdown: bold, italic, code, [links](url), bare URLs */
 function renderInline(text: string): ReactNode[] {

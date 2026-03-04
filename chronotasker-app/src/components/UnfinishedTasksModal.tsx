@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback } from 'react';
 import type { Task } from '../types';
-import { tagColor, tagBgColor } from './TaskList';
+import { formatDuration, tagColor, tagBgColor } from '../utils/format';
 import './UnfinishedTasksModal.css';
 
 interface UnfinishedTasksModalProps {
@@ -14,13 +14,6 @@ interface UnfinishedTasksModalProps {
   onMoveAllToBacklog: () => void;
   onDeleteAll: () => void;
   onDismiss: () => void;
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}min`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}min` : `${h}h`;
 }
 
 export default function UnfinishedTasksModal({

@@ -14,7 +14,7 @@
   --clock-task-opacity: 0.82;
   --clock-task-completed-opacity: var(--color-completed-opacity);
   --clock-ring-bg: var(--color-border);
-  --clock-hand-color: var(--color-info, #88C0D0);
+  --clock-hand-color: var(--color-accent);
   --clock-center-bg: var(--color-surface);
   --clock-center-border: var(--color-border);
   --clock-hover-brightness: 1.12;

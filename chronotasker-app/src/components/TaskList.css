@@ -516,7 +516,12 @@
   }
 
   .task-list__reorder {
-    display: none;
+    display: flex;
+  }
+
+  .task-list__reorder-btn {
+    width: 44px;
+    height: 44px;
   }
 
   .task-list__edit-btn,

@@ -197,7 +197,7 @@
 
 .app-main {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(320px, 1fr) minmax(300px, 1.2fr);
   gap: 2rem;
   align-items: start;
 }
@@ -519,6 +519,13 @@
   min-height: auto;
 }
 
+/* Wide screens — give sidebar more room */
+@media (min-width: 1400px) {
+  .app-main {
+    grid-template-columns: 1fr 1.5fr;
+  }
+}
+
 /* Mobile layout */
 @media (max-width: 768px) {
   .app-main {
@@ -527,6 +534,8 @@
 
   .clock-section {
     position: static;
+    max-width: 400px;
+    margin: 0 auto;
   }
 
   .current-date {

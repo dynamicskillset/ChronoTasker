@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
 import type { PomodoroState, CalendarEvent } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
+import { tagHue } from '../utils/format';
 import './ClockFace.css';
 
 /* =============================================================
@@ -96,15 +97,6 @@ function describeArc(
     `A ${innerR} ${innerR} 0 ${largeArc} 0 ${innerEnd.x} ${innerEnd.y}`,
     'Z',
   ].join(' ');
-}
-
-/** Deterministic hue from a tag string */
-function tagHue(tag: string): number {
-  let hash = 0;
-  for (let i = 0; i < tag.length; i++) {
-    hash = tag.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  return ((hash % 360) + 360) % 360;
 }
 
 /**

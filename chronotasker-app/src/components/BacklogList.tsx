@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import type { Task } from '../types';
-import { tagColor, tagBgColor } from './TaskList';
+import { formatDuration, tagColor, tagBgColor } from '../utils/format';
 import './BacklogList.css';
 
 interface BacklogListProps {
@@ -8,13 +8,6 @@ interface BacklogListProps {
   onAssignToToday: (taskId: string) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
-}
-
-function formatDuration(minutes: number): string {
-  if (minutes < 60) return `${minutes}min`;
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  return m > 0 ? `${h}h ${m}min` : `${h}h`;
 }
 
 export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDeleteTask }: BacklogListProps) {
