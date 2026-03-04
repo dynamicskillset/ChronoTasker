@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" fill="#2E3440"/>
+
+  <!-- Task ring (segmented arc representing time blocks) -->
+  <circle cx="50" cy="50" r="38" fill="none" stroke="#434C5E" stroke-width="12"/>
+
+  <!-- Coloured task segments — three arcs suggesting a planned day -->
+  <!-- Morning block (8-10 o'clock position, ~60deg) -->
+  <path d="M 50 12 A 38 38 0 0 1 82.9 31" fill="none" stroke="#88C0D0" stroke-width="12" stroke-linecap="butt"/>
+  <!-- Mid block (10-11 o'clock position, ~30deg) -->
+  <path d="M 82.9 31 A 38 38 0 0 1 88 50" fill="none" stroke="#A3BE8C" stroke-width="12" stroke-linecap="butt"/>
+  <!-- Afternoon block (11-1 o'clock position, ~60deg) -->
+  <path d="M 88 50 A 38 38 0 0 1 69 82.9" fill="none" stroke="#5E81AC" stroke-width="12" stroke-linecap="butt"/>
+
+  <!-- Hour markers at 12, 3, 6, 9 -->
+  <line x1="50" y1="6" x2="50" y2="10" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
+  <line x1="94" y1="50" x2="90" y2="50" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
+  <line x1="50" y1="94" x2="50" y2="90" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
+  <line x1="6" y1="50" x2="10" y2="50" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
+
+  <!-- Checkmark (task completion motif) — sits in the centre -->
+  <polyline points="39,52 46,59 62,41" fill="none" stroke="#A3BE8C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

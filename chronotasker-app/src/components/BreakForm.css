@@ -1,0 +1,93 @@
+/* BreakForm — Compact break input for ChronoTasker */
+
+.break-form {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+.break-form__label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+
+.break-form__presets {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.break-form__pill {
+  padding: 0.1875rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: inherit;
+  color: var(--color-pill-text);
+  background: var(--color-pill-bg);
+  border: 1px solid transparent;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.break-form__pill:hover {
+  border-color: var(--color-input-border);
+}
+
+.break-form__pill--active {
+  background: var(--color-pill-active-bg);
+  color: var(--color-pill-active-text);
+  border-color: var(--color-pill-active-bg);
+}
+
+.break-form__pill:focus-visible {
+  outline: 2px solid var(--color-input-focus);
+  outline-offset: 2px;
+}
+
+.break-form__time {
+  width: 5.5rem;
+  padding: 0.1875rem 0.375rem;
+  font-size: 0.75rem;
+  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  color: var(--color-text);
+  background: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: 6px;
+  outline: none;
+}
+
+.break-form__time:focus {
+  border-color: var(--color-input-focus);
+}
+
+.break-form__add {
+  margin-left: auto;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-secondary);
+  background: transparent;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.break-form__add:hover {
+  background: var(--color-btn-hover-bg);
+  color: var(--color-text);
+}
+
+.break-form__add:focus-visible {
+  outline: 2px solid var(--color-input-focus);
+  outline-offset: 2px;
+}

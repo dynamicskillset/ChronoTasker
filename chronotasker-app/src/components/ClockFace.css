@@ -1,0 +1,297 @@
+/* ClockFace — Circular time visualisation for ChronoTasker */
+
+/* ============================================================
+   Theme custom properties (derived from global tokens in index.css)
+   ============================================================ */
+.clock-face {
+  --clock-bg: var(--color-surface);
+  --clock-face-bg: var(--color-surface);
+  --clock-text: var(--color-text);
+  --clock-text-secondary: var(--color-text-secondary);
+  --clock-marker: var(--color-border);
+  --clock-marker-major: var(--color-text-secondary);
+  --clock-accent: var(--color-info, #88C0D0);
+  --clock-task-opacity: 0.82;
+  --clock-task-completed-opacity: var(--color-completed-opacity);
+  --clock-ring-bg: var(--color-border);
+  --clock-hand-color: var(--color-info, #88C0D0);
+  --clock-center-bg: var(--color-surface);
+  --clock-center-border: var(--color-border);
+  --clock-hover-brightness: 1.12;
+  --clock-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  --clock-working-day-fill: var(--color-bg);
+  --clock-working-day-opacity: 1;
+  --clock-break-bg: color-mix(in srgb, var(--color-border) 35%, var(--color-bg));
+  --clock-calendar-fill: var(--color-calendar, #B48EAD);
+  --clock-calendar-opacity: 0.7;
+}
+
+/* Dark mode adjustments (only values that differ from defaults) */
+.dark .clock-face {
+  --clock-ring-bg: var(--color-hover-bg);
+  --clock-working-day-fill: var(--color-border);
+  --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
+  --clock-hover-brightness: 1.2;
+  --clock-shadow: 0 2px 16px rgba(0, 0, 0, 0.32);
+  --clock-calendar-opacity: 0.6;
+}
+
+@media (prefers-color-scheme: dark) {
+  .clock-face {
+    --clock-ring-bg: var(--color-hover-bg);
+    --clock-working-day-fill: var(--color-border);
+    --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
+    --clock-hover-brightness: 1.2;
+    --clock-shadow: 0 2px 16px rgba(0, 0, 0, 0.32);
+    --clock-calendar-opacity: 0.6;
+  }
+}
+
+/* ============================================================
+   Container and SVG
+   ============================================================ */
+.clock-face {
+  width: 100%;
+  max-width: 480px;
+  aspect-ratio: 1 / 1;
+  margin: 0 auto;
+  user-select: none;
+  border-radius: 50%;
+  box-shadow: var(--clock-shadow);
+}
+
+.clock-face svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================================
+   Clock background elements
+   ============================================================ */
+.clock-face__background {
+  fill: var(--clock-face-bg);
+}
+
+.clock-face__ring-bg {
+  fill: none;
+  stroke: var(--clock-ring-bg);
+  stroke-width: 75; /* OUTER_R (170) - INNER_R (95) = 75 */
+}
+
+.clock-face__center-disc {
+  fill: var(--clock-center-bg);
+  stroke: var(--clock-center-border);
+  stroke-width: 1.5;
+}
+
+/* ============================================================
+   Working day highlight
+   ============================================================ */
+.clock-face__working-day {
+  fill: var(--clock-working-day-fill);
+  opacity: var(--clock-working-day-opacity);
+  pointer-events: none;
+}
+
+/* ============================================================
+   Hour markers and labels
+   ============================================================ */
+.clock-face__marker {
+  stroke: var(--clock-marker);
+  stroke-width: 1.2;
+  stroke-linecap: round;
+}
+
+.clock-face__marker--major {
+  stroke: var(--clock-marker-major);
+  stroke-width: 2;
+}
+
+.clock-face__hour-label {
+  fill: var(--clock-text-secondary);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  font-weight: 500;
+  text-anchor: middle;
+  dominant-baseline: central;
+  pointer-events: none;
+}
+
+.clock-face__hour-label--major {
+  fill: var(--clock-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   Task arcs
+   ============================================================ */
+.clock-face__task-arc {
+  opacity: var(--clock-task-opacity);
+  cursor: pointer;
+  transition: opacity 0.25s ease, filter 0.2s ease;
+  stroke: var(--clock-face-bg);
+  stroke-width: 0.8;
+}
+
+.clock-face__task-arc:hover {
+  opacity: 1;
+  filter: brightness(var(--clock-hover-brightness));
+}
+
+/* Keyboard focus indicator for task arcs */
+g:focus-visible .clock-face__task-arc {
+  opacity: 1;
+  stroke: var(--clock-text);
+  stroke-width: 2.5;
+  filter: brightness(var(--clock-hover-brightness));
+}
+
+.clock-face__task-arc--completed {
+  opacity: var(--clock-task-completed-opacity);
+}
+
+.clock-face__task-arc--completed:hover {
+  opacity: calc(var(--clock-task-completed-opacity) + 0.15);
+}
+
+.clock-face__task-arc--important {
+  /* important styling applied inline via fill, but add subtle stroke */
+  stroke: var(--clock-accent);
+  stroke-width: 1.2;
+}
+
+/* Break arcs — blend with working day, defined edges */
+/* Break pattern fill */
+.clock-face__break-pattern-bg {
+  fill: var(--clock-break-bg);
+}
+
+.clock-face__break-pattern-line {
+  stroke: var(--clock-text);
+  opacity: 0.55;
+}
+
+.clock-face__task-arc--break {
+  opacity: 1;
+  stroke: none;
+  cursor: default;
+}
+
+.clock-face__task-arc--break:hover {
+  filter: none;
+  opacity: 1;
+}
+
+/* ============================================================
+   Calendar event arcs (outer band)
+   ============================================================ */
+.clock-face__calendar-arc {
+  fill: var(--clock-calendar-fill);
+  opacity: var(--clock-calendar-opacity);
+  pointer-events: none;
+  stroke: var(--clock-face-bg);
+  stroke-width: 0.5;
+}
+
+/* ============================================================
+   Active Pomodoro pulsing effect
+   ============================================================ */
+.clock-face__task-arc--active {
+  animation: clock-pulse 2s ease-in-out infinite;
+}
+
+@keyframes clock-pulse {
+  0%, 100% {
+    opacity: var(--clock-task-opacity);
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Meeting conflict — dashed stroke */
+.clock-face__task-arc--conflict {
+  stroke: var(--color-warning, hsl(40, 85%, 55%));
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+
+/* ============================================================
+   Completed strikethrough pattern overlay
+   ============================================================ */
+.clock-face__completed-pattern {
+  pointer-events: none;
+  opacity: 0.35;
+}
+
+/* ============================================================
+   Current-time hand
+   ============================================================ */
+.clock-face__time-hand {
+  stroke: var(--clock-hand-color);
+  stroke-width: 2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px var(--clock-hand-color));
+  transition: transform 0.5s linear;
+}
+
+.clock-face__time-hand-dot {
+  fill: var(--clock-hand-color);
+  filter: drop-shadow(0 0 4px var(--clock-hand-color));
+}
+
+/* ============================================================
+   Center text
+   ============================================================ */
+.clock-face__center-date {
+  fill: var(--clock-text-secondary);
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  text-anchor: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.clock-face__center-time {
+  fill: var(--clock-text);
+  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 18px;
+  font-weight: 600;
+  text-anchor: middle;
+}
+
+/* ============================================================
+   Task tooltip (title on hover)
+   ============================================================ */
+.clock-face__task-arc title {
+  font-size: 12px;
+}
+
+/* ============================================================
+   Responsive adjustments
+   ============================================================ */
+@media (max-width: 480px) {
+  .clock-face {
+    max-width: 100%;
+  }
+
+  .clock-face__hour-label {
+    font-size: 9px;
+  }
+
+  .clock-face__center-time {
+    font-size: 15px;
+  }
+
+  .clock-face__center-date {
+    font-size: 8px;
+  }
+}
+
+@media (min-width: 768px) {
+  .clock-face {
+    max-width: 520px;
+  }
+}

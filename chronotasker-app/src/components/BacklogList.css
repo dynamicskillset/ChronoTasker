@@ -1,0 +1,171 @@
+/* BacklogList — Backlog task pool for ChronoTasker */
+
+.backlog-list {
+  width: 100%;
+  background: var(--color-bg);
+  border-radius: 8px;
+}
+
+.backlog-list--empty {
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.backlog-list__empty-message {
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.backlog-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.backlog-list__item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.backlog-list__item:last-child {
+  border-bottom: none;
+}
+
+.backlog-list__item:hover {
+  background-color: var(--color-hover-bg);
+}
+
+.backlog-list__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+}
+
+.backlog-list__title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.backlog-list__tag {
+  display: inline-block;
+  flex-shrink: 0;
+  padding: 0.0625rem 0.375rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  border-radius: 999px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.backlog-list__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+}
+
+.backlog-list__duration {
+  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.7rem;
+}
+
+.backlog-list__actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.125rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.backlog-list__item:hover .backlog-list__actions,
+.backlog-list__item:focus-within .backlog-list__actions {
+  opacity: 1;
+}
+
+.backlog-list__assign-btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-submit-text);
+  background: var(--color-submit-bg);
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.backlog-list__assign-btn:hover {
+  background: var(--color-submit-hover);
+}
+
+.backlog-list__edit-btn,
+.backlog-list__delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.backlog-list__edit-btn:hover {
+  background-color: var(--color-btn-hover-bg);
+  color: var(--color-text);
+}
+
+.backlog-list__delete-btn:hover {
+  background-color: var(--color-btn-hover-bg);
+  color: var(--color-danger);
+}
+
+.backlog-list__delete-btn--confirming {
+  color: var(--color-danger);
+  background-color: color-mix(in srgb, var(--color-danger) 12%, transparent);
+}
+
+.backlog-list__delete-btn--confirming:hover {
+  background-color: color-mix(in srgb, var(--color-danger) 20%, transparent);
+}
+
+@media (hover: none) {
+  .backlog-list__actions {
+    opacity: 1;
+  }
+
+  .backlog-list__edit-btn,
+  .backlog-list__delete-btn {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 768px) {
+  .backlog-list__edit-btn,
+  .backlog-list__delete-btn {
+    width: 44px;
+    height: 44px;
+  }
+}

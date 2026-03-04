@@ -1,0 +1,198 @@
+:root {
+  --color-bg: #ECEFF4;
+  --color-surface: #E5E9F0;
+  --color-text: #2E3440;
+  --color-text-secondary: #4C566A;
+  --color-border: #D8DEE9;
+  --color-accent: #5E81AC;
+  --color-accent-light: #E5E9F0;
+  --color-success: #A3BE8C;
+  --color-danger: #BF616A;
+  --color-warning: #D08770;
+  --color-calendar: #B48EAD;
+  --color-info: #88C0D0;
+  --color-task-important: hsl(0, 72%, 62%);
+  --color-task-hue-base: 200;
+  --color-task-saturation: 62%;
+  --color-task-lightness: 68%;
+
+  /* Shared component tokens */
+  --color-hover-bg: #E5E9F0;
+  --color-active-bg: #E5E9F0;
+  --color-active-border: #5E81AC;
+  --color-btn-hover-bg: #D8DEE9;
+  --color-input-bg: #E5E9F0;
+  --color-input-border: #D8DEE9;
+  --color-input-focus: #5E81AC;
+  --color-pill-bg: #D8DEE9;
+  --color-pill-text: #4C566A;
+  --color-pill-active-bg: #5E81AC;
+  --color-pill-active-text: #ECEFF4;
+  --color-submit-bg: #5E81AC;
+  --color-submit-text: #ECEFF4;
+  --color-submit-hover: #81A1C1;
+  --color-checkbox: #4C566A;
+  --color-checkbox-done: #A3BE8C;
+  --color-muted: #D8DEE9;
+  --color-completed-opacity: 0.5;
+
+  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-bg: #2E3440;
+    --color-surface: #3B4252;
+    --color-text: #ECEFF4;
+    --color-text-secondary: #D8DEE9;
+    --color-border: #4C566A;
+    --color-accent: #88C0D0;
+    --color-accent-light: #3B4252;
+    --color-task-important: hsl(0, 65%, 58%);
+    --color-task-saturation: 55%;
+    --color-task-lightness: 62%;
+
+    --color-hover-bg: #434C5E;
+    --color-active-bg: #434C5E;
+    --color-active-border: #88C0D0;
+    --color-btn-hover-bg: #4C566A;
+    --color-input-bg: #434C5E;
+    --color-input-border: #4C566A;
+    --color-input-focus: #88C0D0;
+    --color-pill-bg: #434C5E;
+    --color-pill-text: #D8DEE9;
+    --color-pill-active-bg: #5E81AC;
+    --color-pill-active-text: #ECEFF4;
+    --color-submit-bg: #5E81AC;
+    --color-submit-text: #ECEFF4;
+    --color-submit-hover: #81A1C1;
+    --color-checkbox: #D8DEE9;
+    --color-checkbox-done: #A3BE8C;
+    --color-muted: #4C566A;
+    --color-completed-opacity: 0.4;
+  }
+}
+
+.dark {
+  --color-bg: #2E3440;
+  --color-surface: #3B4252;
+  --color-text: #ECEFF4;
+  --color-text-secondary: #D8DEE9;
+  --color-border: #4C566A;
+  --color-accent: #88C0D0;
+  --color-accent-light: #3B4252;
+  --color-task-important: hsl(0, 65%, 58%);
+  --color-task-saturation: 55%;
+  --color-task-lightness: 62%;
+
+  --color-hover-bg: #434C5E;
+  --color-active-bg: #434C5E;
+  --color-active-border: #88C0D0;
+  --color-btn-hover-bg: #4C566A;
+  --color-input-bg: #434C5E;
+  --color-input-border: #4C566A;
+  --color-input-focus: #88C0D0;
+  --color-pill-bg: #434C5E;
+  --color-pill-text: #D8DEE9;
+  --color-pill-active-bg: #5E81AC;
+  --color-pill-active-text: #ECEFF4;
+  --color-submit-bg: #5E81AC;
+  --color-submit-text: #ECEFF4;
+  --color-submit-hover: #81A1C1;
+  --color-checkbox: #D8DEE9;
+  --color-checkbox-done: #A3BE8C;
+  --color-muted: #4C566A;
+  --color-completed-opacity: 0.4;
+}
+
+.light {
+  --color-bg: #ECEFF4;
+  --color-surface: #E5E9F0;
+  --color-text: #2E3440;
+  --color-text-secondary: #4C566A;
+  --color-border: #D8DEE9;
+  --color-accent-light: #E5E9F0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+button {
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  padding: 0.5em 1em;
+  font-size: 0.875rem;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+button:hover {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent-light);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+input, select {
+  border-radius: 6px;
+  border: 1px solid var(--color-border);
+  padding: 0.5em 0.75em;
+  font-size: 0.875rem;
+  font-family: inherit;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  transition: border-color 0.15s ease;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-light);
+}
+
+input[type="checkbox"] {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-accent);
+}
+
+h1, h2, h3 {
+  line-height: 1.2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

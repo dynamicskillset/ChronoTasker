@@ -1,0 +1,214 @@
+import { Router, Request, Response } from 'express';
+import { v4 as uuidv4 } from 'uuid';
+import { getDb } from '../db';
+
+const router = Router();
+
+// GET /api/tasks?date=YYYY-MM-DD
+router.get('/', (req: Request, res: Response) => {
+  const { date } = req.query;
+
+  if (!date || typeof date !== 'string') {
+    res.status(400).json({ error: 'date query parameter is required (YYYY-MM-DD)' });
+    return;
+  }
+
+  const db = getDb();
+  const tasks = db.prepare(
+    'SELECT * FROM tasks WHERE date = ? ORDER BY sort_order ASC, created_at ASC'
+  ).all(date);
+
+  res.json(tasks);
+});
+
+// POST /api/tasks
+router.post('/', (req: Request, res: Response) => {
+  const {
+    id,
+    title,
+    duration_minutes = 25,
+    fixed_start_time = null,
+    completed = 0,
+    important = 0,
+    is_break = 0,
+    tag = null,
+    details = null,
+    recurrence_pattern = null,
+    recurrence_source_id = null,
+    sort_order = 0,
+    date,
+    created_at,
+    updated_at,
+  } = req.body;
+
+  if (!title || !date) {
+    res.status(400).json({ error: 'title and date are required' });
+    return;
+  }
+
+  const now = new Date().toISOString();
+  const taskId = id || uuidv4();
+
+  const db = getDb();
+  const stmt = db.prepare(`
+    INSERT INTO tasks (id, title, duration_minutes, fixed_start_time, completed, important, is_break, tag, details, recurrence_pattern, recurrence_source_id, sort_order, date, created_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  try {
+    stmt.run(
+      taskId,
+      title,
+      duration_minutes,
+      fixed_start_time,
+      completed ? 1 : 0,
+      important ? 1 : 0,
+      is_break ? 1 : 0,
+      tag,
+      details,
+      recurrence_pattern,
+      recurrence_source_id,
+      sort_order,
+      date,
+      created_at || now,
+      updated_at || now
+    );
+
+    const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(taskId);
+    res.status(201).json(task);
+  } catch (err: any) {
+    if (err.message?.includes('UNIQUE constraint failed')) {
+      res.status(409).json({ error: 'Task with this id already exists' });
+    } else {
+      throw err;
+    }
+  }
+});
+
+// PUT /api/tasks/reorder
+router.put('/reorder', (req: Request, res: Response) => {
+  const { tasks } = req.body;
+
+  if (!Array.isArray(tasks)) {
+    res.status(400).json({ error: 'tasks array is required, each with id and sort_order' });
+    return;
+  }
+
+  const db = getDb();
+  const now = new Date().toISOString();
+  const stmt = db.prepare('UPDATE tasks SET sort_order = ?, updated_at = ? WHERE id = ?');
+
+  const updateMany = db.transaction((items: Array<{ id: string; sort_order: number }>) => {
+    for (const item of items) {
+      stmt.run(item.sort_order, now, item.id);
+    }
+  });
+
+  updateMany(tasks);
+  res.json({ success: true, updated: tasks.length });
+});
+
+// PUT /api/tasks/:id
+router.put('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+  const updates = req.body;
+
+  const db = getDb();
+  const existing = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+
+  if (!existing) {
+    res.status(404).json({ error: 'Task not found' });
+    return;
+  }
+
+  const allowedFields = [
+    'title', 'duration_minutes', 'fixed_start_time', 'completed',
+    'important', 'is_break', 'tag', 'details', 'recurrence_pattern',
+    'recurrence_source_id', 'sort_order', 'date'
+  ];
+
+  const setClauses: string[] = [];
+  const values: any[] = [];
+
+  for (const field of allowedFields) {
+    if (updates[field] !== undefined) {
+      let value = updates[field];
+      // Normalise booleans to 0/1 for SQLite
+      if (field === 'completed' || field === 'important' || field === 'is_break') {
+        value = value ? 1 : 0;
+      }
+      setClauses.push(`${field} = ?`);
+      values.push(value);
+    }
+  }
+
+  if (setClauses.length === 0) {
+    res.status(400).json({ error: 'No valid fields to update' });
+    return;
+  }
+
+  const now = updates.updated_at || new Date().toISOString();
+  setClauses.push('updated_at = ?');
+  values.push(now);
+  values.push(id);
+
+  db.prepare(`UPDATE tasks SET ${setClauses.join(', ')} WHERE id = ?`).run(...values);
+
+  const task = db.prepare('SELECT * FROM tasks WHERE id = ?').get(id);
+  res.json(task);
+});
+
+// DELETE /api/tasks/recurring/:sourceId?mode=single|all|future
+router.delete('/recurring/:sourceId', (req: Request, res: Response) => {
+  const { sourceId } = req.params;
+  const { mode, task_id, from } = req.query;
+
+  const db = getDb();
+
+  if (mode === 'single' && typeof task_id === 'string') {
+    const result = db.prepare('DELETE FROM tasks WHERE id = ?').run(task_id);
+    res.json({ success: true, deletedCount: result.changes });
+    return;
+  }
+
+  if (mode === 'all') {
+    const deleteAll = db.transaction(() => {
+      const r1 = db.prepare('DELETE FROM tasks WHERE id = ?').run(sourceId);
+      const r2 = db.prepare('DELETE FROM tasks WHERE recurrence_source_id = ?').run(sourceId);
+      return r1.changes + r2.changes;
+    });
+    const deletedCount = deleteAll();
+    res.json({ success: true, deletedCount });
+    return;
+  }
+
+  if (mode === 'future' && typeof from === 'string') {
+    const deleteFuture = db.transaction(() => {
+      const r1 = db.prepare('DELETE FROM tasks WHERE recurrence_source_id = ? AND date >= ?').run(sourceId, from);
+      const r2 = db.prepare('DELETE FROM tasks WHERE id = ? AND date >= ?').run(sourceId, from);
+      return r1.changes + r2.changes;
+    });
+    const deletedCount = deleteFuture();
+    res.json({ success: true, deletedCount });
+    return;
+  }
+
+  res.status(400).json({ error: 'Invalid mode. Use mode=single&task_id=ID, mode=all, or mode=future&from=YYYY-MM-DD' });
+});
+
+// DELETE /api/tasks/:id
+router.delete('/:id', (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const db = getDb();
+  const result = db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
+
+  if (result.changes === 0) {
+    res.status(404).json({ error: 'Task not found' });
+    return;
+  }
+
+  res.json({ success: true, deleted: id });
+});
+
+export default router;

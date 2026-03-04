@@ -1,0 +1,262 @@
+/* PomodoroTimer — Pomodoro timer for ChronoTasker */
+
+/* ============================================================
+   Theme aliases (from global tokens in index.css)
+   + static Pomodoro phase colours (theme-invariant)
+   ============================================================ */
+.pomodoro-timer {
+  /* Theme-responsive (inherit from global tokens) */
+  --pomo-ring-bg: var(--color-border);
+  --pomo-text: var(--color-text);
+  --pomo-text-secondary: var(--color-text-secondary);
+  --pomo-btn-secondary-bg: var(--color-input-bg);
+  --pomo-btn-secondary-text: var(--color-text-secondary);
+  --pomo-btn-secondary-hover: var(--color-btn-hover-bg);
+
+  /* Phase colours (same in light and dark) */
+  --pomo-work: #5E81AC;
+  --pomo-work-hover: #81A1C1;
+  --pomo-short-break: #A3BE8C;
+  --pomo-short-break-hover: #8DAF78;
+  --pomo-long-break: #B48EAD;
+  --pomo-long-break-hover: #A07A9A;
+  --pomo-dot-border: #81A1C1;
+  --pomo-dot-filled: #81A1C1;
+}
+
+/* ============================================================
+   Container
+   ============================================================ */
+.pomodoro-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+}
+
+/* -- Progress ring -- */
+
+.pomodoro-timer__ring-container {
+  position: relative;
+  width: 220px;
+  height: 220px;
+}
+
+.pomodoro-timer__ring-svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.pomodoro-timer__ring-bg {
+  fill: none;
+  stroke: var(--pomo-ring-bg);
+  stroke-width: 8;
+}
+
+.pomodoro-timer__ring-progress {
+  fill: none;
+  stroke-width: 8;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s linear, stroke 0.4s ease;
+}
+
+.pomodoro-timer__ring-progress--work {
+  stroke: var(--pomo-work);
+}
+
+.pomodoro-timer__ring-progress--shortBreak {
+  stroke: var(--pomo-short-break);
+}
+
+.pomodoro-timer__ring-progress--longBreak {
+  stroke: var(--pomo-long-break);
+}
+
+/* -- Centre content (overlaid on the SVG) -- */
+
+.pomodoro-timer__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.pomodoro-timer__phase-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+  transition: color 0.4s ease;
+}
+
+.pomodoro-timer__phase-label--work {
+  color: var(--pomo-work);
+}
+
+.pomodoro-timer__phase-label--shortBreak {
+  color: var(--pomo-short-break);
+}
+
+.pomodoro-timer__phase-label--longBreak {
+  color: var(--pomo-long-break);
+}
+
+.pomodoro-timer__time {
+  font-size: 3rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--pomo-text);
+}
+
+.pomodoro-timer__task-title {
+  margin-top: 0.35rem;
+  font-size: 0.75rem;
+  color: var(--pomo-text-secondary);
+  max-width: 160px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* -- Pomodoro count dots -- */
+
+.pomodoro-timer__dots {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pomodoro-timer__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--pomo-dot-border);
+  background: transparent;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.pomodoro-timer__dot--filled {
+  background: var(--pomo-dot-filled);
+}
+
+/* -- Controls -- */
+
+.pomodoro-timer__controls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.pomodoro-timer__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.55rem 1.2rem;
+  transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+  line-height: 1;
+}
+
+.pomodoro-timer__btn:active {
+  transform: scale(0.96);
+}
+
+.pomodoro-timer__btn:focus-visible {
+  outline: 2px solid var(--pomo-work);
+  outline-offset: 2px;
+}
+
+.pomodoro-timer__btn--primary {
+  color: var(--color-submit-text, #ECEFF4);
+  min-width: 100px;
+}
+
+.pomodoro-timer__btn--primary--work {
+  background: var(--pomo-work);
+}
+
+.pomodoro-timer__btn--primary--work:hover {
+  background: var(--pomo-work-hover);
+}
+
+.pomodoro-timer__btn--primary--shortBreak {
+  background: var(--pomo-short-break);
+}
+
+.pomodoro-timer__btn--primary--shortBreak:hover {
+  background: var(--pomo-short-break-hover);
+}
+
+.pomodoro-timer__btn--primary--longBreak {
+  background: var(--pomo-long-break);
+}
+
+.pomodoro-timer__btn--primary--longBreak:hover {
+  background: var(--pomo-long-break-hover);
+}
+
+.pomodoro-timer__btn--secondary {
+  background: var(--pomo-btn-secondary-bg);
+  color: var(--pomo-btn-secondary-text);
+}
+
+.pomodoro-timer__btn--secondary:hover {
+  background: var(--pomo-btn-secondary-hover);
+}
+
+.pomodoro-timer__btn--secondary:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* -- Responsive -- */
+
+@media (max-width: 360px) {
+  .pomodoro-timer__ring-container {
+    width: 180px;
+    height: 180px;
+  }
+
+  .pomodoro-timer__time {
+    font-size: 2.4rem;
+  }
+
+  .pomodoro-timer__phase-label {
+    font-size: 0.7rem;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 479px) {
+  .pomodoro-timer__ring-container {
+    width: 200px;
+    height: 200px;
+  }
+
+  .pomodoro-timer__time {
+    font-size: 2.75rem;
+  }
+}
+
+@media (min-width: 600px) {
+  .pomodoro-timer__ring-container {
+    width: 260px;
+    height: 260px;
+  }
+
+  .pomodoro-timer__time {
+    font-size: 3.5rem;
+  }
+}

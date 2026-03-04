@@ -1,0 +1,9 @@
+CLAUDE.local.md
+HANDOFF.md
+.claude/settings.local.json
+.DS_Store
+node_modules/
+dist/
+.env
+.env.production
+*.db
