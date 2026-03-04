@@ -83,9 +83,9 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
     }
   }, [editingTask]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Focus title input on mount and when switching to edit mode
+  // Focus title input when switching to edit mode (not on initial mount)
   useEffect(() => {
-    titleInputRef.current?.focus();
+    if (editingTask) titleInputRef.current?.focus();
   }, [editingTask]);
 
   function resetForm() {

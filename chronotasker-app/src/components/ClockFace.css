@@ -309,7 +309,7 @@ g:focus-visible .clock-face__calendar-arc {
   }
 }
 
-@media (max-width: 480px) {
+@media (max-width: 767px) {
   .clock-face {
     max-width: 100%;
   }

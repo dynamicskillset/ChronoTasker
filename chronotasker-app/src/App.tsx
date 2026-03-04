@@ -677,7 +677,7 @@ function App() {
       </Suspense>
 
       {showSettings && (
-        <div className="settings-panel-wrapper">
+        <div className={`settings-panel-wrapper${settings.advancedMode ? '' : ' settings-panel-wrapper--simple'}`}>
         <div id="settings-panel" className="settings-panel" role="region" aria-label="Settings" onKeyDown={e => { if (e.key === 'Escape') setShowSettings(false); }}>
           <div className="settings-panel__header">
             <h2 className="settings-panel__title">Settings</h2>

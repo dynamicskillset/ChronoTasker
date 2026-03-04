@@ -90,6 +90,17 @@
   grid-template-columns: minmax(340px, 1fr) minmax(480px, 1.4fr);
   gap: 2rem;
   margin-bottom: 1rem;
+  overflow-anchor: none;
+}
+
+.settings-panel-wrapper--simple {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.settings-panel-wrapper--simple .settings-panel {
+  width: 100%;
+  max-width: 380px;
 }
 
 .settings-panel {
@@ -1001,8 +1012,6 @@
 
   .clock-section {
     position: static;
-    max-width: 400px;
-    margin: 0 auto;
   }
 
   .current-date {
