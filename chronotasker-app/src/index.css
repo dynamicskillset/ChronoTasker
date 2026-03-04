@@ -1,6 +1,7 @@
 :root {
   --color-bg: #ECEFF4;
   --color-surface: #E5E9F0;
+  --color-surface-elevated: var(--color-surface);
   --color-text: #2E3440;
   --color-text-secondary: #4C566A;
   --color-border: #D8DEE9;
@@ -15,6 +16,25 @@
   --color-task-hue-base: 200;
   --color-task-saturation: 62%;
   --color-task-lightness: 68%;
+
+  /* Spacing scale */
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.5rem;
+  --space-2xl: 2rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12), 0 2px 6px rgba(0, 0, 0, 0.06);
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s var(--ease-out);
+  --transition-normal: 0.2s var(--ease-out);
+  --transition-slow: 0.3s var(--ease-out);
 
   /* Shared component tokens */
   --color-hover-bg: #E5E9F0;
@@ -55,14 +75,19 @@
   :root {
     --color-bg: #2E3440;
     --color-surface: #3B4252;
+    --color-surface-elevated: #434C5E;
     --color-text: #ECEFF4;
     --color-text-secondary: #D8DEE9;
-    --color-border: #4C566A;
+    --color-border: #5E6A82;
     --color-accent: #88C0D0;
     --color-accent-light: #3B4252;
     --color-task-important: hsl(0, 65%, 58%);
     --color-task-saturation: 55%;
     --color-task-lightness: 62%;
+
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.12);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
 
     --color-hover-bg: #434C5E;
     --color-active-bg: #434C5E;
@@ -91,14 +116,19 @@
 .dark {
   --color-bg: #2E3440;
   --color-surface: #3B4252;
+  --color-surface-elevated: #434C5E;
   --color-text: #ECEFF4;
   --color-text-secondary: #D8DEE9;
-  --color-border: #4C566A;
+  --color-border: #5E6A82;
   --color-accent: #88C0D0;
   --color-accent-light: #3B4252;
   --color-task-important: hsl(0, 65%, 58%);
   --color-task-saturation: 55%;
   --color-task-lightness: 62%;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2), 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.25), 0 1px 3px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.2);
 
   --color-hover-bg: #434C5E;
   --color-active-bg: #434C5E;
@@ -174,20 +204,19 @@ body {
 
 button {
   border-radius: 6px;
-  border: 1px solid var(--color-border);
+  border: none;
   padding: 0.5em 1em;
   font-size: 0.875rem;
   font-weight: 500;
   font-family: inherit;
-  background-color: var(--color-surface);
+  background-color: transparent;
   color: var(--color-text);
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all var(--transition-normal);
 }
 
 button:hover {
-  border-color: var(--color-accent);
-  background-color: var(--color-accent-light);
+  background-color: var(--color-btn-hover-bg);
 }
 
 button:focus-visible {
@@ -201,13 +230,13 @@ button:active {
 
 input, select {
   border-radius: 6px;
-  border: 1px solid var(--color-border);
+  border: 1px solid color-mix(in srgb, var(--color-border) 80%, transparent);
   padding: 0.5em 0.75em;
   font-size: 0.875rem;
   font-family: inherit;
   background-color: var(--color-surface);
   color: var(--color-text);
-  transition: border-color 0.15s ease;
+  transition: border-color var(--transition-normal);
 }
 
 input:focus, select:focus {

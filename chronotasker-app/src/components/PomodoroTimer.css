@@ -88,12 +88,12 @@
 }
 
 .pomodoro-timer__phase-label {
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   margin-bottom: 0.25rem;
-  transition: color 0.4s ease;
+  transition: color var(--transition-slow);
 }
 
 .pomodoro-timer__phase-label--work {
@@ -141,7 +141,7 @@
   border-radius: 50%;
   border: 2px solid var(--pomo-dot-border);
   background: transparent;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  transition: background var(--transition-slow), border-color var(--transition-slow);
 }
 
 .pomodoro-timer__dot--filled {
@@ -166,7 +166,7 @@
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.55rem 1.2rem;
-  transition: background 0.2s ease, transform 0.1s ease, opacity 0.2s ease;
+  transition: background var(--transition-normal), transform 0.1s ease, opacity var(--transition-normal);
   line-height: 1;
 }
 

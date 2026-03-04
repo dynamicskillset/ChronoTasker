@@ -602,10 +602,10 @@ function CenterDisplay({
         r={INNER_R - 4}
         className="clock-face__center-disc"
       />
-      <text x={CX} y={CY - 10} className="clock-face__center-date">
+      <text x={CX} y={CY - 12} className="clock-face__center-date">
         {dateStr}
       </text>
-      <text x={CX} y={CY + 14} className="clock-face__center-time">
+      <text x={CX} y={CY + 16} className="clock-face__center-time">
         {timeStr}
       </text>
     </g>

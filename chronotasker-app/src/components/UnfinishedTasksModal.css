@@ -20,14 +20,13 @@
 
 .unfinished-modal {
   background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  border-radius: 16px;
   width: 90vw;
   max-width: 440px;
   max-height: 80vh;
   display: flex;
   flex-direction: column;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 1px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
   animation: unfinished-modal-in 0.25s ease;
 }
 
@@ -48,12 +47,12 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-border) 50%, transparent);
   flex-shrink: 0;
 }
 
 .unfinished-modal__title {
-  font-size: 1rem;
+  font-size: 1.125rem;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
@@ -70,7 +69,7 @@
   color: var(--color-text-secondary);
   cursor: pointer;
   border-radius: 6px;
-  transition: color 0.15s ease, background-color 0.15s ease;
+  transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .unfinished-modal__close:hover {
@@ -99,7 +98,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.625rem 1.25rem;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
 }
 
 .unfinished-modal__item:last-child {
@@ -157,7 +156,7 @@
   font-size: 0.7rem;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -211,7 +210,7 @@
   display: flex;
   gap: 0.5rem;
   padding: 1rem 1.25rem;
-  border-top: 1px solid var(--color-border);
+  box-shadow: 0 -1px 0 color-mix(in srgb, var(--color-border) 50%, transparent);
   flex-shrink: 0;
   flex-wrap: wrap;
 }
@@ -225,7 +224,7 @@
   font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s ease;
+  transition: opacity var(--transition-fast);
   white-space: nowrap;
 }
 
@@ -252,7 +251,7 @@
 @media (max-width: 480px) {
   .unfinished-modal {
     width: 95vw;
-    border-radius: 10px;
+    border-radius: 12px;
   }
 
   .unfinished-modal__item {

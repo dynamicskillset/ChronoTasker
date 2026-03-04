@@ -5,7 +5,8 @@
   align-items: center;
   gap: 0.375rem;
   padding: 0.5rem 0.75rem;
-  border: 1px dashed var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 50%, transparent);
+  border: none;
   border-radius: 8px;
   flex-wrap: wrap;
 }
@@ -35,7 +36,7 @@
   border: 1px solid transparent;
   border-radius: 999px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .break-form__pill:hover {
@@ -78,10 +79,10 @@
   font-family: inherit;
   color: var(--color-text-secondary);
   background: transparent;
-  border: 1px solid var(--color-border);
+  border: none;
   border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease;
+  transition: background-color var(--transition-normal), color var(--transition-normal);
 }
 
 .break-form__add:hover {
