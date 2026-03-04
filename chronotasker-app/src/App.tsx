@@ -690,7 +690,7 @@ function App() {
             Use 24-hour time
           </label>
           <label>
-            Colour scheme:
+            Highlight colour:
             <select value={settings.colorScheme || 'nord'} onChange={e => {
               const s = { ...settings, colorScheme: e.target.value as AppSettings['colorScheme'] };
               setSettings(s); debouncedPushSettings(s);
