@@ -8,15 +8,62 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: root
+          node-version: 22
+          cache: npm
+          cache-dependency-path: chronotasker-app/package-lock.json
+
+      - name: Build frontend
+        env:
+          VITE_API_TOKEN: ${{ secrets.VITE_API_TOKEN }}
+        run: |
+          cd chronotasker-app
+          npm ci
+          npm run build
+
+      - name: Install SSH key
+        uses: shimataro/ssh-key-action@v2
+        with:
           key: ${{ secrets.VPS_SSH_KEY }}
-          command_timeout: 30m
-          script: |
-            set -e
-            cd /opt/chronotasker/repo
-            export VITE_API_TOKEN="${{ secrets.VITE_API_TOKEN }}"
-            bash deploy/deploy.sh
+          known_hosts: unnecessary
+          config: |
+            Host vps
+              HostName ${{ secrets.VPS_HOST }}
+              User root
+              StrictHostKeyChecking no
+
+      - name: Deploy frontend to VPS
+        run: |
+          rsync -az --delete chronotasker-app/dist/ vps:/opt/chronotasker/frontend/
+          ssh vps 'cp -r /opt/chronotasker/frontend/* /opt/ghost/sites/chronotasker/'
+
+      - name: Build server and restart on VPS
+        run: |
+          ssh vps 'bash -s' <<'SCRIPT'
+          set -e
+          cd /opt/chronotasker/repo
+          git fetch origin main
+          git reset --hard origin/main
+
+          # Build server
+          cd /opt/chronotasker/repo/server
+          npm install
+          npm run build
+
+          # Deploy server
+          rsync -a --delete /opt/chronotasker/repo/server/dist/ /opt/chronotasker/server/dist/
+          cp /opt/chronotasker/repo/server/package.json /opt/chronotasker/server/package.json
+          cp /opt/chronotasker/repo/server/package-lock.json /opt/chronotasker/server/package-lock.json 2>/dev/null || true
+          cd /opt/chronotasker/server
+          npm install --production
+
+          # Restart
+          pm2 restart chronotasker
+          pm2 save
+          echo "=== Deploy complete ==="
+          SCRIPT
