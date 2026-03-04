@@ -34,6 +34,7 @@ function App() {
   const [showTimer, setShowTimer] = useState(false);
   const [showForm, setShowForm] = useState(true);
   const [showTaskList, setShowTaskList] = useState(true);
+  const [clockColorMap, setClockColorMap] = useState<Map<string, string>>(new Map());
   const [backlogTasks, setBacklogTasks] = useState<Task[]>([]);
   const [showBacklog, setShowBacklog] = useState(false);
   const [recurringDeleteTask, setRecurringDeleteTask] = useState<Task | null>(null);
@@ -660,6 +661,14 @@ function App() {
 
           {/* Pomodoro section */}
           <h3 className="settings-panel__section-heading">Pomodoro</h3>
+          <label className="checkbox-label">
+            <input type="checkbox" checked={settings.showPomodoroTimer}
+              onChange={e => {
+                const s = { ...settings, showPomodoroTimer: e.target.checked };
+                setSettings(s); debouncedPushSettings(s);
+              }} />
+            Show Pomodoro Timer
+          </label>
           <label>
             Work duration (min):
             <input type="number" value={settings.workDuration} min={1} max={120}
@@ -798,6 +807,7 @@ function App() {
             activeTaskId={activeTaskId}
             pomodoroState={pomodoroState}
             onTaskClick={setActiveTaskId}
+            onSlotsResolved={setClockColorMap}
           />
           {calendarEvents.length > 0 && (
             <div className="calendar-events">
@@ -826,8 +836,8 @@ function App() {
         </section>
 
         <section className="sidebar">
-          {/* Collapsible Pomodoro Timer (advanced mode only) */}
-          {settings.advancedMode && (
+          {/* Collapsible Pomodoro Timer */}
+          {settings.showPomodoroTimer && (
             <div className="collapsible-section">
               <button
                 className="collapsible-section__header"
@@ -945,6 +955,7 @@ function App() {
                 <div className="collapsible-section__body collapsible-section__body--flush">
                   <TaskList
                     tasks={tasksWithScheduleInfo}
+                    colorMap={clockColorMap}
                     activeTaskId={activeTaskId}
                     onToggleComplete={handleToggleComplete}
                     onToggleImportant={handleToggleImportant}
@@ -963,6 +974,7 @@ function App() {
             <div className="sidebar-section sidebar-section--flush">
               <TaskList
                 tasks={tasksWithScheduleInfo}
+                colorMap={clockColorMap}
                 activeTaskId={activeTaskId}
                 onToggleComplete={handleToggleComplete}
                 onToggleImportant={handleToggleImportant}

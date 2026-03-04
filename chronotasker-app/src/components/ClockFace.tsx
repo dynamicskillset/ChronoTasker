@@ -20,6 +20,7 @@ interface ClockFaceProps {
   activeTaskId: string | null;
   pomodoroState: PomodoroState | null;
   onTaskClick: (taskId: string) => void;
+  onSlotsResolved?: (colorMap: Map<string, string>) => void;
 }
 
 /* ---- Constants ---- */
@@ -626,6 +627,7 @@ const ClockFace: React.FC<ClockFaceProps> = ({
   activeTaskId,
   pomodoroState,
   onTaskClick,
+  onSlotsResolved,
 }) => {
   // Only recalculate when minute changes (not every second)
   const currentMinuteKey = `${currentTime.getHours()}:${currentTime.getMinutes()}`;
@@ -634,6 +636,23 @@ const ClockFace: React.FC<ClockFaceProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tasks, dayStartHour, dayEndHour, currentMinuteKey, autoAdvance, calendarEvents, meetingBufferMinutes, isToday],
   );
+
+  // Emit colour map to parent so TaskList can use the same colours
+  const onSlotsResolvedRef = React.useRef(onSlotsResolved);
+  onSlotsResolvedRef.current = onSlotsResolved;
+  React.useEffect(() => {
+    if (!onSlotsResolvedRef.current) return;
+    const colorMap = new Map<string, string>();
+    for (const slot of slots) {
+      const { task, index } = slot;
+      if (task.isBreak) continue;
+      const color = task.important
+        ? 'var(--color-task-important, hsl(0, 72%, 62%))'
+        : taskColor(index, slots.length, task.tag);
+      colorMap.set(task.id, color);
+    }
+    onSlotsResolvedRef.current(colorMap);
+  }, [slots]);
   const activePomodoroTaskId =
     pomodoroState?.isRunning && pomodoroState.type === 'work'
       ? pomodoroState.currentTaskId

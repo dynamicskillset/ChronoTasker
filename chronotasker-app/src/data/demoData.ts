@@ -184,6 +184,7 @@ export function getDemoSettings(): AppSettings {
     meetingBufferMinutes: 15,
     enableRecurringTasks: true,
     enableBacklog: true,
+    showPomodoroTimer: true,
     advancedMode: true,
   };
 }

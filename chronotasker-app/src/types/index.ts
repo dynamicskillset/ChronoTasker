@@ -62,6 +62,7 @@ export interface AppSettings {
   meetingBufferMinutes: number; // gap after calendar events, default 15
   enableRecurringTasks: boolean;
   enableBacklog: boolean;
+  showPomodoroTimer: boolean;
   advancedMode: boolean;
 }
 
@@ -78,5 +79,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   meetingBufferMinutes: 15,
   enableRecurringTasks: false,
   enableBacklog: false,
+  showPomodoroTimer: false,
   advancedMode: false,
 };

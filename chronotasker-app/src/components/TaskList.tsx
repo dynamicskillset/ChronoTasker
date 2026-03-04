@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef, useMemo, memo, type ReactNode } from 'react';
+import { useState, useEffect, useCallback, useRef, memo, type ReactNode } from 'react';
 import type { Task } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
@@ -6,6 +6,7 @@ import './TaskList.css';
 
 interface TaskListProps {
   tasks: ScheduledTask[];
+  colorMap?: Map<string, string>;
   activeTaskId: string | null;
   onToggleComplete: (taskId: string) => void;
   onToggleImportant: (taskId: string) => void;
@@ -42,18 +43,6 @@ export function tagBgColor(tag: string): string {
   return `hsl(${tagHue(tag)}, 55%, 92%)`;
 }
 
-/**
- * Clock-face arc colour for a task.
- * Must match ClockFace's taskColor logic exactly:
- *   tagged → deterministic hue from tag
- *   untagged → evenly distributed hue based on position in time order
- */
-function taskArcColor(index: number, total: number, tag?: string): string {
-  const hue = tag
-    ? tagHue(tag)
-    : (index * (360 / Math.max(total, 1)) + 200) % 360;
-  return `hsl(${hue}, var(--color-task-saturation, 62%), var(--color-task-lightness, 68%))`;
-}
 
 /** Lightweight markdown: bold, italic, code, [links](url), bare URLs */
 function renderInline(text: string): ReactNode[] {
@@ -423,6 +412,7 @@ const TaskItem = memo(function TaskItem({
 
 export default function TaskList({
   tasks,
+  colorMap,
   activeTaskId,
   onToggleComplete,
   onToggleImportant,
@@ -463,35 +453,16 @@ export default function TaskList({
     };
   }, [reschedulingTaskId, dismissReschedule]);
 
-  // Sort: incomplete tasks by sortOrder first, completed tasks at the bottom
+  // Sort: incomplete tasks by scheduledStart (matches clock face order), completed at bottom
   const sortedTasks = [...tasks].sort((a, b) => {
     if (a.completed !== b.completed) return a.completed ? 1 : -1;
-    return a.sortOrder - b.sortOrder;
+    return a.scheduledStart - b.scheduledStart;
   });
 
   const incompleteTasks = sortedTasks.filter((t) => !t.completed);
   const unfinishedCount = sortedTasks.filter((t) => !t.completed && !t.isBreak).length;
-  const importantTasks = sortedTasks.filter((t) => t.important && !t.completed);
-  const regularTasks = sortedTasks.filter((t) => !t.important || t.completed);
 
-  // Build a colour map matching the clock face's arc colours.
-  // The clock sorts incomplete tasks by scheduledStart and assigns index-based hues.
-  const arcColorMap = useMemo(() => {
-    const timeSorted = [...incompleteTasks].sort(
-      (a, b) => a.scheduledStart - b.scheduledStart,
-    );
-    const total = timeSorted.length;
-    const map = new Map<string, string>();
-    timeSorted.forEach((t, i) => {
-      if (t.isBreak) return; // breaks use hatch pattern on the clock
-      if (t.important) {
-        map.set(t.id, 'var(--color-task-important, hsl(0, 72%, 62%))');
-      } else {
-        map.set(t.id, taskArcColor(i, total, t.tag));
-      }
-    });
-    return map;
-  }, [incompleteTasks]);
+  // Colour map comes from ClockFace via prop (single source of truth)
 
   const handleDeleteClick = useCallback((taskId: string) => {
     // Recurring tasks skip two-click confirmation — the modal serves as confirmation
@@ -581,7 +552,7 @@ export default function TaskList({
     <TaskItem
       key={task.id}
       task={task}
-      arcColor={arcColorMap.get(task.id)}
+      arcColor={colorMap?.get(task.id)}
       isActive={task.id === activeTaskId}
       isFirst={!task.completed && task.id === incompleteTasks[0]?.id}
       isLast={!task.completed && task.id === incompleteTasks[incompleteTasks.length - 1]?.id}
@@ -609,24 +580,9 @@ export default function TaskList({
 
   return (
     <div className="task-list">
-      {importantTasks.length > 0 && (
-        <>
-          <h3 className="task-list__section-heading">Important</h3>
-          <ul className="task-list__items" role="list">
-            {importantTasks.map((task) => renderItem(task))}
-          </ul>
-        </>
-      )}
-      {regularTasks.length > 0 && (
-        <>
-          {importantTasks.length > 0 && (
-            <h3 className="task-list__section-heading">Tasks</h3>
-          )}
-          <ul className="task-list__items" role="list">
-            {regularTasks.map((task) => renderItem(task))}
-          </ul>
-        </>
-      )}
+      <ul className="task-list__items" role="list">
+        {sortedTasks.map((task) => renderItem(task))}
+      </ul>
       {onMoveAllToTomorrow && unfinishedCount > 0 && (
         <div className="task-list__batch-actions">
           <button
