@@ -19,8 +19,10 @@ interface ClockFaceProps {
   use24Hour: boolean;
   currentTime: Date;
   activeTaskId: string | null;
+  activeCalendarUid: string | null;
   pomodoroState: PomodoroState | null;
   onTaskClick: (taskId: string) => void;
+  onCalendarEventClick?: (uid: string) => void;
   onSlotsResolved?: (colorMap: Map<string, string>) => void;
 }
 
@@ -399,7 +401,7 @@ const TaskArc = React.memo(function TaskArc({
       ? 'var(--color-task-important, hsl(0, 72%, 62%))'
       : taskColor(index, totalTasks, task.tag);
 
-  const hasConflict = !!task.meetingConflict;
+  const hasConflict = !!task.meetingConflict && !task.isBreak;
 
   const classNames = [
     'clock-face__task-arc',
@@ -465,15 +467,19 @@ const WorkingDayArc = React.memo(function WorkingDayArc({
   );
 });
 
-/** A single calendar event arc (non-interactive, outer band) */
+/** A single calendar event arc */
 const CalendarArc = React.memo(function CalendarArc({
   event,
   meetingBufferMinutes,
   showBuffer,
+  isActive,
+  onCalendarEventClick,
 }: {
   event: CalendarEvent;
   meetingBufferMinutes: number;
   showBuffer: boolean;
+  isActive: boolean;
+  onCalendarEventClick?: (uid: string) => void;
 }) {
   if (event.allDay) return null; // skip all-day events on the clock
 
@@ -516,10 +522,25 @@ const CalendarArc = React.memo(function CalendarArc({
     );
   }
 
+  const arcClass = [
+    'clock-face__calendar-arc',
+    isActive && 'clock-face__calendar-arc--active',
+    onCalendarEventClick && 'clock-face__calendar-arc--clickable',
+  ].filter(Boolean).join(' ');
+
   return (
-    <g>
+    <g
+      onClick={onCalendarEventClick ? () => onCalendarEventClick(event.uid) : undefined}
+      onKeyDown={onCalendarEventClick ? (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onCalendarEventClick(event.uid); }
+      } : undefined}
+      role={onCalendarEventClick ? 'button' : undefined}
+      tabIndex={onCalendarEventClick ? 0 : undefined}
+      aria-label={onCalendarEventClick ? tooltip : undefined}
+      aria-pressed={onCalendarEventClick ? isActive : undefined}
+    >
       <title>{tooltip}</title>
-      <path d={d} className="clock-face__calendar-arc" />
+      <path d={d} className={arcClass} />
       {bufferArc}
     </g>
   );
@@ -619,8 +640,10 @@ const ClockFace: React.FC<ClockFaceProps> = ({
   use24Hour,
   currentTime,
   activeTaskId,
+  activeCalendarUid,
   pomodoroState,
   onTaskClick,
+  onCalendarEventClick,
   onSlotsResolved,
 }) => {
   // Only recalculate when minute changes (not every second)
@@ -698,6 +721,8 @@ const ClockFace: React.FC<ClockFaceProps> = ({
               event={event}
               meetingBufferMinutes={meetingBufferMinutes}
               showBuffer={!blockedByEvent && !blockedByBreak}
+              isActive={event.uid === activeCalendarUid}
+              onCalendarEventClick={onCalendarEventClick}
             />
           );
         })}

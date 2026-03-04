@@ -93,13 +93,15 @@
   background-color: var(--tl-hover-bg);
 }
 
-/* Active (linked to Pomodoro) */
+/* Active (linked to clock selection) */
 .task-list__item--active {
-  background-color: var(--tl-active-bg);
+  background: color-mix(in srgb, var(--task-color, var(--color-accent)) 15%, var(--tl-bg));
+  outline: 1px solid color-mix(in srgb, var(--task-color, var(--color-accent)) 40%, transparent);
+  outline-offset: -1px;
 }
 
 .task-list__item--active:hover {
-  background-color: var(--tl-active-bg);
+  background: color-mix(in srgb, var(--task-color, var(--color-accent)) 22%, var(--tl-bg));
 }
 
 /* Break */
@@ -294,20 +296,22 @@
   border: none;
   background: none;
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 1rem;
   color: var(--tl-text-muted);
   cursor: pointer;
-  border-radius: 4px;
+  border-radius: 6px;
   transition: color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .task-list__important-btn:hover {
   background-color: var(--tl-btn-hover-bg);
-  color: var(--tl-accent);
+  color: var(--color-warning);
 }
 
 .task-list__important-btn--active {
-  color: var(--tl-accent);
+  color: var(--color-warning);
+  background: color-mix(in srgb, var(--color-warning) 18%, transparent);
+  font-size: 1.15rem;
 }
 
 /* ============================================================

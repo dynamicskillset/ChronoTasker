@@ -1,5 +1,5 @@
 .app {
-  max-width: 1200px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 1.25rem;
   min-height: 100vh;
@@ -197,7 +197,7 @@
 
 .app-main {
   display: grid;
-  grid-template-columns: minmax(320px, 1fr) minmax(300px, 1.2fr);
+  grid-template-columns: minmax(320px, 400px) 1fr;
   gap: 2rem;
   align-items: start;
 }
@@ -208,6 +208,95 @@
   align-items: center;
   position: sticky;
   top: 1rem;
+}
+
+/* ============================================================
+   Day summary widget
+   ============================================================ */
+.day-summary {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 1.5rem;
+}
+
+.day-summary__heading {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.4rem;
+}
+
+.day-summary__bar {
+  display: flex;
+  height: 6px;
+  border-radius: 999px;
+  overflow: hidden;
+  gap: 2px;
+  margin-bottom: 0.5rem;
+}
+
+.day-summary__bar-segment {
+  border-radius: 999px;
+  min-width: 4px;
+}
+
+.day-summary__bar-segment--events { background: var(--color-calendar); }
+.day-summary__bar-segment--tasks  { background: var(--color-accent); }
+.day-summary__bar-segment--breaks { background: var(--color-border); }
+
+.day-summary__rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.day-summary__row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.day-summary__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.day-summary__dot--events { background: var(--color-calendar); }
+.day-summary__dot--tasks  { background: var(--color-accent); }
+.day-summary__dot--breaks { background: var(--color-border); }
+
+.day-summary__label {
+  flex: 1;
+  color: var(--color-text-secondary);
+}
+
+.day-summary__value {
+  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.75rem;
+  color: var(--color-text);
+}
+
+.day-summary__row--total {
+  border-top: 1px solid var(--color-border);
+  margin-top: 0.2rem;
+  padding-top: 0.2rem;
+}
+
+.day-summary__row--total .day-summary__label {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.day-summary__row--total .day-summary__value {
+  font-weight: 700;
 }
 
 /* Calendar event list below the clock */
@@ -264,6 +353,12 @@
 
 .calendar-events__summary {
   color: var(--color-text);
+}
+
+.calendar-events__item--active {
+  background: color-mix(in srgb, var(--color-calendar) 20%, var(--color-surface));
+  outline: 1px solid var(--color-calendar);
+  outline-offset: -1px;
 }
 
 .sidebar {
@@ -522,7 +617,7 @@
 /* Wide screens — give sidebar more room */
 @media (min-width: 1400px) {
   .app-main {
-    grid-template-columns: 1fr 1.5fr;
+    grid-template-columns: minmax(360px, 440px) 1fr;
   }
 }
 

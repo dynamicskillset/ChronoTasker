@@ -186,6 +186,7 @@ export function getDemoSettings(): AppSettings {
     enableRecurringTasks: true,
     enableBacklog: true,
     showPomodoroTimer: true,
+    showDaySummary: false,
     advancedMode: true,
   };
 }

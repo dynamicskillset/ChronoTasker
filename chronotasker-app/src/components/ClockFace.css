@@ -201,6 +201,28 @@ g:focus-visible .clock-face__task-arc {
   pointer-events: none;
   stroke: var(--clock-face-bg);
   stroke-width: 0.5;
+  transition: opacity var(--transition-normal);
+}
+
+.clock-face__calendar-arc--clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+g:has(.clock-face__calendar-arc--clickable):hover .clock-face__calendar-arc {
+  opacity: 1;
+}
+
+g:focus-visible .clock-face__calendar-arc {
+  opacity: 1;
+  stroke: var(--clock-text);
+  stroke-width: 2;
+}
+
+.clock-face__calendar-arc--active {
+  opacity: 1;
+  stroke: var(--clock-text);
+  stroke-width: 1.5;
 }
 
 /* ============================================================

@@ -10,6 +10,7 @@ import BacklogList from './components/BacklogList';
 import { usePomodoro } from './hooks/usePomodoro';
 import { useSync } from './hooks/useSync';
 import { scheduleTasks, type ScheduledTask } from './utils/scheduling';
+import { formatDuration } from './utils/format';
 import { todayString, tomorrowString, formatDate } from './utils/scheduling';
 import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
 import * as storage from './services/storage';
@@ -29,6 +30,13 @@ function App() {
   const [settings, setSettings] = useState<AppSettings>({ ...DEFAULT_SETTINGS });
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
+  const [activeCalendarUid, setActiveCalendarUid] = useState<string | null>(null);
+  const calendarListRef = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    if (!activeCalendarUid || !calendarListRef.current) return;
+    const el = calendarListRef.current.querySelector(`[data-event-uid="${activeCalendarUid}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [activeCalendarUid]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showSettings, setShowSettings] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
@@ -190,6 +198,31 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [tasks, settings.dayStartHour, settings.dayEndHour, currentMinuteKey, settings.autoAdvance, calendarEvents, settings.meetingBufferMinutes, isToday]
   );
+
+  const daySummary = useMemo(() => {
+    if (!settings.showDaySummary || !settings.advancedMode) return null;
+    const nonAllDayEvents = calendarEvents.filter(e => !e.allDay);
+    const eventMinutes = nonAllDayEvents.reduce((sum, e) => sum + (e.endMinutes - e.startMinutes), 0);
+    const taskMinutes = tasks
+      .filter(t => !t.isBreak)
+      .reduce((sum, t) => sum + t.durationMinutes, 0);
+    const explicitBreakMinutes = tasks
+      .filter(t => Boolean(t.isBreak))
+      .reduce((sum, t) => sum + t.durationMinutes, 0);
+    // Count non-suppressed meeting buffer periods as breaks (they appear as dedicated
+    // break arcs on the clock, distinct from event and task arcs)
+    const sortedEvents = [...nonAllDayEvents].sort((a, b) => a.startMinutes - b.startMinutes);
+    const bufferBreakMinutes = settings.meetingBufferMinutes > 0
+      ? sortedEvents.reduce((sum, event, i) => {
+          const bufferEnd = event.endMinutes + settings.meetingBufferMinutes;
+          if ((sortedEvents[i + 1]?.startMinutes ?? Infinity) < bufferEnd) return sum;
+          return sum + settings.meetingBufferMinutes;
+        }, 0)
+      : 0;
+    const breakMinutes = explicitBreakMinutes + bufferBreakMinutes;
+    const totalMinutes = eventMinutes + taskMinutes + breakMinutes;
+    return { eventMinutes, taskMinutes, breakMinutes, totalMinutes };
+  }, [settings.showDaySummary, settings.advancedMode, settings.meetingBufferMinutes, calendarEvents, tasks]);
 
   // Merge scheduling metadata (overflows, meetingConflict) into full task list for TaskList
   const tasksWithScheduleInfo: ScheduledTask[] = useMemo(() => {
@@ -572,7 +605,7 @@ function App() {
   const pomodoroState: PomodoroState = pomodoro.state;
 
   return (
-    <div className={`app ${settings.theme === 'dark' ? 'dark' : settings.theme === 'light' ? 'light' : ''}${settings.colorScheme && settings.colorScheme !== 'nord' ? ` scheme-${settings.colorScheme}` : ''}`}>
+    <div className={`app dark${settings.colorScheme && settings.colorScheme !== 'nord' ? ` scheme-${settings.colorScheme}` : ''}`}>
       <header className="app-header">
         <div className="app-title-group">
           <h1 className="app-title">
@@ -655,17 +688,6 @@ function App() {
                 setSettings(s); debouncedPushSettings(s);
               }} />
             Use 24-hour time
-          </label>
-          <label>
-            Theme:
-            <select value={settings.theme} onChange={e => {
-              const s = { ...settings, theme: e.target.value as AppSettings['theme'] };
-              setSettings(s); debouncedPushSettings(s);
-            }}>
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </select>
           </label>
           <label>
             Colour scheme:
@@ -783,6 +805,14 @@ function App() {
                   }} />
                 Backlog
               </label>
+              <label className="checkbox-label">
+                <input type="checkbox" checked={settings.showDaySummary}
+                  onChange={e => {
+                    const s = { ...settings, showDaySummary: e.target.checked };
+                    setSettings(s); debouncedPushSettings(s);
+                  }} />
+                Day time summary
+              </label>
             </>
           )}
 
@@ -826,14 +856,16 @@ function App() {
             use24Hour={settings.use24Hour}
             currentTime={currentTime}
             activeTaskId={activeTaskId}
+            activeCalendarUid={activeCalendarUid}
             pomodoroState={pomodoroState}
             onTaskClick={setActiveTaskId}
+            onCalendarEventClick={(uid) => setActiveCalendarUid(prev => prev === uid ? null : uid)}
             onSlotsResolved={setClockColorMap}
           />
           {calendarEvents.length > 0 && (
             <div className="calendar-events">
               <h3 className="calendar-events__heading">Calendar</h3>
-              <ul className="calendar-events__list">
+              <ul ref={calendarListRef} className="calendar-events__list">
                 {[...calendarEvents]
                   .sort((a, b) => a.startMinutes - b.startMinutes)
                   .map(event => {
@@ -845,12 +877,68 @@ function App() {
                       ? 'All day'
                       : `${String(startH).padStart(2, '0')}:${String(startM).padStart(2, '0')}–${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
                     return (
-                      <li key={event.uid} className="calendar-events__item">
+                      <li
+                        key={event.uid}
+                        data-event-uid={event.uid}
+                        className={`calendar-events__item${event.uid === activeCalendarUid ? ' calendar-events__item--active' : ''}`}
+                      >
                         <span className="calendar-events__time">{timeStr}</span>
                         <span className="calendar-events__summary">{event.summary}</span>
                       </li>
                     );
                   })}
+              </ul>
+            </div>
+          )}
+          {daySummary && (
+            <div className="day-summary">
+              <h3 className="day-summary__heading">Day breakdown</h3>
+              {daySummary.totalMinutes > 0 && (
+                <div className="day-summary__bar" aria-hidden="true">
+                  {daySummary.eventMinutes > 0 && (
+                    <div
+                      className="day-summary__bar-segment day-summary__bar-segment--events"
+                      style={{ flex: daySummary.eventMinutes }}
+                    />
+                  )}
+                  {daySummary.taskMinutes > 0 && (
+                    <div
+                      className="day-summary__bar-segment day-summary__bar-segment--tasks"
+                      style={{ flex: daySummary.taskMinutes }}
+                    />
+                  )}
+                  {daySummary.breakMinutes > 0 && (
+                    <div
+                      className="day-summary__bar-segment day-summary__bar-segment--breaks"
+                      style={{ flex: daySummary.breakMinutes }}
+                    />
+                  )}
+                </div>
+              )}
+              <ul className="day-summary__rows">
+                {daySummary.eventMinutes > 0 && (
+                  <li className="day-summary__row">
+                    <span className="day-summary__dot day-summary__dot--events" aria-hidden="true" />
+                    <span className="day-summary__label">Events</span>
+                    <span className="day-summary__value">{formatDuration(daySummary.eventMinutes)}</span>
+                  </li>
+                )}
+                <li className="day-summary__row">
+                  <span className="day-summary__dot day-summary__dot--tasks" aria-hidden="true" />
+                  <span className="day-summary__label">Tasks</span>
+                  <span className="day-summary__value">{formatDuration(daySummary.taskMinutes)}</span>
+                </li>
+                {daySummary.breakMinutes > 0 && (
+                  <li className="day-summary__row">
+                    <span className="day-summary__dot day-summary__dot--breaks" aria-hidden="true" />
+                    <span className="day-summary__label">Breaks</span>
+                    <span className="day-summary__value">{formatDuration(daySummary.breakMinutes)}</span>
+                  </li>
+                )}
+                <li className="day-summary__row day-summary__row--total">
+                  <span className="day-summary__label">Total</span>
+                  <span className="day-summary__value">{formatDuration(daySummary.totalMinutes)}</span>
+                </li>
               </ul>
             </div>
           )}

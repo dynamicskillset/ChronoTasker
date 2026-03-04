@@ -60,7 +60,8 @@ export function scheduleTasks(
     if (task.fixedStartTime) {
       const [h, m] = task.fixedStartTime.split(':').map(Number);
       const start = h * 60 + m;
-      const conflict = findMeetingConflict(start, task.durationMinutes, calendarEvents, meetingBufferMinutes);
+      // Breaks during a meeting buffer are intentional — don't flag as conflict
+      const conflict = task.isBreak ? null : findMeetingConflict(start, task.durationMinutes, calendarEvents, meetingBufferMinutes);
       fixedTasks.push({
         ...task,
         scheduledStart: start,

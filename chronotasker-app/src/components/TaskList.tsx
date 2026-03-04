@@ -150,6 +150,7 @@ const TaskItem = memo(function TaskItem({
 }: TaskItemProps) {
   return (
     <li
+      data-task-id={task.id}
       className={[
         'task-list__item',
         task.completed && 'task-list__item--completed',
@@ -226,7 +227,7 @@ const TaskItem = memo(function TaskItem({
               @ {task.fixedStartTime}
             </span>
           )}
-          {task.meetingConflict && (
+          {task.meetingConflict && !task.isBreak && (
             <span className="task-list__warning" title={`Overlaps: ${task.meetingConflict}`}>
               ⚠ Overlaps
             </span>
@@ -401,6 +402,15 @@ export default function TaskList({
   onRescheduleTask,
   onMoveAllToTomorrow,
 }: TaskListProps) {
+  const listRef = useRef<HTMLUListElement>(null);
+
+  // Scroll active task into view when selection changes
+  useEffect(() => {
+    if (!activeTaskId || !listRef.current) return;
+    const el = listRef.current.querySelector(`[data-task-id="${activeTaskId}"]`);
+    el?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [activeTaskId]);
+
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const confirmingDeleteRef = useRef<string | null>(null);
   const [reschedulingTaskId, setReschedulingTaskId] = useState<string | null>(null);
@@ -560,7 +570,7 @@ export default function TaskList({
 
   return (
     <div className="task-list">
-      <ul className="task-list__items" role="list">
+      <ul ref={listRef} className="task-list__items" role="list">
         {sortedTasks.map((task) => renderItem(task))}
       </ul>
       {onMoveAllToTomorrow && unfinishedCount > 0 && (

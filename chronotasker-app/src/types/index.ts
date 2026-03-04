@@ -64,6 +64,7 @@ export interface AppSettings {
   enableRecurringTasks: boolean;
   enableBacklog: boolean;
   showPomodoroTimer: boolean;
+  showDaySummary: boolean;
   advancedMode: boolean;
 }
 
@@ -82,5 +83,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   enableRecurringTasks: false,
   enableBacklog: false,
   showPomodoroTimer: false,
+  showDaySummary: false,
   advancedMode: false,
 };
