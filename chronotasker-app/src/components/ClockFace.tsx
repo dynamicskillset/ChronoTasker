@@ -469,9 +469,11 @@ const WorkingDayArc = React.memo(function WorkingDayArc({
 const CalendarArc = React.memo(function CalendarArc({
   event,
   meetingBufferMinutes,
+  showBuffer,
 }: {
   event: CalendarEvent;
   meetingBufferMinutes: number;
+  showBuffer: boolean;
 }) {
   if (event.allDay) return null; // skip all-day events on the clock
 
@@ -495,7 +497,7 @@ const CalendarArc = React.memo(function CalendarArc({
 
   // Buffer arc after the event
   let bufferArc: React.ReactElement | null = null;
-  if (meetingBufferMinutes > 0) {
+  if (meetingBufferMinutes > 0 && showBuffer) {
     const bufferEndMinutes = event.endMinutes + meetingBufferMinutes;
     const bufferEndHour = Math.floor(bufferEndMinutes / 60);
     const bufferEndMinute = bufferEndMinutes % 60;
@@ -678,9 +680,27 @@ const ClockFace: React.FC<ClockFaceProps> = ({
         <HourMarkers />
 
         {/* Calendar event arcs (inside the ring, behind task arcs) */}
-        {calendarEvents.map((event) => (
-          <CalendarArc key={event.uid} event={event} meetingBufferMinutes={meetingBufferMinutes} />
-        ))}
+        {calendarEvents.map((event) => {
+          // Suppress buffer if another event or a scheduled break already covers the buffer window
+          const bufferEnd = event.endMinutes + meetingBufferMinutes;
+          const blockedByEvent = calendarEvents.some(
+            (other) => !other.allDay && other !== event && other.startMinutes < bufferEnd && other.startMinutes >= event.endMinutes,
+          );
+          const blockedByBreak = slots.some((slot) => {
+            if (!slot.task.isBreak) return false;
+            const slotStart = slot.startHour * 60 + slot.startMinute;
+            const slotEnd = slot.endHour * 60 + slot.endMinute;
+            return slotStart < bufferEnd && slotEnd > event.endMinutes;
+          });
+          return (
+            <CalendarArc
+              key={event.uid}
+              event={event}
+              meetingBufferMinutes={meetingBufferMinutes}
+              showBuffer={!blockedByEvent && !blockedByBreak}
+            />
+          );
+        })}
 
         {/* Task arcs (drawn on top of calendar arcs) */}
         {slots.map((slot) => (
