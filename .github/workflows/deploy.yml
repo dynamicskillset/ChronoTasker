@@ -16,36 +16,6 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             set -e
-
-            # Set up deploy key for GitHub access (first run only)
-            if [ ! -f /root/.ssh/chronotasker_deploy ]; then
-              cp /dev/stdin /root/.ssh/chronotasker_deploy <<'KEYEOF'
-            ${{ secrets.VPS_SSH_KEY }}
-            KEYEOF
-              chmod 600 /root/.ssh/chronotasker_deploy
-            fi
-
-            # Configure SSH to use deploy key for GitHub
-            if ! grep -q 'chronotasker' /root/.ssh/config 2>/dev/null; then
-              cat >> /root/.ssh/config <<'SSHEOF'
-
-            Host github-chronotasker
-              HostName github.com
-              User git
-              IdentityFile /root/.ssh/chronotasker_deploy
-              StrictHostKeyChecking no
-            SSHEOF
-              chmod 600 /root/.ssh/config
-            fi
-
-            # Clone repo if first run
-            if [ ! -d /opt/chronotasker/repo/.git ]; then
-              git clone git@github-chronotasker:${{ github.repository }}.git /opt/chronotasker/repo
-              cd /opt/chronotasker/repo
-              git remote set-url origin git@github-chronotasker:${{ github.repository }}.git
-            fi
-
-            # Run the deploy script
             cd /opt/chronotasker/repo
             export VITE_API_TOKEN="${{ secrets.VITE_API_TOKEN }}"
             bash deploy/deploy.sh
