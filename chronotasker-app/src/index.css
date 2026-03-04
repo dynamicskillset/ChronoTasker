@@ -35,6 +35,9 @@
   --color-checkbox-done: #A3BE8C;
   --color-muted: #D8DEE9;
   --color-completed-opacity: 0.5;
+  --tag-saturation: 55%;
+  --tag-text-lightness: 40%;
+  --tag-bg-lightness: 92%;
 
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   line-height: 1.5;
@@ -79,6 +82,9 @@
     --color-checkbox-done: #A3BE8C;
     --color-muted: #4C566A;
     --color-completed-opacity: 0.4;
+    --tag-saturation: 45%;
+    --tag-text-lightness: 70%;
+    --tag-bg-lightness: 22%;
   }
 }
 
@@ -112,6 +118,9 @@
   --color-checkbox-done: #A3BE8C;
   --color-muted: #4C566A;
   --color-completed-opacity: 0.4;
+  --tag-saturation: 45%;
+  --tag-text-lightness: 70%;
+  --tag-bg-lightness: 22%;
 }
 
 .light {
@@ -144,6 +153,9 @@
   --color-checkbox-done: #A3BE8C;
   --color-muted: #D8DEE9;
   --color-completed-opacity: 0.5;
+  --tag-saturation: 55%;
+  --tag-text-lightness: 40%;
+  --tag-bg-lightness: 92%;
 }
 
 * {
@@ -176,6 +188,11 @@ button {
 button:hover {
   border-color: var(--color-accent);
   background-color: var(--color-accent-light);
+}
+
+button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 button:active {

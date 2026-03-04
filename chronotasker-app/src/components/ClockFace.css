@@ -282,6 +282,12 @@ g:focus-visible .clock-face__task-arc {
 /* ============================================================
    Responsive adjustments
    ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .clock-face__task-arc--active {
+    animation: none;
+  }
+}
+
 @media (max-width: 480px) {
   .clock-face {
     max-width: 100%;

@@ -62,8 +62,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
   background: none;
@@ -129,7 +129,7 @@
   display: inline-block;
   flex-shrink: 0;
   padding: 0.0625rem 0.375rem;
-  font-size: 0.65rem;
+  font-size: 0.75rem;
   font-weight: 600;
   border-radius: 999px;
   line-height: 1.4;
@@ -138,7 +138,7 @@
 
 .unfinished-modal__item-duration {
   font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
@@ -253,11 +253,6 @@
   .unfinished-modal {
     width: 95vw;
     border-radius: 10px;
-  }
-
-  .unfinished-modal__close {
-    width: 44px;
-    height: 44px;
   }
 
   .unfinished-modal__item {

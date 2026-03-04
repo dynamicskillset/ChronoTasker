@@ -546,6 +546,12 @@
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .task-list__item--completed {
+    animation: none;
+  }
+}
+
 @media (max-width: 360px) {
   .task-list__meta {
     flex-direction: column;

@@ -179,7 +179,7 @@
 }
 
 .task-form__duration-unit {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   color: var(--tf-text-secondary);
   margin-left: -0.125rem;
 }

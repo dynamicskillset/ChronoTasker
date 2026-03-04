@@ -55,7 +55,17 @@ export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDele
     <div className="backlog-list">
       <ul className="backlog-list__items" role="list">
         {tasks.map((task) => (
-          <li key={task.id} className="backlog-list__item">
+          <li
+            key={task.id}
+            className="backlog-list__item"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                onEditTask(task);
+              }
+            }}
+          >
             <div className="backlog-list__content">
               <span className="backlog-list__title">
                 {task.title}

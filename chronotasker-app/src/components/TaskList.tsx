@@ -36,11 +36,11 @@ function tagHue(tag: string): number {
 }
 
 export function tagColor(tag: string): string {
-  return `hsl(${tagHue(tag)}, 55%, 55%)`;
+  return `hsl(${tagHue(tag)}, var(--tag-saturation, 55%), var(--tag-text-lightness, 40%))`;
 }
 
 export function tagBgColor(tag: string): string {
-  return `hsl(${tagHue(tag)}, 55%, 92%)`;
+  return `hsl(${tagHue(tag)}, var(--tag-saturation, 55%), var(--tag-bg-lightness, 92%))`;
 }
 
 

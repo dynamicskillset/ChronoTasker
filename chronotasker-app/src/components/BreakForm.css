@@ -26,6 +26,7 @@
 
 .break-form__pill {
   padding: 0.1875rem 0.5rem;
+  min-height: 36px;
   font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
@@ -71,6 +72,7 @@
 .break-form__add {
   margin-left: auto;
   padding: 0.25rem 0.625rem;
+  min-height: 36px;
   font-size: 0.78rem;
   font-weight: 600;
   font-family: inherit;

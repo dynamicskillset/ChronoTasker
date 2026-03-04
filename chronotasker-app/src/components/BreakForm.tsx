@@ -31,8 +31,8 @@ export default function BreakForm({ onSubmit, date }: BreakFormProps) {
 
   return (
     <form className="break-form" onSubmit={handleSubmit}>
-      <label className="break-form__label">Break
-      <div className="break-form__presets">
+      <span className="break-form__label">Break</span>
+      <div className="break-form__presets" role="group" aria-label="Break duration">
         {BREAK_PRESETS.map((m) => (
           <button
             key={m}
@@ -45,7 +45,6 @@ export default function BreakForm({ onSubmit, date }: BreakFormProps) {
           </button>
         ))}
       </div>
-      </label>
       <label className="break-form__time-label">
         <span className="visually-hidden">Break time (optional)</span>
         <input

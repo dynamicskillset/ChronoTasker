@@ -139,7 +139,7 @@
 
 .settings-panel__section-heading {
   grid-column: 1 / -1;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
