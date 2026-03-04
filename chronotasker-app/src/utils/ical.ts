@@ -22,19 +22,19 @@ export function parseIcalEvents(icsText: string, targetDate: string): CalendarEv
     const uid = props['UID'] || `event-${i}`;
     const summary = props['SUMMARY'] || 'Busy';
 
-    const dtstart = props['DTSTART'] || findPrefixedProp(block, 'DTSTART');
-    const dtend = props['DTEND'] || findPrefixedProp(block, 'DTEND');
+    const dtstartInfo = findPropertyWithTzid(block, 'DTSTART');
+    const dtendInfo = findPropertyWithTzid(block, 'DTEND');
 
-    if (!dtstart) continue;
+    if (!dtstartInfo) continue;
 
-    const start = parseIcalDate(dtstart);
+    const start = parseIcalDate(dtstartInfo.value, dtstartInfo.tzid);
     if (!start) continue;
 
-    const allDay = dtstart.length === 8; // YYYYMMDD format (no time)
+    const allDay = dtstartInfo.value.length === 8; // YYYYMMDD format (no time)
 
     let end: { date: string; minutes: number } | null = null;
-    if (dtend) {
-      end = parseIcalDate(dtend);
+    if (dtendInfo) {
+      end = parseIcalDate(dtendInfo.value, dtendInfo.tzid);
     }
 
     // Check if event overlaps the target date
@@ -74,15 +74,20 @@ function parseProperties(block: string): Record<string, string> {
   return props;
 }
 
-/** Find a property that may have parameters (e.g., DTSTART;TZID=Europe/London:20250101T090000) */
-function findPrefixedProp(block: string, prefix: string): string | null {
+/** Find a property and extract its value and optional TZID parameter */
+function findPropertyWithTzid(block: string, prefix: string): { value: string; tzid?: string } | null {
   const lines = block.split('\n');
   for (const line of lines) {
     if (line.startsWith(prefix)) {
       const colonIdx = line.indexOf(':');
-      if (colonIdx >= 0) {
-        return line.slice(colonIdx + 1).trim();
-      }
+      if (colonIdx < 0) continue;
+      const value = line.slice(colonIdx + 1).trim();
+      if (!value) continue;
+
+      // Extract TZID from parameters (e.g., DTSTART;TZID=Europe/London:...)
+      const paramStr = line.slice(prefix.length, colonIdx);
+      const tzidMatch = paramStr.match(/TZID=([^;:]+)/);
+      return { value, tzid: tzidMatch?.[1] };
     }
   }
   return null;
@@ -92,10 +97,11 @@ function findPrefixedProp(block: string, prefix: string): string | null {
  * Parse an iCal datetime value into a local date string and minutes from midnight.
  * Supports:
  *   - 20250301T140000Z (UTC)
- *   - 20250301T140000 (local/TZID — treated as local)
+ *   - 20250301T140000 with tzid (converted from that timezone to local)
+ *   - 20250301T140000 without tzid (treated as local)
  *   - 20250301 (all-day DATE)
  */
-function parseIcalDate(value: string): { date: string; minutes: number } | null {
+function parseIcalDate(value: string, tzid?: string): { date: string; minutes: number } | null {
   // All-day: YYYYMMDD
   if (/^\d{8}$/.test(value)) {
     const date = `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`;
@@ -112,18 +118,53 @@ function parseIcalDate(value: string): { date: string; minutes: number } | null 
   if (isUtc) {
     // Convert UTC to local time
     const utcDate = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
-    const localYear = utcDate.getFullYear();
-    const localMonth = String(utcDate.getMonth() + 1).padStart(2, '0');
-    const localDay = String(utcDate.getDate()).padStart(2, '0');
-    const localDateStr = `${localYear}-${localMonth}-${localDay}`;
-    const minutes = utcDate.getHours() * 60 + utcDate.getMinutes();
-    return { date: localDateStr, minutes };
+    return dateToLocal(utcDate);
   }
 
-  // Local time (or TZID — treat as local for now)
+  if (tzid) {
+    // Convert from the specified timezone to local time
+    const localDate = convertFromTzid(year, month, day, hour, minute, tzid);
+    if (localDate) return dateToLocal(localDate);
+    // Fall through to treat as local if TZID is invalid
+  }
+
+  // Local time (no TZID, no Z suffix)
   const dateStr = `${year}-${month}-${day}`;
   const minutes = parseInt(hour) * 60 + parseInt(minute);
   return { date: dateStr, minutes };
+}
+
+/** Extract local date string and minutes from a JS Date */
+function dateToLocal(d: Date): { date: string; minutes: number } {
+  const localYear = d.getFullYear();
+  const localMonth = String(d.getMonth() + 1).padStart(2, '0');
+  const localDay = String(d.getDate()).padStart(2, '0');
+  return {
+    date: `${localYear}-${localMonth}-${localDay}`,
+    minutes: d.getHours() * 60 + d.getMinutes(),
+  };
+}
+
+/**
+ * Convert a datetime from a named timezone to the user's local time.
+ * Uses Intl offset trick: find the timezone's UTC offset, then create a proper UTC Date.
+ */
+function convertFromTzid(
+  year: string, month: string, day: string,
+  hour: string, minute: string, tzid: string,
+): Date | null {
+  try {
+    // 1. Treat the time as if it were UTC
+    const assumedUtc = new Date(`${year}-${month}-${day}T${hour}:${minute}:00Z`);
+    // 2. Format that UTC instant in the target timezone to find the offset
+    const inTz = new Date(assumedUtc.toLocaleString('en-US', { timeZone: tzid }));
+    const offsetMs = inTz.getTime() - assumedUtc.getTime();
+    // 3. The actual UTC time is the assumed time minus the offset
+    return new Date(assumedUtc.getTime() - offsetMs);
+  } catch {
+    // Invalid TZID — fall back to treating as local
+    return null;
+  }
 }
 
 /** Check if an event overlaps a target date (YYYY-MM-DD) */
