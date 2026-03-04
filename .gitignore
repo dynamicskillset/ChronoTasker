@@ -1,5 +1,10 @@
+CLAUDE.md
 CLAUDE.local.md
+COPY_STYLE_GUIDE.md
 HANDOFF.md
+MISTAKES.md
+PLAN.md
+STATE.md
 .claude/settings.local.json
 .DS_Store
 node_modules/
