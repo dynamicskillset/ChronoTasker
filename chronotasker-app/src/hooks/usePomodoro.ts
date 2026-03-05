@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import type { AppSettings, PomodoroState, PomodoroSession } from '../types';
+import { playBeep } from '../utils/audio';
 
 function generateId(): string {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
@@ -23,55 +24,6 @@ function getDurationSeconds(
   }
 }
 
-let sharedAudioCtx: AudioContext | null = null;
-
-function getAudioContext(): AudioContext {
-  if (!sharedAudioCtx || sharedAudioCtx.state === 'closed') {
-    sharedAudioCtx = new AudioContext();
-  }
-  if (sharedAudioCtx.state === 'suspended') {
-    sharedAudioCtx.resume();
-  }
-  return sharedAudioCtx;
-}
-
-function playBeep(): void {
-  try {
-    const ctx = getAudioContext();
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
-
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.01);
-    gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.08);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.15);
-
-    oscillator.start(ctx.currentTime);
-    oscillator.stop(ctx.currentTime + 0.15);
-
-    // Play a second beep after a short gap
-    const osc2 = ctx.createOscillator();
-    const gain2 = ctx.createGain();
-    osc2.connect(gain2);
-    gain2.connect(ctx.destination);
-    osc2.type = 'sine';
-    osc2.frequency.setValueAtTime(880, ctx.currentTime + 0.2);
-    gain2.gain.setValueAtTime(0, ctx.currentTime + 0.2);
-    gain2.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.21);
-    gain2.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.28);
-    gain2.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.35);
-    osc2.start(ctx.currentTime + 0.2);
-    osc2.stop(ctx.currentTime + 0.35);
-  } catch {
-    // Web Audio API not available; silently ignore
-  }
-}
 
 function sendNotification(title: string, body: string): void {
   if ('Notification' in window && Notification.permission === 'granted') {
@@ -178,7 +130,7 @@ export function usePomodoro(settings: AppSettings) {
     }
 
     // Notifications and audio
-    playBeep();
+    if (settings.enableSounds) playBeep();
     if (state.type === 'work') {
       sendNotification(
         'ChronoTasker',

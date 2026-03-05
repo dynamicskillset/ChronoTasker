@@ -15,6 +15,7 @@ import { todayString, tomorrowString, formatDate } from './utils/scheduling';
 import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
 import * as storage from './services/storage';
 import { parseIcalEvents } from './utils/ical';
+import { playTick } from './utils/audio';
 const HelpModal = lazy(() => import('./components/HelpModal'));
 const RecurringDeleteModal = lazy(() => import('./components/RecurringDeleteModal'));
 const UnfinishedTasksModal = lazy(() => import('./components/UnfinishedTasksModal'));
@@ -242,6 +243,11 @@ function App() {
     return { eventMinutes, taskMinutes, breakMinutes, totalMinutes };
   }, [settings.showDaySummary, settings.advancedMode, settings.meetingBufferMinutes, calendarEvents, tasks]);
 
+  const allTasksDone = useMemo(
+    () => tasks.length > 0 && tasks.filter(t => !t.isBreak).every(t => t.completed),
+    [tasks],
+  );
+
   // Reorg suggestion: detect if a largest-first ordering would eliminate overflow
   const flexibleTaskKey = useMemo(
     () => tasks.filter(t => !t.fixedStartTime && !t.completed).map(t => `${t.id}:${t.durationMinutes}`).join(','),
@@ -308,10 +314,11 @@ function App() {
     setTasks(prev => prev.map(t => {
       if (t.id !== taskId) return t;
       const toggled = { ...t, completed: !t.completed, updatedAt: new Date().toISOString() };
+      if (toggled.completed && settings.enableSounds) playTick();
       pushTask('update', toggled);
       return toggled;
     }));
-  }, [pushTask]);
+  }, [pushTask, settings.enableSounds]);
 
   const handleToggleImportant = useCallback((taskId: string) => {
     setTasks(prev => prev.map(t => {
@@ -802,6 +809,17 @@ function App() {
                   <span className="toggle-switch__track" aria-hidden="true" />
                 </label>
               </div>
+
+              <div className="settings-row">
+                <div className="settings-row__label-group">
+                  <span className="settings-row__label">Sound effects</span>
+                  <span className="settings-row__hint">Tick on task complete, chime on Pomodoro end</span>
+                </div>
+                <label className="toggle-switch">
+                  <input type="checkbox" checked={!!settings.enableSounds} onChange={e => { const s = { ...settings, enableSounds: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                  <span className="toggle-switch__track" aria-hidden="true" />
+                </label>
+              </div>
             </div>
 
             {/* Scheduling column (advanced only) */}
@@ -1166,7 +1184,9 @@ function App() {
                         </svg>
                         <span className="collapsible-section__title">Tasks</span>
                         {!showTaskList && (
-                          <span className="collapsible-section__count">{tasks.filter(t => !t.completed).length} remaining</span>
+                          <span className="collapsible-section__count">
+                            {allTasksDone ? 'All done' : `${tasks.filter(t => !t.completed && !t.isBreak).length} remaining`}
+                          </span>
                         )}
                       </button>
                       {showTaskList && (
@@ -1184,6 +1204,7 @@ function App() {
                             tasks={tasksWithScheduleInfo}
                             colorMap={clockColorMap}
                             activeTaskId={activeTaskId}
+                            allTasksDone={allTasksDone}
                             onToggleComplete={handleToggleComplete}
                             onToggleImportant={handleToggleImportant}
                             onDeleteTask={handleDeleteTask}
@@ -1260,6 +1281,7 @@ function App() {
                   tasks={tasksWithScheduleInfo}
                   colorMap={clockColorMap}
                   activeTaskId={activeTaskId}
+                  allTasksDone={allTasksDone}
                   onToggleComplete={handleToggleComplete}
                   onToggleImportant={handleToggleImportant}
                   onDeleteTask={handleDeleteTask}

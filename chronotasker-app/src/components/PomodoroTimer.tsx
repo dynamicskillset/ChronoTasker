@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from 'react';
 import type { PomodoroState } from '../types';
 import './PomodoroTimer.css';
 
@@ -68,6 +69,18 @@ export default function PomodoroTimer({
   const hasStarted =
     isRunning || timeRemainingSeconds < totalSeconds;
 
+  // Milestone: show a brief message when a long break is earned
+  const [showMilestone, setShowMilestone] = useState(false);
+  const prevTypeRef = useRef(type);
+  useEffect(() => {
+    if (prevTypeRef.current !== 'longBreak' && type === 'longBreak') {
+      setShowMilestone(true);
+      const t = setTimeout(() => setShowMilestone(false), 3000);
+      return () => clearTimeout(t);
+    }
+    prevTypeRef.current = type;
+  }, [type]);
+
   return (
     <div className="pomodoro-timer">
       {/* Progress ring */}
@@ -95,9 +108,9 @@ export default function PomodoroTimer({
         {/* Centre overlay */}
         <div className="pomodoro-timer__center">
           <span
-            className={`pomodoro-timer__phase-label pomodoro-timer__phase-label--${type}`}
+            className={`pomodoro-timer__phase-label pomodoro-timer__phase-label--${type}${showMilestone ? ' pomodoro-timer__phase-label--milestone' : ''}`}
           >
-            {PHASE_LABELS[type]}
+            {showMilestone ? 'Cycle done' : PHASE_LABELS[type]}
           </span>
           <span className="pomodoro-timer__time" role="timer" aria-live="polite" aria-atomic="true">
             {formatTime(timeRemainingSeconds)}

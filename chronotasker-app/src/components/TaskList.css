@@ -36,8 +36,26 @@
 
 .task-list__empty-message {
   color: var(--tl-text-secondary);
-  font-size: 0.9rem;
+  font-size: 0.875rem;
   margin: 0;
+}
+
+.task-list--all-done .task-list__all-done-message {
+  color: var(--color-accent);
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.75rem 0.75rem 0.5rem;
+  margin: 0;
+  animation: task-all-done 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes task-all-done {
+  0%   { opacity: 0; transform: translateY(-4px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
+}
+
+.task-list__items--done {
+  opacity: 0.55;
 }
 
 /* ============================================================
@@ -508,7 +526,11 @@
    Drag and drop
    ============================================================ */
 .task-list__item--dragging {
-  opacity: 0.4;
+  opacity: 0.5;
+  transform: scale(1.02) rotate(-0.5deg);
+  box-shadow: var(--shadow-md);
+  z-index: 1;
+  cursor: grabbing;
 }
 
 .task-list__item--drag-over {

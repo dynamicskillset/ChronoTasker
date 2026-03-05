@@ -67,6 +67,7 @@ export interface AppSettings {
   showDaySummary: boolean;
   clockPosition: 'left' | 'right';
   advancedMode: boolean;
+  enableSounds: boolean;
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -87,4 +88,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showDaySummary: false,
   clockPosition: 'left',
   advancedMode: false,
+  enableSounds: false,
 };

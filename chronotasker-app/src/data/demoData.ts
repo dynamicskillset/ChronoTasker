@@ -189,5 +189,6 @@ export function getDemoSettings(): AppSettings {
     showDaySummary: false,
     clockPosition: 'left',
     advancedMode: true,
+    enableSounds: false,
   };
 }

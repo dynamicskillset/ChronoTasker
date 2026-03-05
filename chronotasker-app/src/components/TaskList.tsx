@@ -9,6 +9,7 @@ interface TaskListProps {
   tasks: ScheduledTask[];
   colorMap?: Map<string, string>;
   activeTaskId: string | null;
+  allTasksDone?: boolean;
   onToggleComplete: (taskId: string) => void;
   onToggleImportant: (taskId: string) => void;
   onDeleteTask: (taskId: string) => void;
@@ -403,6 +404,7 @@ export default function TaskList({
   tasks,
   colorMap,
   activeTaskId,
+  allTasksDone,
   onToggleComplete,
   onToggleImportant,
   onDeleteTask,
@@ -544,7 +546,18 @@ export default function TaskList({
   if (tasks.length === 0) {
     return (
       <div className="task-list task-list--empty">
-        <p className="task-list__empty-message">No tasks for today. Add one above.</p>
+        <p className="task-list__empty-message">Nothing scheduled yet. Add your first task above.</p>
+      </div>
+    );
+  }
+
+  if (allTasksDone) {
+    return (
+      <div className="task-list task-list--all-done">
+        <p className="task-list__all-done-message">All done for today.</p>
+        <ul ref={listRef} className="task-list__items task-list__items--done" role="list">
+          {sortedTasks.map((task) => renderItem(task))}
+        </ul>
       </div>
     );
   }

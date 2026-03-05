@@ -229,7 +229,7 @@ button:focus-visible {
 }
 
 button:active {
-  transform: scale(0.97);
+  transform: scale(0.97) translateY(1px);
 }
 
 input, select {
