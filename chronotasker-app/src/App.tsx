@@ -54,7 +54,7 @@ function App() {
     settings: AppSettings;
     backlogTasks: Task[];
     calendarEvents: CalendarEvent[];
-    icsCache: string | null;
+    icsCache: (string | null)[];
     date: string;
     editingTask: Task | undefined;
     activeTaskId: string | null;
@@ -124,75 +124,96 @@ function App() {
     if (editingTask) setShowForm(true);
   }, [editingTask]);
 
-  // Calendar events from iCal feed
+  // Calendar events from iCal feeds (up to 3)
   const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
-  const [icalUrlInput, setIcalUrlInput] = useState(settings.icalUrl || '');
+  const initIcalUrls = (): string[] => {
+    const stored = settings.icalUrls?.length ? settings.icalUrls : (settings.icalUrl ? [settings.icalUrl] : []);
+    return stored.length ? stored : [''];
+  };
+  const [icalUrlInputs, setIcalUrlInputs] = useState<string[]>(initIcalUrls);
   const [icalLoading, setIcalLoading] = useState(false);
-  const [icalError, setIcalError] = useState<string | null>(null);
-  const [committedIcalUrl, setCommittedIcalUrl] = useState(settings.icalUrl || '');
-  const icsCache = useRef<string | null>(null);
+  const [icalErrors, setIcalErrors] = useState<(string | null)[]>([null]);
+  const initCommitted = (): string[] => settings.icalUrls?.length ? settings.icalUrls : (settings.icalUrl ? [settings.icalUrl] : []);
+  const [committedIcalUrls, setCommittedIcalUrls] = useState<string[]>(initCommitted);
+  const icsCache = useRef<(string | null)[]>([]);
 
-  // Keep input in sync when settings load from server
+  // Keep inputs in sync when settings load from server
   useEffect(() => {
-    if (settings.icalUrl && !committedIcalUrl) {
-      setIcalUrlInput(settings.icalUrl);
-      setCommittedIcalUrl(settings.icalUrl);
+    const urls = settings.icalUrls?.length ? settings.icalUrls : (settings.icalUrl ? [settings.icalUrl] : []);
+    if (urls.length && !committedIcalUrls.length) {
+      setIcalUrlInputs([...urls]);
+      setCommittedIcalUrls(urls);
     }
-  }, [settings.icalUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [settings.icalUrls, settings.icalUrl]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const loadCalendar = useCallback(async (url: string) => {
-    if (!url) {
+  const mergeCalendarEvents = (events: CalendarEvent[]): CalendarEvent[] => {
+    const seen = new Set<string>();
+    return events.filter(e => { if (seen.has(e.uid)) return false; seen.add(e.uid); return true; });
+  };
+
+  const loadCalendars = useCallback(async (urls: string[]) => {
+    const nonEmpty = urls.filter(u => u.trim());
+    if (!nonEmpty.length) {
       setCalendarEvents([]);
-      icsCache.current = null;
-      setIcalError(null);
+      icsCache.current = urls.map(() => null);
+      setIcalErrors(urls.map(() => null));
       return;
     }
     setIcalLoading(true);
-    setIcalError(null);
-    try {
-      const text = await fetchCalendar(url);
-      icsCache.current = text;
-      setCalendarEvents(parseIcalEvents(text, date));
-    } catch (err: unknown) {
-      setIcalError(err instanceof Error ? err.message : 'Failed to load calendar');
-      setCalendarEvents([]);
-      icsCache.current = null;
-    } finally {
-      setIcalLoading(false);
-    }
-  }, [date]);
+    const errors: (string | null)[] = urls.map(() => null);
+    const caches: (string | null)[] = urls.map(() => null);
+    await Promise.all(urls.map(async (url, i) => {
+      if (!url.trim()) return;
+      try {
+        caches[i] = await fetchCalendar(url);
+      } catch (err: unknown) {
+        errors[i] = err instanceof Error ? err.message : 'Failed to load calendar';
+      }
+    }));
+    icsCache.current = caches;
+    setIcalErrors(errors);
+    const allEvents = mergeCalendarEvents(
+      caches.flatMap((c, i) => (c && !errors[i] ? parseIcalEvents(c, date) : []))
+    );
+    setCalendarEvents(allEvents);
+    setIcalLoading(false);
+  }, [date]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Fetch when committed URL changes
+  // Fetch when committed URLs change
   useEffect(() => {
     if (demoMode) return;
-    if (!committedIcalUrl) {
+    if (!committedIcalUrls.length) {
       setCalendarEvents([]);
-      icsCache.current = null;
+      icsCache.current = [];
       return;
     }
-
-    loadCalendar(committedIcalUrl);
-
+    loadCalendars(committedIcalUrls);
     // Refresh every 5 minutes
-    const interval = setInterval(() => loadCalendar(committedIcalUrl), 5 * 60 * 1000);
+    const interval = setInterval(() => loadCalendars(committedIcalUrls), 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [committedIcalUrl, loadCalendar, demoMode]);
+  }, [committedIcalUrls, loadCalendars, demoMode]);
 
   // Re-parse cached iCal data when date changes
   useEffect(() => {
     if (demoMode) return;
-    if (icsCache.current) {
-      setCalendarEvents(parseIcalEvents(icsCache.current, date));
+    const valid = icsCache.current.filter(Boolean) as string[];
+    if (valid.length) {
+      const seen = new Set<string>();
+      const allEvents: CalendarEvent[] = [];
+      valid.forEach(c => parseIcalEvents(c, date).forEach(e => {
+        if (!seen.has(e.uid)) { seen.add(e.uid); allEvents.push(e); }
+      }));
+      setCalendarEvents(allEvents);
     }
   }, [date, demoMode]);
 
   const handleLoadCalendar = useCallback(() => {
-    const url = icalUrlInput.trim() || undefined;
-    const s = { ...settings, icalUrl: url };
+    const urls = icalUrlInputs.map(u => u.trim()).filter(Boolean);
+    const s = { ...settings, icalUrls: urls, icalUrl: urls[0] };
     setSettings(s);
     pushSettings(s);
-    setCommittedIcalUrl(url || '');
-  }, [icalUrlInput, settings, pushSettings]);
+    setCommittedIcalUrls(urls);
+  }, [icalUrlInputs, settings, pushSettings]);
 
   // Fetch backlog tasks when feature is enabled
   useEffect(() => {
@@ -650,10 +671,10 @@ function App() {
   // Demo mode
   const enterDemoMode = useCallback(() => {
     stashedState.current = {
-      tasks, settings, backlogTasks, calendarEvents, icsCache: icsCache.current, date,
+      tasks, settings, backlogTasks, calendarEvents, icsCache: [...icsCache.current], date,
       editingTask, activeTaskId,
     };
-    icsCache.current = null;
+    icsCache.current = [];
     setTasks(getDemoTasks());
     setSettings(getDemoSettings());
     setBacklogTasks(getDemoBacklogTasks());
@@ -840,21 +861,35 @@ function App() {
                 </div>
 
                 <div className="settings-row settings-row--stacked">
-                  <span className="settings-row__label">Calendar feed</span>
-                  <div className="ical-input-row">
-                    <input type="url" value={icalUrlInput} placeholder="https://calendar.proton.me/..."
-                      onChange={e => setIcalUrlInput(e.target.value)}
-                      onKeyDown={e => { if (e.key === 'Enter') handleLoadCalendar(); }} />
+                  <span className="settings-row__label">Calendar feeds</span>
+                  {icalUrlInputs.map((url, i) => (
+                    <div key={i} className="ical-feed-entry">
+                      <div className="ical-input-row">
+                        <input type="url" value={url} placeholder="https://calendar.proton.me/..."
+                          onChange={e => { const next = [...icalUrlInputs]; next[i] = e.target.value; setIcalUrlInputs(next); }}
+                          onKeyDown={e => { if (e.key === 'Enter') handleLoadCalendar(); }} />
+                        {icalUrlInputs.length > 1 && (
+                          <button type="button" className="ical-remove-btn" aria-label="Remove calendar"
+                            onClick={() => setIcalUrlInputs(icalUrlInputs.filter((_, j) => j !== i))}>−</button>
+                        )}
+                      </div>
+                      {icalErrors[i] && <span className="settings-hint settings-hint--error" role="alert">{icalErrors[i]}</span>}
+                    </div>
+                  ))}
+                  <div className="ical-actions-row">
+                    {icalUrlInputs.length < 3 && (
+                      <button type="button" className="ical-add-btn"
+                        onClick={() => setIcalUrlInputs([...icalUrlInputs, ''])}>+ Add calendar</button>
+                    )}
                     <button className="ical-load-btn" onClick={handleLoadCalendar} disabled={icalLoading}>
-                      {icalLoading ? 'Loading…' : committedIcalUrl ? 'Reload' : 'Load'}
+                      {icalLoading ? 'Loading…' : committedIcalUrls.length ? 'Reload' : 'Load'}
                     </button>
                   </div>
-                  {icalError && <span className="settings-hint settings-hint--error" role="alert">{icalError}</span>}
                   {calendarEvents.length > 0 && <span className="settings-hint">{calendarEvents.length} event{calendarEvents.length !== 1 ? 's' : ''} loaded</span>}
-                  {committedIcalUrl && !icalError && calendarEvents.length === 0 && !icalLoading && <span className="settings-hint">No events for this date</span>}
+                  {committedIcalUrls.length > 0 && !icalErrors.some(Boolean) && calendarEvents.length === 0 && !icalLoading && <span className="settings-hint">No events for this date</span>}
                 </div>
 
-                {committedIcalUrl && (
+                {committedIcalUrls.length > 0 && (
                   <div className="settings-row">
                     <span className="settings-row__label">Buffer after meetings</span>
                     <div className="stepper">

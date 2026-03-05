@@ -190,5 +190,6 @@ export function getDemoSettings(): AppSettings {
     clockPosition: 'left',
     advancedMode: true,
     enableSounds: false,
+    icalUrls: [],
   };
 }
