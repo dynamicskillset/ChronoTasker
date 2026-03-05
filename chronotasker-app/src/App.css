@@ -547,7 +547,7 @@
   min-width: 4px;
 }
 
-.day-summary__bar-segment--events { background: var(--color-calendar); }
+.day-summary__bar-segment--events { background: var(--color-accent); }
 .day-summary__bar-segment--tasks  { background: var(--color-accent); }
 .day-summary__bar-segment--breaks { background: var(--color-border); }
 
@@ -574,7 +574,7 @@
   flex-shrink: 0;
 }
 
-.day-summary__dot--events { background: var(--color-calendar); }
+.day-summary__dot--events { background: var(--color-accent); }
 .day-summary__dot--tasks  { background: var(--color-accent); }
 .day-summary__dot--breaks { background: var(--color-border); }
 
@@ -616,7 +616,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: var(--color-calendar);
+  color: var(--color-accent);
   margin-bottom: 0.4rem;
 }
 
@@ -644,7 +644,7 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--color-calendar);
+  background: var(--color-accent);
   flex-shrink: 0;
 }
 
@@ -661,8 +661,8 @@
 }
 
 .calendar-events__item--active {
-  background: color-mix(in srgb, var(--color-calendar) 20%, var(--color-surface));
-  outline: 1px solid var(--color-calendar);
+  background: color-mix(in srgb, var(--color-accent) 20%, var(--color-surface));
+  outline: 1px solid var(--color-accent);
   outline-offset: -1px;
 }
 
