@@ -264,7 +264,7 @@
   width: 0.875rem;
   height: 0.875rem;
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-bg);
   top: 0.188rem;
   left: 0.188rem;
   transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -473,7 +473,7 @@
   padding: 0.25em 0.55em;
   line-height: 1;
   background: transparent;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
   border: 1px solid var(--color-border);
   flex-shrink: 0;
 }
@@ -525,7 +525,7 @@
 .current-date {
   font-size: 1.125rem;
   font-weight: 600;
-  min-width: 200px;
+  min-width: min(200px, 40vw);
   text-align: center;
 }
 
@@ -605,7 +605,7 @@
 }
 
 .day-summary__bar-segment--events { background: var(--color-accent); }
-.day-summary__bar-segment--tasks  { background: var(--color-text-secondary); }
+.day-summary__bar-segment--tasks  { background: color-mix(in srgb, var(--color-text) 40%, transparent); }
 .day-summary__bar-segment--breaks { background: var(--color-border); }
 
 .day-summary__rows {
@@ -632,7 +632,7 @@
 }
 
 .day-summary__dot--events { background: var(--color-accent); }
-.day-summary__dot--tasks  { background: var(--color-text-secondary); }
+.day-summary__dot--tasks  { background: color-mix(in srgb, var(--color-text) 40%, transparent); }
 .day-summary__dot--breaks { background: var(--color-border); }
 
 .day-summary__label {
@@ -818,8 +818,8 @@
 }
 
 .collapsible-section__header:focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: -2px;
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .collapsible-section__chevron {
@@ -1117,7 +1117,7 @@
   border: none;
   background: none;
   cursor: pointer;
-  color: var(--color-text-muted);
+  color: var(--color-muted);
   border-radius: 4px;
   font-size: 0.8rem;
 }
@@ -1135,6 +1135,14 @@
   .app-main,
   .settings-panel-wrapper {
     grid-template-columns: minmax(360px, 1fr) minmax(520px, 1.5fr);
+  }
+}
+
+/* Tablet layout (769px–1024px) */
+@media (min-width: 769px) and (max-width: 1023px) {
+  .app-main,
+  .settings-panel-wrapper {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
   }
 }
 

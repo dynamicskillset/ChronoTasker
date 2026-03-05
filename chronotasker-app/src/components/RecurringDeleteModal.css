@@ -9,9 +9,13 @@
   align-items: center;
   justify-content: center;
   background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
   animation: recurring-delete-overlay-in 0.2s ease;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .recurring-delete-overlay {
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+  }
 }
 
 @keyframes recurring-delete-overlay-in {

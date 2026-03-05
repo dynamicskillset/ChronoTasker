@@ -216,7 +216,7 @@ button {
   background-color: transparent;
   color: var(--color-text);
   cursor: pointer;
-  transition: all var(--transition-normal);
+  transition: background-color var(--transition-normal), color var(--transition-normal), opacity var(--transition-normal), border-color var(--transition-normal);
 }
 
 button:hover {

@@ -116,7 +116,7 @@ interface TaskItemProps {
   onRescheduleTask?: (taskId: string, newDate: string) => void;
   onDeleteClick: (taskId: string) => void;
   onDeleteBlur: (taskId: string) => void;
-  onToggleReschedule: (taskId: string) => void;
+  onToggleReschedule: (taskId: string, triggerEl?: HTMLElement) => void;
   onDragStart: (taskId: string) => void;
   onDragOver: (e: React.DragEvent, taskId: string) => void;
   onDragEnd: () => void;
@@ -322,7 +322,7 @@ const TaskItem = memo(function TaskItem({
               className="task-list__reschedule-btn"
               onClick={(e) => {
                 e.stopPropagation();
-                onToggleReschedule(task.id);
+                onToggleReschedule(task.id, e.currentTarget);
               }}
               aria-label="Move to another day"
               title="Move to another day"
@@ -427,12 +427,17 @@ export default function TaskList({
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const confirmingDeleteRef = useRef<string | null>(null);
   const [reschedulingTaskId, setReschedulingTaskId] = useState<string | null>(null);
+  const rescheduleTriggerRef = useRef<HTMLElement | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [expandedDetailsId, setExpandedDetailsId] = useState<string | null>(null);
 
   // Dismiss reschedule popover on Escape or outside click
-  const dismissReschedule = useCallback(() => setReschedulingTaskId(null), []);
+  const dismissReschedule = useCallback(() => {
+    setReschedulingTaskId(null);
+    rescheduleTriggerRef.current?.focus();
+    rescheduleTriggerRef.current = null;
+  }, []);
 
   useEffect(() => {
     if (!reschedulingTaskId) return;
@@ -494,8 +499,12 @@ export default function TaskList({
     }, 200);
   }, []);
 
-  const handleToggleReschedule = useCallback((taskId: string) => {
-    setReschedulingTaskId((current) => (current === taskId ? null : taskId));
+  const handleToggleReschedule = useCallback((taskId: string, triggerEl?: HTMLElement) => {
+    setReschedulingTaskId((current) => {
+      if (current === taskId) return null;
+      rescheduleTriggerRef.current = triggerEl ?? null;
+      return taskId;
+    });
   }, []);
 
   const handleToggleDetails = useCallback((taskId: string) => {
