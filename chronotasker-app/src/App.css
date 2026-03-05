@@ -698,10 +698,6 @@
   flex-direction: column;
 }
 
-/* When used directly as clock-panel__body, the list needs its own padding */
-.calendar-events__list.clock-panel__body {
-  padding: 0.25rem 0.75rem 0.5rem;
-}
 
 .calendar-events__item {
   display: flex;

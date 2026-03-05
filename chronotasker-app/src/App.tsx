@@ -990,7 +990,8 @@ function App() {
                   </h3>
                 </div>
                 {panelId === 'calendar' && (
-                  <ul ref={calendarListRef} className="calendar-events__list clock-panel__body">
+                  <div className="clock-panel__body">
+                  <ul ref={calendarListRef} className="calendar-events__list">
                     {[...calendarEvents]
                       .sort((a, b) => a.startMinutes - b.startMinutes)
                       .map(event => {
@@ -1013,6 +1014,7 @@ function App() {
                         );
                       })}
                   </ul>
+                  </div>
                 )}
                 {panelId === 'summary' && daySummary && (
                   <div className="clock-panel__body">
