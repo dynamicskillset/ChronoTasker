@@ -2,8 +2,9 @@ import type { CalendarEvent } from '../types';
 
 /**
  * Parse iCal text and return events that overlap a target date.
- * Handles: line unfolding, VEVENT extraction, DTSTART/DTEND (UTC, TZID, and DATE formats).
- * Does NOT handle RRULE (recurring events) in v1.
+ * Handles: line unfolding, VEVENT extraction, DTSTART/DTEND (UTC, TZID, and DATE formats),
+ * and RRULE recurring events (DAILY, WEEKLY, MONTHLY, YEARLY with INTERVAL, UNTIL, COUNT,
+ * BYDAY, BYMONTHDAY, BYMONTH) plus EXDATE exclusions.
  */
 export function parseIcalEvents(icsText: string, targetDate: string): CalendarEvent[] {
   // Step 1: Unfold lines (RFC 5545 §3.1 — continuation lines start with space or tab)
@@ -37,16 +38,25 @@ export function parseIcalEvents(icsText: string, targetDate: string): CalendarEv
       end = parseIcalDate(dtendInfo.value, dtendInfo.tzid);
     }
 
-    // Check if event overlaps the target date
-    if (!overlapsDate(start, end, allDay, targetDate)) continue;
+    // Check if this event occurs on the target date
+    const rruleStr = props['RRULE'];
+    if (rruleStr) {
+      // Recurring event: use RRULE to check if it occurs on targetDate
+      if (!rruleOccursOnDate(start, rruleStr, block, targetDate)) continue;
+    } else {
+      // Non-recurring: use direct overlap check
+      if (!overlapsDate(start, end, allDay, targetDate)) continue;
+    }
 
     if (allDay) {
       events.push({ uid, summary, startMinutes: 0, endMinutes: 24 * 60, allDay: true });
     } else {
-      // Clamp to target date boundaries
-      const startMin = start.date === targetDate ? start.minutes : 0;
+      // For recurring events, the occurrence always starts at DTSTART's time of day
+      const startMin = rruleStr
+        ? start.minutes
+        : (start.date === targetDate ? start.minutes : 0);
       const endMin = end
-        ? (end.date === targetDate ? end.minutes : 24 * 60)
+        ? (rruleStr ? end.minutes : (end.date === targetDate ? end.minutes : 24 * 60))
         : Math.min(startMin + 60, 24 * 60); // default 1h if no end
 
       events.push({ uid, summary, startMinutes: startMin, endMinutes: endMin, allDay: false });
@@ -55,6 +65,240 @@ export function parseIcalEvents(icsText: string, targetDate: string): CalendarEv
 
   return events;
 }
+
+// ---------------------------------------------------------------------------
+// RRULE support
+// ---------------------------------------------------------------------------
+
+const DAY_ABBR: Record<string, number> = { SU: 0, MO: 1, TU: 2, WE: 3, TH: 4, FR: 5, SA: 6 };
+
+interface RruleByDay {
+  day: number;       // 0=SU, 1=MO … 6=SA
+  ordinal?: number;  // e.g. 1 for "1MO" (first Monday), -1 for "-1FR" (last Friday)
+}
+
+interface ParsedRrule {
+  freq: 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
+  interval: number;
+  untilDate?: string;   // YYYY-MM-DD
+  count?: number;
+  byday?: RruleByDay[];
+  bymonthday?: number[];
+  bymonth?: number[];
+}
+
+function parseRrule(rruleStr: string): ParsedRrule | null {
+  const parts: Record<string, string> = {};
+  for (const seg of rruleStr.split(';')) {
+    const eq = seg.indexOf('=');
+    if (eq > 0) parts[seg.slice(0, eq)] = seg.slice(eq + 1);
+  }
+
+  const freq = parts['FREQ'] as ParsedRrule['freq'];
+  if (!['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY'].includes(freq)) return null;
+
+  const interval = parts['INTERVAL'] ? Math.max(1, parseInt(parts['INTERVAL'], 10)) : 1;
+
+  let untilDate: string | undefined;
+  if (parts['UNTIL']) {
+    // UNTIL can be YYYYMMDD or YYYYMMDDTHHmmssZ — extract date portion only
+    const raw = parts['UNTIL'].slice(0, 8);
+    if (raw.length === 8) untilDate = `${raw.slice(0, 4)}-${raw.slice(4, 6)}-${raw.slice(6, 8)}`;
+  }
+
+  const count = parts['COUNT'] ? parseInt(parts['COUNT'], 10) : undefined;
+
+  let byday: RruleByDay[] | undefined;
+  if (parts['BYDAY']) {
+    const parsed = parts['BYDAY'].split(',').flatMap(d => {
+      const m = d.match(/^(-?\d*)([A-Z]{2})$/);
+      if (!m || !(m[2] in DAY_ABBR)) return [];
+      return [{ day: DAY_ABBR[m[2]], ordinal: m[1] ? parseInt(m[1], 10) : undefined }];
+    });
+    if (parsed.length > 0) byday = parsed;
+  }
+
+  let bymonthday: number[] | undefined;
+  if (parts['BYMONTHDAY']) {
+    const parsed = parts['BYMONTHDAY'].split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+    if (parsed.length > 0) bymonthday = parsed;
+  }
+
+  let bymonth: number[] | undefined;
+  if (parts['BYMONTH']) {
+    const parsed = parts['BYMONTH'].split(',').map(n => parseInt(n, 10)).filter(n => !isNaN(n));
+    if (parsed.length > 0) bymonth = parsed;
+  }
+
+  return { freq, interval, untilDate, count, byday, bymonthday, bymonth };
+}
+
+/** Extract EXDATE values from a VEVENT block as a set of YYYY-MM-DD strings. */
+function extractExdates(block: string, tzid?: string): Set<string> {
+  const result = new Set<string>();
+  for (const line of block.split('\n')) {
+    if (!line.startsWith('EXDATE')) continue;
+    const colonIdx = line.indexOf(':');
+    if (colonIdx < 0) continue;
+    // EXDATE can have its own TZID parameter
+    const paramStr = line.slice('EXDATE'.length, colonIdx);
+    const tzidMatch = paramStr.match(/TZID=([^;:]+)/);
+    const exTzid = tzidMatch?.[1] ?? tzid;
+    for (const val of line.slice(colonIdx + 1).trim().split(',')) {
+      const parsed = parseIcalDate(val.trim(), exTzid);
+      if (parsed) result.add(parsed.date);
+    }
+  }
+  return result;
+}
+
+/** Returns a YYYY-MM-DD string for a Date object (local time). */
+function localDateStr(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
+/**
+ * Check whether a target Date matches the recurrence pattern defined by an RRULE,
+ * given the DTSTART date as the anchor.
+ */
+function matchesRrulePattern(target: Date, start: Date, rrule: ParsedRrule): boolean {
+  const diffMs = target.getTime() - start.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+  if (diffDays < 0) return false;
+
+  switch (rrule.freq) {
+    case 'DAILY':
+      return diffDays % rrule.interval === 0;
+
+    case 'WEEKLY': {
+      if (rrule.byday && rrule.byday.length > 0) {
+        // Check that the target day of week is in BYDAY list
+        if (!rrule.byday.some(bd => bd.day === target.getDay())) return false;
+        // Check interval: which "week block" since start does target fall in?
+        const weeksSinceStart = Math.floor(diffDays / 7);
+        return weeksSinceStart % rrule.interval === 0;
+      }
+      // No BYDAY: same day of week as DTSTART, every interval weeks
+      if (target.getDay() !== start.getDay()) return false;
+      return (diffDays / 7) % rrule.interval === 0;
+    }
+
+    case 'MONTHLY': {
+      const monthsDiff =
+        (target.getFullYear() - start.getFullYear()) * 12 +
+        (target.getMonth() - start.getMonth());
+      if (monthsDiff < 0 || monthsDiff % rrule.interval !== 0) return false;
+
+      if (rrule.bymonthday) {
+        return rrule.bymonthday.includes(target.getDate());
+      }
+
+      if (rrule.byday && rrule.byday.length > 0) {
+        const targetDow = target.getDay();
+        return rrule.byday.some(bd => {
+          if (bd.day !== targetDow) return false;
+          if (bd.ordinal === undefined) return true;
+          if (bd.ordinal > 0) {
+            // e.g. "1MO" = first Monday: is target the ordinal-th occurrence of that weekday?
+            const ordinal = Math.ceil(target.getDate() / 7);
+            return ordinal === bd.ordinal;
+          } else {
+            // e.g. "-1FR" = last Friday
+            const daysInMonth = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+            const ordinalFromEnd = -Math.ceil((daysInMonth - target.getDate() + 1) / 7);
+            return ordinalFromEnd === bd.ordinal;
+          }
+        });
+      }
+
+      // Default: same day of month as DTSTART
+      return target.getDate() === start.getDate();
+    }
+
+    case 'YEARLY': {
+      const yearsDiff = target.getFullYear() - start.getFullYear();
+      if (yearsDiff < 0 || yearsDiff % rrule.interval !== 0) return false;
+
+      if (rrule.bymonth) {
+        if (!rrule.bymonth.includes(target.getMonth() + 1)) return false;
+      } else {
+        if (target.getMonth() !== start.getMonth()) return false;
+      }
+
+      if (rrule.bymonthday) {
+        return rrule.bymonthday.includes(target.getDate());
+      }
+      if (rrule.byday && rrule.byday.length > 0) {
+        return rrule.byday.some(bd => bd.day === target.getDay());
+      }
+      return target.getDate() === start.getDate();
+    }
+  }
+}
+
+/**
+ * For RRULE COUNT: walk forward from start, counting occurrences.
+ * Returns true if targetDate is among the first COUNT occurrences.
+ */
+function isOccurrenceWithinCount(
+  start: Date,
+  target: Date,
+  rrule: ParsedRrule,
+  exdates: Set<string>,
+): boolean {
+  if (rrule.count === undefined) return true;
+
+  let occCount = 0;
+  const cur = new Date(start);
+
+  while (true) {
+    if (cur.getTime() > target.getTime()) return false;
+
+    const ds = localDateStr(cur);
+    if (matchesRrulePattern(cur, start, rrule) && !exdates.has(ds)) {
+      occCount++;
+      if (cur.getTime() === target.getTime()) return true;
+      if (occCount >= rrule.count) return false;
+    }
+
+    cur.setDate(cur.getDate() + 1);
+  }
+}
+
+/**
+ * Check whether a recurring event (defined by its DTSTART + RRULE) produces
+ * an occurrence on the given targetDate, respecting EXDATE and COUNT/UNTIL.
+ */
+function rruleOccursOnDate(
+  dtstart: { date: string; minutes: number },
+  rruleStr: string,
+  block: string,
+  targetDate: string,
+): boolean {
+  const rrule = parseRrule(rruleStr);
+  if (!rrule) return false;
+
+  if (targetDate < dtstart.date) return false;
+  if (rrule.untilDate && targetDate > rrule.untilDate) return false;
+
+  const exdates = extractExdates(block);
+  if (exdates.has(targetDate)) return false;
+
+  const start = new Date(dtstart.date + 'T00:00:00');
+  const target = new Date(targetDate + 'T00:00:00');
+
+  if (!matchesRrulePattern(target, start, rrule)) return false;
+
+  if (rrule.count !== undefined) {
+    return isOccurrenceWithinCount(start, target, rrule, exdates);
+  }
+
+  return true;
+}
+
+// ---------------------------------------------------------------------------
+// Existing helpers (unchanged)
+// ---------------------------------------------------------------------------
 
 /** Parse simple KEY:VALUE properties from a VEVENT block */
 function parseProperties(block: string): Record<string, string> {
