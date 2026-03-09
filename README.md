@@ -30,23 +30,20 @@ Push to `main` triggers GitHub Actions. Frontend builds in CI, backend builds on
 
 ### v1.0.1 — 2026-03-09
 
-- Fix: calendar events from non-local timezones now display at the correct local time. The previous `toLocaleString` + `new Date()` offset trick double-applied the local UTC offset; replaced with `Intl.DateTimeFormat.formatToParts` for accurate conversion.
-- Add: version number displayed in the app header next to the help button.
+- Calendar events from other time zones now appear at the right time of day instead of being shifted by several hours.
+- The app version number is shown in the top-left corner of the screen, next to the help button.
 
 ### v1.0.0 — 2026-03-05
 
-Initial versioned release. Core features:
+First proper release. Everything needed for a full day of planning:
 
-- Circular clock face (SVG) with task arcs and live time hand
-- Pomodoro timer (25/5/15 cycles) with audio and milestone animation
-- Task management: add, edit, delete, drag-to-reorder, reschedule, fixed-time slots
-- iCal calendar feed integration (up to 3 feeds) with meeting buffer arcs and RRULE recurring event support
-- Backlog for unscheduled tasks
-- 5 colour schemes: Nord, Aurora, Frost, Evergreen, Berry
-- Offline-first sync via Express + SQLite backend
-- HTTP basic auth via Caddy
-- PWA: installable, service worker, offline support
-- Help modal with FAQ
-- Accessibility audit: all critical/high/medium items resolved
-- Delight pass: completion sounds, all-done state, drag animation, button press, toggle spring
-- Auto-deploy pipeline via GitHub Actions
+- Your day shown as a clock face — tasks appear as coloured arcs so you can see at a glance how your time is allocated
+- Pomodoro timer built in: 25-minute focus sessions, short breaks, and a longer break every four cycles, with a sound and a small animation when you complete a cycle
+- Add, edit, move, and reorder tasks; drag them into position; reschedule to another day; set a fixed start time if needed
+- Connect up to three calendar feeds so meetings show up on the clock automatically, with a configurable buffer before each one
+- Recurring calendar events (weekly stand-ups, etc.) are supported
+- A backlog for tasks that don't have a place in today's schedule yet
+- Five colour schemes to choose from
+- Works offline and syncs across your devices when you're back online
+- Can be installed to your home screen on any device
+- A help page explaining how everything works
