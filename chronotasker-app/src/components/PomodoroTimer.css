@@ -13,15 +13,19 @@
   --pomo-btn-secondary-text: var(--color-text-secondary);
   --pomo-btn-secondary-hover: var(--color-btn-hover-bg);
 
-  /* Phase colours (same in light and dark) */
-  --pomo-work: #5E81AC;
-  --pomo-work-hover: #81A1C1;
+  /* Work phase tracks the active highlight colour */
+  --pomo-work: var(--color-accent);
+  --pomo-work-hover: var(--color-submit-hover);
+  --pomo-dot-border: var(--color-accent);
+  --pomo-dot-filled: var(--color-accent);
+
+  /* Break colours — ring/label use vivid shades; button uses darker for contrast */
   --pomo-short-break: #A3BE8C;
-  --pomo-short-break-hover: #8DAF78;
+  --pomo-short-break-btn: #4E7A38;
+  --pomo-short-break-btn-hover: #65994C;
   --pomo-long-break: #B48EAD;
-  --pomo-long-break-hover: #A07A9A;
-  --pomo-dot-border: #81A1C1;
-  --pomo-dot-filled: #81A1C1;
+  --pomo-long-break-btn: #7B5678;
+  --pomo-long-break-btn-hover: #9A7297;
 }
 
 /* ============================================================
@@ -194,27 +198,27 @@
 }
 
 .pomodoro-timer__btn--primary--work {
-  background: var(--pomo-work);
+  background: var(--color-submit-bg);
 }
 
 .pomodoro-timer__btn--primary--work:hover {
-  background: var(--pomo-work-hover);
+  background: var(--color-submit-hover);
 }
 
 .pomodoro-timer__btn--primary--shortBreak {
-  background: var(--pomo-short-break);
+  background: var(--pomo-short-break-btn);
 }
 
 .pomodoro-timer__btn--primary--shortBreak:hover {
-  background: var(--pomo-short-break-hover);
+  background: var(--pomo-short-break-btn-hover);
 }
 
 .pomodoro-timer__btn--primary--longBreak {
-  background: var(--pomo-long-break);
+  background: var(--pomo-long-break-btn);
 }
 
 .pomodoro-timer__btn--primary--longBreak:hover {
-  background: var(--pomo-long-break-hover);
+  background: var(--pomo-long-break-btn-hover);
 }
 
 .pomodoro-timer__btn--secondary {
@@ -229,6 +233,20 @@
 .pomodoro-timer__btn--secondary:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+/* Evergreen accent is green — shift short break to teal so they don't clash */
+.scheme-evergreen .pomodoro-timer {
+  --pomo-short-break: #8FBCBB;
+  --pomo-short-break-btn: #3B7877;
+  --pomo-short-break-btn-hover: #4E9695;
+}
+
+/* Berry accent is purple — shift long break to orange so they don't clash */
+.scheme-berry .pomodoro-timer {
+  --pomo-long-break: #D08770;
+  --pomo-long-break-btn: #A5563A;
+  --pomo-long-break-btn-hover: #C06B48;
 }
 
 /* -- Responsive -- */

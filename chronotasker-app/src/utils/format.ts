@@ -1,10 +1,15 @@
-/** Deterministic hue from a tag string */
+// 12 hues, 30° apart starting at 15°, avoids pure primaries which can look garish.
+// Any two tags that land on different slots are guaranteed ≥30° apart.
+const TAG_HUES = [15, 45, 75, 105, 135, 165, 195, 225, 255, 285, 315, 345];
+
+/** Deterministic hue from a tag string. Same tag always returns the same hue;
+ *  different tags are distributed across 12 evenly-spaced hue slots. */
 export function tagHue(tag: string): number {
   let hash = 0;
   for (let i = 0; i < tag.length; i++) {
     hash = tag.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return ((hash % 360) + 360) % 360;
+  return TAG_HUES[Math.abs(hash) % TAG_HUES.length];
 }
 
 export function tagColor(tag: string): string {

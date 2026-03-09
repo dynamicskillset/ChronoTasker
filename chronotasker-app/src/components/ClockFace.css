@@ -33,7 +33,10 @@
   --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
   --clock-hover-brightness: 1.2;
   --clock-shadow: 0 2px 16px rgba(0, 0, 0, 0.32);
-  --clock-calendar-opacity: 0.6;
+  --clock-calendar-opacity: 0.85;
+  --clock-task-opacity: 1;
+  --color-task-saturation: 72%;
+  --color-task-lightness: 74%;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -43,7 +46,10 @@
     --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
     --clock-hover-brightness: 1.2;
     --clock-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
-    --clock-calendar-opacity: 0.6;
+    --clock-calendar-opacity: 0.85;
+    --clock-task-opacity: 1;
+    --color-task-saturation: 72%;
+    --color-task-lightness: 74%;
   }
 }
 

@@ -28,6 +28,16 @@ Push to `main` triggers GitHub Actions. Frontend builds in CI, backend builds on
 
 ## Changelog
 
+### v1.0.2 — 2026-03-09
+
+- The highlight colour now defaults to warm gold (Nord yellow) instead of blue.
+- Tags are now assigned distinct colours that are clearly different from each other.
+- Tag colours in dark mode are brighter and easier to read.
+- The clock face arcs are more vivid in dark mode.
+- The Pomodoro timer ring and dots now follow the active highlight colour.
+- Pomodoro timer buttons now use colours that meet accessibility contrast requirements.
+- Demo mode now shows different tasks and calendar events on different days — navigate back to yesterday or forward to tomorrow to see a full example week.
+
 ### v1.0.1 — 2026-03-09
 
 - Calendar events from other time zones now appear at the right time of day instead of being shifted by several hours.

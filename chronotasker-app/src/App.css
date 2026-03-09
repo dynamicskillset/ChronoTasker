@@ -379,6 +379,7 @@
 .colour-swatch--frost .colour-swatch__dot    { background: #8FBCBB; }
 .colour-swatch--evergreen .colour-swatch__dot { background: #A3BE8C; }
 .colour-swatch--berry .colour-swatch__dot    { background: #B48EAD; }
+.colour-swatch--yellow .colour-swatch__dot   { background: #EBCB8B; }
 
 /* Two-column layout on desktop */
 .settings-panel__cols {

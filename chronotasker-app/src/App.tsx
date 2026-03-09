@@ -193,6 +193,13 @@ function App() {
     return () => clearInterval(interval);
   }, [committedIcalUrls, loadCalendars, demoMode]);
 
+  // Reload demo data when navigating days in demo mode
+  useEffect(() => {
+    if (!demoMode) return;
+    setTasks(getDemoTasks(date));
+    setCalendarEvents(getDemoCalendarEvents(date));
+  }, [date, demoMode]);
+
   // Re-parse cached iCal data when date changes
   useEffect(() => {
     if (demoMode) return;
@@ -682,11 +689,12 @@ function App() {
       editingTask, activeTaskId,
     };
     icsCache.current = [];
-    setTasks(getDemoTasks());
+    const demoDate = todayString();
+    setTasks(getDemoTasks(demoDate));
     setSettings(getDemoSettings());
     setBacklogTasks(getDemoBacklogTasks());
-    setCalendarEvents(getDemoCalendarEvents());
-    setDate(todayString());
+    setCalendarEvents(getDemoCalendarEvents(demoDate));
+    setDate(demoDate);
     setEditingTask(undefined);
     setActiveTaskId(null);
     setShowTimer(true);
@@ -821,9 +829,9 @@ function App() {
               <div className="settings-row">
                 <span className="settings-row__label">Highlight colour</span>
                 <div className="colour-swatches" role="radiogroup" aria-label="Highlight colour">
-                  {(['nord', 'aurora', 'frost', 'evergreen', 'berry'] as const).map(scheme => (
-                    <label key={scheme} className={`colour-swatch colour-swatch--${scheme}${(settings.colorScheme || 'nord') === scheme ? ' colour-swatch--active' : ''}`} title={scheme.charAt(0).toUpperCase() + scheme.slice(1)}>
-                      <input type="radio" name="colorScheme" value={scheme} checked={(settings.colorScheme || 'nord') === scheme}
+                  {(['yellow', 'nord', 'aurora', 'frost', 'evergreen', 'berry'] as const).map(scheme => (
+                    <label key={scheme} className={`colour-swatch colour-swatch--${scheme}${(settings.colorScheme || 'yellow') === scheme ? ' colour-swatch--active' : ''}`} title={scheme.charAt(0).toUpperCase() + scheme.slice(1)}>
+                      <input type="radio" name="colorScheme" value={scheme} checked={(settings.colorScheme || 'yellow') === scheme}
                         onChange={() => { const s = { ...settings, colorScheme: scheme as AppSettings['colorScheme'] }; setSettings(s); debouncedPushSettings(s); }} />
                       <span className="colour-swatch__dot" />
                     </label>

@@ -151,9 +151,9 @@
   --color-checkbox-done: #A3BE8C;
   --color-muted: #4C566A;
   --color-completed-opacity: 0.4;
-  --tag-saturation: 45%;
-  --tag-text-lightness: 70%;
-  --tag-bg-lightness: 22%;
+  --tag-saturation: 70%;
+  --tag-text-lightness: 82%;
+  --tag-bg-lightness: 28%;
 }
 
 .light {
@@ -392,6 +392,37 @@ h1, h2, h3 {
     --color-pill-active-bg: #926587;
     --color-submit-bg: #926587;
     --color-submit-hover: #A87CA0;
+  }
+}
+
+/* ── Colour scheme: Yellow (Nord #EBCB8B) ── */
+.scheme-yellow {
+  --color-accent: #9A7420;
+  --color-accent-hue: 41;
+  --color-active-border: #9A7420;
+  --color-input-focus: #9A7420;
+  --color-pill-active-bg: #9A7420;
+  --color-submit-bg: #9A7420;
+  --color-submit-hover: #B58C2A;
+}
+.dark.scheme-yellow {
+  --color-accent: #EBCB8B;
+  --color-accent-hue: 41;
+  --color-active-border: #EBCB8B;
+  --color-input-focus: #EBCB8B;
+  --color-pill-active-bg: #A07830;
+  --color-submit-bg: #A07830;
+  --color-submit-hover: #C09040;
+}
+@media (prefers-color-scheme: dark) {
+  .scheme-yellow:not(.light):not(.dark) {
+    --color-accent: #EBCB8B;
+    --color-accent-hue: 41;
+    --color-active-border: #EBCB8B;
+    --color-input-focus: #EBCB8B;
+    --color-pill-active-bg: #A07830;
+    --color-submit-bg: #A07830;
+    --color-submit-hover: #C09040;
   }
 }
 
