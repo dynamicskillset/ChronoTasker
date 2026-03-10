@@ -51,7 +51,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -o ServerAliveInterval=30 root@${{ secrets.VPS_HOST }} 'bash -s' <<'SCRIPT'
           set -e
-          cd /opt/chronotasker/server
+          cd /opt/taskdial/server
           # Only run npm install if package-lock.json changed (avoids slow native recompile)
           NEW_HASH=$(md5sum package-lock.json | cut -d' ' -f1)
           OLD_HASH=$(cat .package-lock-hash 2>/dev/null || echo "")
