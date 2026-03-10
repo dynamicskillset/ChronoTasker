@@ -2,13 +2,13 @@
 
 **Last updated:** 10 March 2026
 
-ChronoTasker is a personal productivity tool. This policy explains what information is collected when you use it, why, and what rights you have over it.
+TaskDial is a personal productivity tool. This policy explains what information is collected when you use it, why, and what rights you have over it.
 
 ---
 
 ## Who is responsible for your data
 
-ChronoTasker is operated by Doug Belshaw (privacy@dynamicskillset.com). For the purposes of the GDPR, Doug Belshaw is the data controller.
+TaskDial is operated by Doug Belshaw (privacy@dynamicskillset.com). For the purposes of the GDPR, Doug Belshaw is the data controller.
 
 If you have any questions or want to exercise your rights, contact: **privacy@dynamicskillset.com**
 
@@ -105,11 +105,20 @@ All data is stored on a server in the European Union. No data is transferred out
 | Data | Retention |
 |------|-----------|
 | Account and task data | Until you ask for your account to be deleted |
-| Audit log entries | 12 months, then deleted |
+| Audit log entries | 12 months from the date your account is deleted, then permanently removed |
 | Refresh tokens | 30 days from issue, then expired automatically |
 | Anonymous analytics events | 12 months, then deleted |
+| Inactive accounts | Accounts with no activity for 24 months will receive a notice and be deleted 30 days later if no action is taken |
 
-If your account is deleted, all associated tasks, sessions, settings, and tokens are permanently removed. Audit log entries linked to your account have the link removed (the entry is kept for security record-keeping but is no longer associated with you).
+If your account is deleted, all associated tasks, sessions, settings, and tokens are permanently removed. Audit log entries are anonymised: the link to your account (your user ID and IP address) is removed from each entry, and the anonymised entries are kept for security record-keeping for up to 12 months from the date of deletion, then permanently deleted.
+
+---
+
+## Exporting and importing your data
+
+You can download all your data at any time from the app's Settings panel. The export is a JSON file containing your tasks, Pomodoro session records, and settings — enough to restore your data or use it in another application. It does not include your password or internal security data.
+
+If you import data using the import tool, you are responsible for ensuring that the file contains only your own personal data. Importing data that includes other people's personal information without a lawful basis is not permitted.
 
 ---
 
@@ -120,11 +129,11 @@ You have the right to:
 - **Access** the personal data we hold about you
 - **Correct** inaccurate data
 - **Delete** your account and all associated data ("right to be forgotten")
-- **Export** your data in a portable format
+- **Export** your data in a portable format (JSON)
 - **Restrict** processing of your data in certain circumstances
 - **Object** to processing based on legitimate interests
 
-To exercise any of these rights, contact **doug@dynamicskillset.com**. We will respond within 30 days.
+To exercise any of these rights, contact **privacy@dynamicskillset.com**. We will respond within 30 days.
 
 You also have the right to lodge a complaint with the supervisory authority in your country. In the UK, this is the [Information Commissioner's Office (ICO)](https://ico.org.uk/).
 
