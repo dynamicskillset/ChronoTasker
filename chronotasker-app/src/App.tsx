@@ -163,6 +163,14 @@ function App({ user, onLogout }: AppProps) {
     paused: demoMode,
   });
 
+  // Only show "syncing..." if a sync takes longer than 1.5s — avoids flash on routine background polls
+  const [showSyncing, setShowSyncing] = useState(false);
+  useEffect(() => {
+    if (!isSyncing) { setShowSyncing(false); return; }
+    const t = setTimeout(() => setShowSyncing(true), 1500);
+    return () => clearTimeout(t);
+  }, [isSyncing]);
+
   // Unfinished tasks from yesterday
   const { unfinishedTasks, setUnfinishedTasks, showPrompt, dismissPrompt } =
     useUnfinishedTasks({ currentDate: date, enabled: !demoMode });
@@ -925,7 +933,7 @@ function App({ user, onLogout }: AppProps) {
         </div>
         <div className="header-status">
           <span className={`sync-indicator ${demoMode ? 'demo' : isOnline ? 'online' : 'offline'}`} aria-live="polite">
-            {demoMode ? 'demo' : isSyncing ? 'syncing...' : isOnline ? 'online' : 'offline'}
+            {demoMode ? 'demo' : showSyncing ? 'syncing...' : isOnline ? 'online' : 'offline'}
           </span>
           {isAdmin() && (
             <a href="/admin" className="header-admin-link" title={`Signed in as ${user.email}`}>
