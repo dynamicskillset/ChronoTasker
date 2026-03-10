@@ -2,39 +2,93 @@
 
 ![ChronoTasker screenshot](chronotasker-screenshot.png)
 
-A visual time-planning tool with an integrated Pomodoro timer. Instead of a list, your day appears as a clock face — tasks are coloured arcs so you can see at a glance how your time is allocated.
+Most to-do apps show you a list. ChronoTasker shows you your day as a clock: tasks are coloured arcs, so you can see at a glance whether your plan is realistic, where the gaps are, and where you're overloading yourself.
 
-**Live at [chronotasker.dougbelshaw.com](https://chronotasker.dougbelshaw.com)** — invite-only during the testing period.
+There's a built-in Pomodoro timer too, so focused work and planning live in the same place.
+
+**Try it at [chronotasker.dougbelshaw.com](https://chronotasker.dougbelshaw.com)** — invite-only while we're testing.
 
 ---
 
-## What it does
+## What you get
 
-- **Clock face view** — tasks sit on a 12-hour clock as arcs; you see time, not a list
-- **Pomodoro timer** — 25-minute focus sessions, short breaks, long break every four cycles; sounds and notifications when cycles complete
-- **Calendar feeds** — connect up to three iCal feeds; meetings appear on the clock with a configurable buffer
-- **Task management** — add, edit, reorder (drag or tap), reschedule, set fixed times, mark important, tag, repeat
-- **Backlog** — tasks that don't have a place today sit in a backlog until you're ready
-- **Undo/redo** — undo or redo any task action
-- **Offline-first PWA** — works without a connection; syncs when you're back online; installable on any device
+- **Clock face** — your day as a visual ring, not a list; tasks are arcs you can see and move
+- **Pomodoro timer** — 25-minute focus sessions with short breaks and a longer break every four cycles; sounds and notifications when each phase ends
+- **Calendar feeds** — connect up to three iCal feeds (Google Calendar, Proton Calendar, etc.) and see your meetings on the clock with a configurable gap before the next task
+- **Task management** — add, edit, reorder by dragging, reschedule to another day, set a fixed start time, mark as important, add tags, set up repeating tasks
+- **Backlog** — a place for tasks that don't belong to any particular day yet; move them to today when you're ready
+- **Undo/redo** — change your mind freely; undo or redo any action
+- **Works offline** — tasks save locally first and sync when you're back online; installable as a PWA
 - **Five colour schemes** — Nord, Aurora, Frost, Evergreen, Berry
-- **Accessible** — keyboard navigable, screen-reader friendly
+- **Accessible** — keyboard navigable and screen-reader friendly
 
 ---
 
-## Getting started
+## Getting access
 
-ChronoTasker is currently in testing. To get access, ask for an invite code. Once you have one:
+ChronoTasker is currently in testing, so you'll need an invite code to sign up. Once you have one:
 
 1. Go to [chronotasker.dougbelshaw.com](https://chronotasker.dougbelshaw.com)
-2. Click **Create account**, enter your email, a password (12+ characters), and your invite code
-3. Install to your home screen for the best experience (Android and iOS) or as a desktop app via Chrome or Edge (Mac and Linux)
+2. Click **Create account** and enter your email, a password (12 characters or more), and your invite code
+3. Install it for the best experience: on **Android and iOS**, add it to your home screen; on **Mac and Linux**, use Chrome or Edge and choose "Install app"
 
 ---
 
-## Self-hosting
+## Privacy
 
-ChronoTasker is designed to be self-hosted. You run one server for yourself and any people you invite.
+ChronoTasker stores your tasks and settings on the server so they sync across your devices. It uses no third-party trackers, shares no data, and does not use your data to train AI models. Full details are in the [Privacy Policy](https://chronotasker.dougbelshaw.com/privacy).
+
+---
+
+## Changelog
+
+### v1.1.1 — 2026-03-10
+
+- **Privacy policy**: a full privacy policy is now at `/privacy`, linked from the login page and the help panel.
+- **Login inputs**: the email and password fields now have a visible border so they stand out against the dark background.
+
+### v1.1.0 — 2026-03-10
+
+- **Multi-user support**: ChronoTasker now supports multiple accounts. Each person sees only their own tasks and settings.
+- **Sign up and log in**: create an account with an invite code; sessions refresh automatically so you stay logged in.
+- **Admin dashboard**: the owner account gets a panel at `/admin` to manage users, create and revoke invite codes, and view an audit log.
+- **Security**: passwords are hashed, tokens are stored in secure httpOnly cookies rather than localStorage, and all data is scoped to the logged-in user.
+
+### v1.0.4 — 2026-03-09
+
+- **Drag to reorder**: drag tasks up and down the list to change their order on the clock. The up/down buttons remain available on touch devices.
+- **Accessibility**: screen readers now get clear descriptions for the Pomodoro timer, recurring task badge, conflict and overflow warnings, day start/end time inputs, and colour scheme options.
+
+### v1.0.3 — 2026-03-09
+
+- **Undo/redo**: undo or redo the last task action with Cmd+Z / Cmd+Shift+Z, or use the bar at the bottom of the screen.
+- **Tag filtering**: when tasks have different tags, filter pills appear above the task list.
+- **First-time onboarding**: new users see a short explanation of how the app works, with a link to try demo mode.
+- **Browser notifications**: the app notifies you when a scheduled task is about to start.
+
+### v1.0.2 — 2026-03-09
+
+- The highlight colour now defaults to warm gold instead of blue.
+- Tags are assigned distinct colours that are clearly different from each other.
+- The Pomodoro timer ring and dots follow the active highlight colour.
+- Demo mode shows different tasks and calendar events on different days.
+
+### v1.0.1 — 2026-03-09
+
+- Calendar events from other time zones now appear at the correct local time.
+- The app version number is shown in the top-left corner.
+- Task titles on mobile now wrap instead of being cut off.
+
+### v1.0.0 — 2026-03-05
+
+First release: clock face visualisation, Pomodoro timer, task management, calendar feeds, recurring tasks, backlog, colour schemes, offline sync, PWA install, help page.
+
+---
+
+<details>
+<summary><strong>Self-hosting and development</strong></summary>
+
+ChronoTasker is designed to be self-hosted. You run one server for yourself and anyone you invite.
 
 ### Requirements
 
@@ -43,11 +97,11 @@ ChronoTasker is designed to be self-hosted. You run one server for yourself and 
 
 ### Setup
 
-**1. Clone and install**
+**1. Clone the repo**
 
 ```bash
-git clone https://github.com/your-username/chronotasker
-cd chronotasker
+git clone https://github.com/dynamicskillset/ChronoTasker
+cd ChronoTasker
 ```
 
 **2. Configure the server**
@@ -75,7 +129,7 @@ npm run build
 node dist/index.js
 ```
 
-On first run, the server creates your owner account and prints a one-time password to the console. Save it.
+On first run the server creates your owner account and prints a one-time password to the console. Save it — it won't be shown again.
 
 **4. Build the frontend**
 
@@ -109,33 +163,29 @@ your-domain.com {
 }
 ```
 
-### Inviting users
+**6. Inviting people**
 
-Log in with your owner account and visit `/admin`. From there you can generate invite codes and share them with the people you want to give access to.
+Log in with your owner account and go to `/admin`. From there you can generate invite codes to share.
 
----
-
-## Development
+### Running locally
 
 ```bash
-# Start the backend
+# Backend
 cd server && npm run dev
 
-# Start the frontend (separate terminal)
+# Frontend (separate terminal)
 cd chronotasker-app && npm run dev
 ```
 
 The frontend dev server runs on `http://localhost:5173`. The API runs on port `3001`.
 
-### Running tests
+### Tests
 
 ```bash
 cd chronotasker-app && npm test
 ```
 
----
-
-## Stack
+### Stack
 
 | Layer | Technology |
 |-------|-----------|
@@ -144,48 +194,4 @@ cd chronotasker-app && npm test
 | Auth | JWT (httpOnly cookies), bcrypt, rotating refresh tokens |
 | Deploy | GitHub Actions → VPS, Caddy reverse proxy, pm2 |
 
----
-
-## Changelog
-
-### v1.1.0 — 2026-03-10
-
-- **Multi-user support**: ChronoTasker now supports multiple accounts. Each user sees only their own tasks and settings.
-- **Accounts**: sign up with an invite code, log in, log out. Sessions use short-lived tokens that refresh automatically.
-- **Admin dashboard**: the owner account gets an admin panel at `/admin` to manage users, generate and revoke invite codes, and view an audit log.
-- **Security**: passwords are hashed with bcrypt, tokens are stored in httpOnly cookies (not localStorage), and all API routes check that data belongs to the requesting user.
-
-### v1.1.1 — 2026-03-10
-
-- **Privacy policy**: a full privacy policy is now accessible at `/privacy`, linked from the login page and the help FAQ.
-- **Login inputs**: the email and password boxes now have a visible border so they are easier to spot on the dark background.
-- **Platform clarity**: the getting-started guide now correctly explains that desktop install on Mac and Linux requires Chrome or Edge.
-
-### v1.0.4 — 2026-03-09
-
-- **Drag to reorder**: drag tasks up and down the list to change their order on the clock. On touch devices the up/down buttons remain available.
-- **Accessibility**: screen readers now get clear descriptions for the Pomodoro timer, recurring task badge, conflict and overflow warnings, day start/end time inputs, and colour scheme options.
-
-### v1.0.3 — 2026-03-09
-
-- **Undo/redo**: undo or redo the last task action using Cmd+Z / Cmd+Shift+Z or the bar that appears at the bottom of the screen.
-- **Tag filtering**: filter pills appear above the task list when tasks have different tags.
-- **First-time onboarding**: new users see a short explanation of how the app works, with a link to try demo mode.
-- **Browser notifications**: the app notifies you when a scheduled task is about to start.
-
-### v1.0.2 — 2026-03-09
-
-- The highlight colour now defaults to warm gold instead of blue.
-- Tags are assigned distinct colours that are clearly different from each other.
-- The Pomodoro timer ring and dots follow the active highlight colour.
-- Demo mode shows different tasks and calendar events on different days.
-
-### v1.0.1 — 2026-03-09
-
-- Calendar events from other time zones now appear at the correct local time.
-- The app version number is shown in the top-left corner.
-- Task titles on mobile now wrap instead of being cut off.
-
-### v1.0.0 — 2026-03-05
-
-First release: clock face visualisation, Pomodoro timer, task management, calendar feeds, recurring tasks, backlog, colour schemes, offline sync, PWA install, help page.
+</details>
