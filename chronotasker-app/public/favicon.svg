@@ -1,36 +1,34 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Dark disc -->
-  <circle cx="50" cy="50" r="49" fill="#2E3440"/>
+  <style>
+    /* Light mode defaults */
+    .lt { stroke: #3B4252; }
+    .lc { stroke: #2E3440; }
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {
+      .lt { stroke: #4C566A; }
+      .lc { stroke: #ECEFF4; }
+    }
+  </style>
 
-  <!-- Base ring track -->
-  <circle cx="50" cy="50" r="35" fill="none" stroke="#3B4252" stroke-width="12"/>
+  <!-- Outer border circle -->
+  <circle cx="50" cy="50" r="47" fill="none" class="lc" stroke-width="1.5" opacity="0.2"/>
 
-  <!-- Arc 1: Nord blue — 355° to 85° (~90°, top-right to right) -->
+  <!-- Arc track (faint background ring) -->
+  <circle cx="50" cy="50" r="35" fill="none" class="lt" stroke-width="9" opacity="0.18"/>
+
+  <!-- Arc 1: Nord blue — 355° to 85° -->
   <path d="M 46.9 15.1 A 35 35 0 0 1 84.9 46.9"
-        fill="none" stroke="#5E81AC" stroke-width="12" stroke-linecap="butt"/>
+        fill="none" stroke="#5E81AC" stroke-width="9" stroke-linecap="butt"/>
 
-  <!-- Arc 2: Nord teal — 95° to 175° (~80°, right to bottom-right) -->
+  <!-- Arc 2: Nord teal — 95° to 175° -->
   <path d="M 84.9 53.1 A 35 35 0 0 1 53.1 84.9"
-        fill="none" stroke="#88C0D0" stroke-width="12" stroke-linecap="butt"/>
+        fill="none" stroke="#88C0D0" stroke-width="9" stroke-linecap="butt"/>
 
-  <!-- Arc 3: Nord green — 185° to 270° (~85°, bottom-left to left) -->
+  <!-- Arc 3: Nord green — 185° to 270° -->
   <path d="M 46.9 84.9 A 35 35 0 0 1 15 50"
-        fill="none" stroke="#A3BE8C" stroke-width="12" stroke-linecap="butt"/>
+        fill="none" stroke="#A3BE8C" stroke-width="9" stroke-linecap="butt"/>
 
-  <!-- Hour markers at 12, 3, 6, 9 -->
-  <circle cx="50" cy="5" r="2" fill="#D8DEE9"/>
-  <circle cx="95" cy="50" r="2" fill="#D8DEE9"/>
-  <circle cx="50" cy="95" r="2" fill="#D8DEE9"/>
-  <circle cx="5" cy="50" r="2" fill="#D8DEE9"/>
-
-  <!-- Clock hands at 10:10 — hands frame the open top-left gap -->
-  <!-- Hour hand: 10 o'clock (300°), length 21 -->
-  <line x1="50" y1="50" x2="31.8" y2="39.5"
-        stroke="#ECEFF4" stroke-width="3.5" stroke-linecap="round"/>
-  <!-- Minute hand: 2 o'clock (60°), length 24 -->
-  <line x1="50" y1="50" x2="70.8" y2="38"
-        stroke="#ECEFF4" stroke-width="2.5" stroke-linecap="round"/>
-
-  <!-- Centre pivot -->
-  <circle cx="50" cy="50" r="4" fill="#ECEFF4"/>
+  <!-- Checkmark -->
+  <path d="M 32 50 L 44 63 L 68 37"
+        fill="none" class="lc" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>

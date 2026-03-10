@@ -99,6 +99,7 @@ function App({ user, onLogout }: AppProps) {
   }
 
   // Data & account section
+  const [showDataSection, setShowDataSection] = useState(false);
   const [dataActionStatus, setDataActionStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [importWorking, setImportWorking] = useState(false);
   const [exportWorking, setExportWorking] = useState(false);
@@ -889,15 +890,17 @@ function App({ user, onLogout }: AppProps) {
             <img src="/favicon.svg" alt="" className="app-logo" aria-hidden="true" />
             <span className="app-title__wordmark">TaskDial</span>
           </h1>
-          <button
-            className="help-trigger-btn"
-            onClick={() => setShowHelp(true)}
-            aria-label="How to use TaskDial"
-            title="How to use TaskDial"
-          >
-            ?
-          </button>
-          <span className="app-version" aria-label={`Version ${APP_VERSION}`}>v{APP_VERSION}</span>
+          <div className="app-title-meta">
+            <button
+              className="help-trigger-btn"
+              onClick={() => setShowHelp(true)}
+              aria-label="How to use TaskDial"
+              title="How to use TaskDial"
+            >
+              ?
+            </button>
+            <span className="app-version" aria-label={`Version ${APP_VERSION}`}>v{APP_VERSION}</span>
+          </div>
         </div>
         <div className="header-status">
           <span className={`sync-indicator ${demoMode ? 'demo' : isOnline ? 'online' : 'offline'}`} aria-live="polite">
@@ -956,7 +959,7 @@ function App({ user, onLogout }: AppProps) {
               <span className="settings-row__hint">Fixed-time scheduling, calendar, recurring tasks</span>
             </div>
             <label className="toggle-switch">
-              <input type="checkbox" checked={settings.advancedMode} onChange={e => { const s = { ...settings, advancedMode: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+              <input type="checkbox" aria-label="Advanced mode" checked={settings.advancedMode} onChange={e => { const s = { ...settings, advancedMode: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
               <span className="toggle-switch__track" aria-hidden="true" />
             </label>
           </div>
@@ -984,7 +987,7 @@ function App({ user, onLogout }: AppProps) {
             {/* Display column */}
             <div className="settings-col">
               <div className="settings-divider" />
-              <p className="settings-section-label">Display</p>
+              <p className="settings-section-label" role="heading" aria-level={3}>Display</p>
 
               <div className="settings-row">
                 <span className="settings-row__label">Day hours</span>
@@ -1002,7 +1005,7 @@ function App({ user, onLogout }: AppProps) {
               <div className="settings-row">
                 <span className="settings-row__label">24-hour time</span>
                 <label className="toggle-switch">
-                  <input type="checkbox" checked={settings.use24Hour} onChange={e => { const s = { ...settings, use24Hour: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                  <input type="checkbox" aria-label="24-hour time" checked={settings.use24Hour} onChange={e => { const s = { ...settings, use24Hour: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                   <span className="toggle-switch__track" aria-hidden="true" />
                 </label>
               </div>
@@ -1023,7 +1026,7 @@ function App({ user, onLogout }: AppProps) {
               <div className="settings-row">
                 <span className="settings-row__label">Clock on right</span>
                 <label className="toggle-switch">
-                  <input type="checkbox" checked={settings.clockPosition === 'right'} onChange={e => { const s = { ...settings, clockPosition: (e.target.checked ? 'right' : 'left') as AppSettings['clockPosition'] }; setSettings(s); debouncedPushSettings(s); }} />
+                  <input type="checkbox" aria-label="Clock on right" checked={settings.clockPosition === 'right'} onChange={e => { const s = { ...settings, clockPosition: (e.target.checked ? 'right' : 'left') as AppSettings['clockPosition'] }; setSettings(s); debouncedPushSettings(s); }} />
                   <span className="toggle-switch__track" aria-hidden="true" />
                 </label>
               </div>
@@ -1034,7 +1037,7 @@ function App({ user, onLogout }: AppProps) {
                   <span className="settings-row__hint">Tick on task complete, chime on Pomodoro end</span>
                 </div>
                 <label className="toggle-switch">
-                  <input type="checkbox" checked={!!settings.enableSounds} onChange={e => { const s = { ...settings, enableSounds: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                  <input type="checkbox" aria-label="Sound effects" checked={!!settings.enableSounds} onChange={e => { const s = { ...settings, enableSounds: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                   <span className="toggle-switch__track" aria-hidden="true" />
                 </label>
               </div>
@@ -1044,7 +1047,7 @@ function App({ user, onLogout }: AppProps) {
             {settings.advancedMode && (
               <div className="settings-col settings-col--right">
                 <div className="settings-divider" />
-                <p className="settings-section-label">Scheduling</p>
+                <p className="settings-section-label" role="heading" aria-level={3}>Scheduling</p>
 
                 <div className="settings-row settings-row--stacked">
                   <div className="settings-row__label-group">
@@ -1085,7 +1088,7 @@ function App({ user, onLogout }: AppProps) {
                     <span className="settings-row__hint">Start scheduling from now, not the day start</span>
                   </div>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={settings.autoAdvance} onChange={e => { const s = { ...settings, autoAdvance: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                    <input type="checkbox" aria-label="Auto-advance" checked={settings.autoAdvance} onChange={e => { const s = { ...settings, autoAdvance: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                     <span className="toggle-switch__track" aria-hidden="true" />
                   </label>
                 </div>
@@ -1123,9 +1126,9 @@ function App({ user, onLogout }: AppProps) {
                   <div className="settings-row">
                     <span className="settings-row__label">Buffer after meetings</span>
                     <div className="stepper">
-                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.max(0, settings.meetingBufferMinutes - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease">−</button>
+                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.max(0, settings.meetingBufferMinutes - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease meeting buffer">−</button>
                       <span className="stepper__value">{settings.meetingBufferMinutes}</span>
-                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.min(60, settings.meetingBufferMinutes + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase">+</button>
+                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.min(60, settings.meetingBufferMinutes + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase meeting buffer">+</button>
                       <span className="stepper__unit">min</span>
                     </div>
                   </div>
@@ -1134,7 +1137,7 @@ function App({ user, onLogout }: AppProps) {
                 <div className="settings-row">
                   <span className="settings-row__label">Recurring tasks</span>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={settings.enableRecurringTasks} onChange={e => { const s = { ...settings, enableRecurringTasks: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                    <input type="checkbox" aria-label="Recurring tasks" checked={settings.enableRecurringTasks} onChange={e => { const s = { ...settings, enableRecurringTasks: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                     <span className="toggle-switch__track" aria-hidden="true" />
                   </label>
                 </div>
@@ -1142,7 +1145,7 @@ function App({ user, onLogout }: AppProps) {
                 <div className="settings-row">
                   <span className="settings-row__label">Backlog</span>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={settings.enableBacklog} onChange={e => { const s = { ...settings, enableBacklog: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                    <input type="checkbox" aria-label="Backlog" checked={settings.enableBacklog} onChange={e => { const s = { ...settings, enableBacklog: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                     <span className="toggle-switch__track" aria-hidden="true" />
                   </label>
                 </div>
@@ -1150,19 +1153,19 @@ function App({ user, onLogout }: AppProps) {
                 <div className="settings-row">
                   <span className="settings-row__label">Day time summary</span>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={settings.showDaySummary} onChange={e => { const s = { ...settings, showDaySummary: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                    <input type="checkbox" aria-label="Day time summary" checked={settings.showDaySummary} onChange={e => { const s = { ...settings, showDaySummary: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                     <span className="toggle-switch__track" aria-hidden="true" />
                   </label>
                 </div>
 
                 {/* Pomodoro — lives at the bottom of the right column */}
                 <div className="settings-divider settings-divider--inset" />
-                <p className="settings-section-label">Pomodoro</p>
+                <p className="settings-section-label" role="heading" aria-level={3}>Pomodoro</p>
 
                 <div className="settings-row">
                   <span className="settings-row__label">Pomodoro Timer</span>
                   <label className="toggle-switch">
-                    <input type="checkbox" checked={settings.showPomodoroTimer} onChange={e => { const s = { ...settings, showPomodoroTimer: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
+                    <input type="checkbox" aria-label="Pomodoro timer" checked={settings.showPomodoroTimer} onChange={e => { const s = { ...settings, showPomodoroTimer: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
                     <span className="toggle-switch__track" aria-hidden="true" />
                   </label>
                 </div>
@@ -1172,27 +1175,27 @@ function App({ user, onLogout }: AppProps) {
                     <div className="settings-row">
                       <span className="settings-row__label">Work</span>
                       <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.max(1, settings.workDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease">−</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.max(1, settings.workDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease work duration">−</button>
                         <span className="stepper__value">{settings.workDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.min(120, settings.workDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase">+</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.min(120, settings.workDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase work duration">+</button>
                         <span className="stepper__unit">min</span>
                       </div>
                     </div>
                     <div className="settings-row">
                       <span className="settings-row__label">Short break</span>
                       <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.max(1, settings.shortBreakDuration - 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease">−</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.max(1, settings.shortBreakDuration - 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease short break duration">−</button>
                         <span className="stepper__value">{settings.shortBreakDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.min(30, settings.shortBreakDuration + 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase">+</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.min(30, settings.shortBreakDuration + 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase short break duration">+</button>
                         <span className="stepper__unit">min</span>
                       </div>
                     </div>
                     <div className="settings-row">
                       <span className="settings-row__label">Long break</span>
                       <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.max(1, settings.longBreakDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease">−</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.max(1, settings.longBreakDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease long break duration">−</button>
                         <span className="stepper__value">{settings.longBreakDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.min(60, settings.longBreakDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase">+</button>
+                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.min(60, settings.longBreakDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase long break duration">+</button>
                         <span className="stepper__unit">min</span>
                       </div>
                     </div>
@@ -1204,52 +1207,66 @@ function App({ user, onLogout }: AppProps) {
 
           {/* Data & account section */}
           <div className="settings-divider" />
-          <p className="settings-section-label">Data &amp; account</p>
+          <button
+            className="settings-disclosure"
+            aria-expanded={showDataSection}
+            aria-controls="data-account-section"
+            onClick={() => setShowDataSection(v => !v)}
+          >
+            <span className="settings-section-label" role="heading" aria-level={3}>Data &amp; account</span>
+            <svg className={`settings-disclosure__chevron${showDataSection ? ' settings-disclosure__chevron--open' : ''}`} width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+              <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
 
-          {dataActionStatus && (
-            <p className={`data-action-status data-action-status--${dataActionStatus.type}`} role="alert">
-              {dataActionStatus.message}
-            </p>
+          {showDataSection && (
+            <div id="data-account-section">
+              {dataActionStatus && (
+                <p className={`data-action-status data-action-status--${dataActionStatus.type}`} role="alert">
+                  {dataActionStatus.message}
+                </p>
+              )}
+
+              <div className="settings-row settings-row--stacked">
+                <span className="settings-row__label">Export your data</span>
+                <span className="settings-row__hint">Download all your tasks, sessions, and settings as a JSON file.</span>
+                <button
+                  className="data-action-btn"
+                  onClick={handleExport}
+                  disabled={exportWorking}
+                >
+                  {exportWorking ? 'Exporting…' : 'Download export'}
+                </button>
+              </div>
+
+              <div className="settings-row settings-row--stacked">
+                <span className="settings-row__label">Import data</span>
+                <span className="settings-row__hint">Restore from a previously exported JSON file. This replaces all current data.</span>
+                <label className={`data-action-btn${importWorking ? ' data-action-btn--disabled' : ''}`}>
+                  {importWorking ? 'Importing…' : 'Choose file…'}
+                  <input
+                    type="file"
+                    accept="application/json,.json"
+                    onChange={handleImport}
+                    disabled={importWorking}
+                    style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
+                    aria-label="Choose JSON export file to import"
+                  />
+                </label>
+              </div>
+
+              <div className="settings-row settings-row--stacked">
+                <span className="settings-row__label settings-row__label--danger">Delete account</span>
+                <span className="settings-row__hint">Permanently removes your account and all associated data. This cannot be undone.</span>
+                <button
+                  className="data-action-btn data-action-btn--danger"
+                  onClick={() => { setShowDeleteModal(true); setDeleteError(''); setDeletePassword(''); setDeleteConfirmed(false); }}
+                >
+                  Delete my account…
+                </button>
+              </div>
+            </div>
           )}
-
-          <div className="settings-row settings-row--stacked">
-            <span className="settings-row__label">Export your data</span>
-            <span className="settings-row__hint">Download all your tasks, sessions, and settings as a JSON file.</span>
-            <button
-              className="data-action-btn"
-              onClick={handleExport}
-              disabled={exportWorking}
-            >
-              {exportWorking ? 'Exporting…' : 'Download export'}
-            </button>
-          </div>
-
-          <div className="settings-row settings-row--stacked">
-            <span className="settings-row__label">Import data</span>
-            <span className="settings-row__hint">Restore from a previously exported JSON file. This replaces all current data.</span>
-            <label className={`data-action-btn${importWorking ? ' data-action-btn--disabled' : ''}`}>
-              {importWorking ? 'Importing…' : 'Choose file…'}
-              <input
-                type="file"
-                accept="application/json,.json"
-                onChange={handleImport}
-                disabled={importWorking}
-                style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
-                aria-label="Choose JSON export file to import"
-              />
-            </label>
-          </div>
-
-          <div className="settings-row settings-row--stacked">
-            <span className="settings-row__label settings-row__label--danger">Delete account</span>
-            <span className="settings-row__hint">Permanently removes your account and all associated data. This cannot be undone.</span>
-            <button
-              className="data-action-btn data-action-btn--danger"
-              onClick={() => { setShowDeleteModal(true); setDeleteError(''); setDeletePassword(''); setDeleteConfirmed(false); }}
-            >
-              Delete my account…
-            </button>
-          </div>
 
         </div>
         </div>

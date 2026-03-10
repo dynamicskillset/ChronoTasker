@@ -277,13 +277,13 @@
    Help trigger button (placed next to app title)
    ============================================================ */
 .help-trigger-btn {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
   width: 24px;
   height: 24px;
-  padding: 10px;
-  margin: -10px -10px -10px calc(-10px + 0.5rem);
+  padding: 0;
   border: 1.5px solid var(--color-border);
   border-radius: 50%;
   background: none;
@@ -294,6 +294,13 @@
   opacity: 0.5;
   transition: opacity var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
   line-height: 1;
+}
+
+/* Expand touch/click target to 44×44px without affecting layout */
+.help-trigger-btn::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
 }
 
 .help-trigger-btn:hover {
