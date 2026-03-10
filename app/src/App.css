@@ -1378,7 +1378,7 @@
   border-radius: 5px;
   cursor: pointer;
   background: var(--color-warning);
-  color: var(--color-submit-text);
+  color: #1a1200;
   transition: opacity var(--transition-normal);
 }
 
