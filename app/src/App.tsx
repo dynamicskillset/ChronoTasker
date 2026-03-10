@@ -27,6 +27,7 @@ import { getDemoTasks, getDemoBacklogTasks, getDemoCalendarEvents, getDemoSettin
 import { isAdmin } from './services/auth';
 import type { AuthUser } from './services/auth';
 import { exportData, importData, deleteAccount } from './services/api';
+import { SettingsPanel } from './components/SettingsPanel';
 import './App.css';
 
 interface AppProps {
@@ -113,7 +114,6 @@ function App({ user, onLogout }: AppProps) {
   }
 
   // Data & account section
-  const [showDataSection, setShowDataSection] = useState(false);
   const [dataActionStatus, setDataActionStatus] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [importWorking, setImportWorking] = useState(false);
   const [exportWorking, setExportWorking] = useState(false);
@@ -204,6 +204,12 @@ function App({ user, onLogout }: AppProps) {
     if (settingsTimerRef.current) clearTimeout(settingsTimerRef.current);
     settingsTimerRef.current = setTimeout(() => pushSettings(s), 500);
   }, [pushSettings]);
+
+  // Single callback for SettingsPanel: updates local state + queues API push
+  const handleSettingChange = useCallback((s: AppSettings) => {
+    setSettings(s);
+    debouncedPushSettings(s);
+  }, [debouncedPushSettings]);
 
   // Auto-expand timer when running
   useEffect(() => {
@@ -1020,339 +1026,26 @@ function App({ user, onLogout }: AppProps) {
       </Suspense>
 
       {showSettings && (
-        <div className={`settings-panel-wrapper${settings.advancedMode ? '' : ' settings-panel-wrapper--simple'}`}>
-        <div id="settings-panel" className="settings-panel" role="region" aria-label="Settings" onKeyDown={e => { if (e.key === 'Escape') setShowSettings(false); }}>
-          <div className="settings-panel__header">
-            <h2 className="settings-panel__title">Settings</h2>
-            <button className="settings-panel__close" onClick={() => setShowSettings(false)} aria-label="Close settings">
-              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 1L11 11M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" /></svg>
-            </button>
-          </div>
-
-          {/* Mode toggle — at top, prominent */}
-          <div className="settings-row settings-row--featured">
-            <div className="settings-row__label-group">
-              <span className="settings-row__label">Advanced mode</span>
-              <span className="settings-row__hint">Unlock calendar feeds, recurring tasks, backlog, and Pomodoro timer</span>
-            </div>
-            <label className="toggle-switch">
-              <input type="checkbox" aria-label="Advanced mode" checked={settings.advancedMode} onChange={e => { const s = { ...settings, advancedMode: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-              <span className="toggle-switch__track" aria-hidden="true" />
-            </label>
-          </div>
-
-          {/* Theme */}
-          <div className="settings-divider" />
-          <div className="settings-row">
-            <span className="settings-row__label">Appearance</span>
-            <div className="theme-toggle" role="group" aria-label="Colour scheme preference">
-              {(['light', 'system', 'dark'] as const).map(opt => (
-                <button
-                  key={opt}
-                  className={`theme-toggle__btn${tdTheme === opt ? ' theme-toggle__btn--active' : ''}`}
-                  onClick={() => handleThemeChange(opt)}
-                  aria-pressed={tdTheme === opt}
-                >
-                  {opt === 'light' ? '☀ Light' : opt === 'dark' ? '☾ Dark' : '⊙ System'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Display + Scheduling: side-by-side on desktop when both visible */}
-          <div className={settings.advancedMode ? 'settings-panel__cols' : undefined}>
-            {/* Display column */}
-            <div className="settings-col">
-              <div className="settings-divider" />
-              <p className="settings-section-label" role="heading" aria-level={3}>Display</p>
-
-              <div className="settings-row">
-                <span className="settings-row__label">Day hours</span>
-                <div className="settings-row__control--inline">
-                  <input type="time" className="settings-time-input" aria-label="Day start time"
-                    value={`${String(Math.floor(settings.dayStartHour)).padStart(2, '0')}:${String(Math.round((settings.dayStartHour % 1) * 60)).padStart(2, '0')}`}
-                    onChange={e => { const [h, m] = e.target.value.split(':').map(Number); if (!isNaN(h)) { const s = { ...settings, dayStartHour: h + (m || 0) / 60 }; setSettings(s); debouncedPushSettings(s); } }} />
-                  <span className="settings-row__sep">to</span>
-                  <input type="time" className="settings-time-input" aria-label="Day end time"
-                    value={`${String(Math.floor(settings.dayEndHour)).padStart(2, '0')}:${String(Math.round((settings.dayEndHour % 1) * 60)).padStart(2, '0')}`}
-                    onChange={e => { const [h, m] = e.target.value.split(':').map(Number); if (!isNaN(h)) { const s = { ...settings, dayEndHour: h + (m || 0) / 60 }; setSettings(s); debouncedPushSettings(s); } }} />
-                </div>
-              </div>
-
-              <div className="settings-row">
-                <span className="settings-row__label">24-hour time</span>
-                <label className="toggle-switch">
-                  <input type="checkbox" aria-label="24-hour time" checked={settings.use24Hour} onChange={e => { const s = { ...settings, use24Hour: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                  <span className="toggle-switch__track" aria-hidden="true" />
-                </label>
-              </div>
-
-              <div className="settings-row">
-                <span className="settings-row__label">Highlight colour</span>
-                <div className="colour-swatches" role="radiogroup" aria-label="Highlight colour">
-                  {(['berry', 'nord', 'aurora', 'frost', 'evergreen'] as const).map(scheme => (
-                    <label key={scheme} className={`colour-swatch colour-swatch--${scheme}${(settings.colorScheme || 'berry') === scheme ? ' colour-swatch--active' : ''}`} title={scheme.charAt(0).toUpperCase() + scheme.slice(1)} aria-label={scheme.charAt(0).toUpperCase() + scheme.slice(1)}>
-                      <input type="radio" name="colorScheme" value={scheme} checked={(settings.colorScheme || 'berry') === scheme}
-                        onChange={() => { const s = { ...settings, colorScheme: scheme as AppSettings['colorScheme'] }; setSettings(s); debouncedPushSettings(s); }} />
-                      <span className="colour-swatch__dot" />
-                    </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="settings-row">
-                <span className="settings-row__label">Clock on right</span>
-                <label className="toggle-switch">
-                  <input type="checkbox" aria-label="Clock on right" checked={settings.clockPosition === 'right'} onChange={e => { const s = { ...settings, clockPosition: (e.target.checked ? 'right' : 'left') as AppSettings['clockPosition'] }; setSettings(s); debouncedPushSettings(s); }} />
-                  <span className="toggle-switch__track" aria-hidden="true" />
-                </label>
-              </div>
-
-              <div className="settings-row">
-                <div className="settings-row__label-group">
-                  <span className="settings-row__label">Sound effects</span>
-                  <span className="settings-row__hint">Tick on task complete, chime on Pomodoro end</span>
-                </div>
-                <label className="toggle-switch">
-                  <input type="checkbox" aria-label="Sound effects" checked={!!settings.enableSounds} onChange={e => { const s = { ...settings, enableSounds: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                  <span className="toggle-switch__track" aria-hidden="true" />
-                </label>
-              </div>
-            </div>
-
-            {/* Scheduling column (advanced only) */}
-            {settings.advancedMode && (
-              <div className="settings-col settings-col--right">
-                <div className="settings-divider" />
-                <p className="settings-section-label" role="heading" aria-level={3}>Scheduling</p>
-
-                <div className="settings-row settings-row--stacked">
-                  <div className="settings-row__label-group">
-                    <span className="settings-row__label">Working days</span>
-                    <span className="settings-row__hint">Only these days are shown when navigating</span>
-                  </div>
-                  <div className="working-days-picker" role="group" aria-label="Working days">
-                    {([
-                      { label: 'Mon', day: 1 }, { label: 'Tue', day: 2 }, { label: 'Wed', day: 3 },
-                      { label: 'Thu', day: 4 }, { label: 'Fri', day: 5 }, { label: 'Sat', day: 6 }, { label: 'Sun', day: 7 },
-                    ] as { label: string; day: number }[]).map(({ label, day }) => {
-                      const active = settings.workingDays.includes(day);
-                      const id = `wd-${day}`;
-                      return (
-                        <label
-                          key={day}
-                          htmlFor={id}
-                          className="working-days-picker__day"
-                        >
-                          <input
-                            type="checkbox"
-                            id={id}
-                            checked={active}
-                            onChange={() => {
-                              const next = active
-                                ? settings.workingDays.filter(d => d !== day)
-                                : [...settings.workingDays, day].sort((a, b) => a - b);
-                              const s = { ...settings, workingDays: next };
-                              setSettings(s);
-                              debouncedPushSettings(s);
-                            }}
-                          />
-                          <span>{label}</span>
-                        </label>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                <div className="settings-row">
-                  <div className="settings-row__label-group">
-                    <span className="settings-row__label">Auto-advance</span>
-                    <span className="settings-row__hint">Start scheduling from now, not the day start</span>
-                  </div>
-                  <label className="toggle-switch">
-                    <input type="checkbox" aria-label="Auto-advance" checked={settings.autoAdvance} onChange={e => { const s = { ...settings, autoAdvance: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                    <span className="toggle-switch__track" aria-hidden="true" />
-                  </label>
-                </div>
-
-                <div className="settings-row settings-row--stacked">
-                  <span className="settings-row__label">Calendar feeds</span>
-                  <span className="settings-hint">Paste a secret/private iCal URL. Google Calendar: Settings → [calendar] → "Secret address in iCal format". Apple Calendar: right-click → Share → Public Calendar link. Proton Calendar: Settings → [calendar] → "Link to this calendar".</span>
-                  {icalUrlInputs.map((url, i) => (
-                    <div key={i} className="ical-feed-entry">
-                      <div className="ical-input-row">
-                        <input type="url" value={url} placeholder="https://calendar.proton.me/..."
-                          onChange={e => { const next = [...icalUrlInputs]; next[i] = e.target.value; setIcalUrlInputs(next); }}
-                          onKeyDown={e => { if (e.key === 'Enter') handleLoadCalendar(); }} />
-                        {icalUrlInputs.length > 1 && (
-                          <button type="button" className="ical-remove-btn" aria-label="Remove calendar"
-                            onClick={() => setIcalUrlInputs(icalUrlInputs.filter((_, j) => j !== i))}>−</button>
-                        )}
-                      </div>
-                      {icalErrors[i] && <span className="settings-hint settings-hint--error" role="alert">{icalErrors[i]}</span>}
-                    </div>
-                  ))}
-                  <div className="ical-actions-row">
-                    {icalUrlInputs.length < 3 && (
-                      <button type="button" className="ical-add-btn"
-                        onClick={() => setIcalUrlInputs([...icalUrlInputs, ''])}>+ Add calendar</button>
-                    )}
-                    <button className="ical-load-btn" onClick={handleLoadCalendar} disabled={icalLoading}>
-                      {icalLoading ? 'Loading…' : committedIcalUrls.length ? 'Reload' : 'Load'}
-                    </button>
-                  </div>
-                  {calendarEvents.length > 0 && <span className="settings-hint">{calendarEvents.length} event{calendarEvents.length !== 1 ? 's' : ''} loaded</span>}
-                  {committedIcalUrls.length > 0 && !icalErrors.some(Boolean) && calendarEvents.length === 0 && !icalLoading && <span className="settings-hint">No events for this date</span>}
-                </div>
-
-                {committedIcalUrls.length > 0 && (
-                  <div className="settings-row">
-                    <span className="settings-row__label">Buffer after meetings</span>
-                    <div className="stepper">
-                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.max(0, settings.meetingBufferMinutes - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease meeting buffer">−</button>
-                      <span className="stepper__value">{settings.meetingBufferMinutes}</span>
-                      <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, meetingBufferMinutes: Math.min(60, settings.meetingBufferMinutes + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase meeting buffer">+</button>
-                      <span className="stepper__unit">min</span>
-                    </div>
-                  </div>
-                )}
-
-                <div className="settings-row">
-                  <span className="settings-row__label">Recurring tasks</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" aria-label="Recurring tasks" checked={settings.enableRecurringTasks} onChange={e => { const s = { ...settings, enableRecurringTasks: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                    <span className="toggle-switch__track" aria-hidden="true" />
-                  </label>
-                </div>
-
-                <div className="settings-row">
-                  <span className="settings-row__label">Backlog</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" aria-label="Backlog" checked={settings.enableBacklog} onChange={e => { const s = { ...settings, enableBacklog: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                    <span className="toggle-switch__track" aria-hidden="true" />
-                  </label>
-                </div>
-
-                <div className="settings-row">
-                  <span className="settings-row__label">Day time summary</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" aria-label="Day time summary" checked={settings.showDaySummary} onChange={e => { const s = { ...settings, showDaySummary: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                    <span className="toggle-switch__track" aria-hidden="true" />
-                  </label>
-                </div>
-
-                {/* Pomodoro — lives at the bottom of the right column */}
-                <div className="settings-divider settings-divider--inset" />
-                <p className="settings-section-label" role="heading" aria-level={3}>Pomodoro</p>
-
-                <div className="settings-row">
-                  <span className="settings-row__label">Pomodoro Timer</span>
-                  <label className="toggle-switch">
-                    <input type="checkbox" aria-label="Pomodoro timer" checked={settings.showPomodoroTimer} onChange={e => { const s = { ...settings, showPomodoroTimer: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
-                    <span className="toggle-switch__track" aria-hidden="true" />
-                  </label>
-                </div>
-
-                {settings.showPomodoroTimer && (
-                  <div className="settings-subsection">
-                    <div className="settings-row">
-                      <span className="settings-row__label">Work</span>
-                      <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.max(1, settings.workDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease work duration">−</button>
-                        <span className="stepper__value">{settings.workDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, workDuration: Math.min(120, settings.workDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase work duration">+</button>
-                        <span className="stepper__unit">min</span>
-                      </div>
-                    </div>
-                    <div className="settings-row">
-                      <span className="settings-row__label">Short break</span>
-                      <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.max(1, settings.shortBreakDuration - 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease short break duration">−</button>
-                        <span className="stepper__value">{settings.shortBreakDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, shortBreakDuration: Math.min(30, settings.shortBreakDuration + 1) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase short break duration">+</button>
-                        <span className="stepper__unit">min</span>
-                      </div>
-                    </div>
-                    <div className="settings-row">
-                      <span className="settings-row__label">Long break</span>
-                      <div className="stepper">
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.max(1, settings.longBreakDuration - 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Decrease long break duration">−</button>
-                        <span className="stepper__value">{settings.longBreakDuration}</span>
-                        <button type="button" className="stepper__btn" onClick={() => { const s = { ...settings, longBreakDuration: Math.min(60, settings.longBreakDuration + 5) }; setSettings(s); debouncedPushSettings(s); }} aria-label="Increase long break duration">+</button>
-                        <span className="stepper__unit">min</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Data & account section */}
-          <div className="settings-divider" />
-          <button
-            className="settings-disclosure"
-            aria-expanded={showDataSection}
-            aria-controls="data-account-section"
-            onClick={() => setShowDataSection(v => !v)}
-          >
-            <span className="settings-section-label" role="heading" aria-level={3}>Data &amp; account</span>
-            <svg className={`settings-disclosure__chevron${showDataSection ? ' settings-disclosure__chevron--open' : ''}`} width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
-              <path d="M2 4L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
-          </button>
-
-          {showDataSection && (
-            <div id="data-account-section">
-              {dataActionStatus && (
-                <p className={`data-action-status data-action-status--${dataActionStatus.type}`} role="alert">
-                  {dataActionStatus.message}
-                </p>
-              )}
-
-              <div className="settings-row settings-row--stacked">
-                <span className="settings-row__label">Export your data</span>
-                <span className="settings-row__hint">Download all your tasks, sessions, and settings as a JSON file.</span>
-                <button
-                  className="data-action-btn"
-                  onClick={handleExport}
-                  disabled={exportWorking}
-                >
-                  {exportWorking ? 'Exporting…' : 'Download export'}
-                </button>
-              </div>
-
-              <div className="settings-row settings-row--stacked">
-                <span className="settings-row__label">Import data</span>
-                <span className="settings-row__hint">Restore from a previously exported JSON file. This replaces all current data.</span>
-                <label className={`data-action-btn${importWorking ? ' data-action-btn--disabled' : ''}`}>
-                  {importWorking ? 'Importing…' : 'Choose file…'}
-                  <input
-                    type="file"
-                    accept="application/json,.json"
-                    onChange={handleImport}
-                    disabled={importWorking}
-                    style={{ position: 'absolute', width: 1, height: 1, opacity: 0, overflow: 'hidden' }}
-                    aria-label="Choose JSON export file to import"
-                  />
-                </label>
-              </div>
-
-              <div className="settings-row settings-row--stacked">
-                <span className="settings-row__label settings-row__label--danger">Delete account</span>
-                <span className="settings-row__hint">Permanently removes your account and all associated data. This cannot be undone.</span>
-                <button
-                  className="data-action-btn data-action-btn--danger"
-                  onClick={() => { setShowDeleteModal(true); setDeleteError(''); setDeletePassword(''); setDeleteConfirmed(false); }}
-                >
-                  Delete my account…
-                </button>
-              </div>
-            </div>
-          )}
-
-        </div>
-        </div>
+        <SettingsPanel
+          settings={settings}
+          onSettingChange={handleSettingChange}
+          tdTheme={tdTheme}
+          onThemeChange={handleThemeChange}
+          onClose={() => setShowSettings(false)}
+          icalUrlInputs={icalUrlInputs}
+          onIcalUrlsChange={setIcalUrlInputs}
+          icalLoading={icalLoading}
+          icalErrors={icalErrors}
+          calendarEvents={calendarEvents}
+          committedIcalUrls={committedIcalUrls}
+          onLoadCalendar={handleLoadCalendar}
+          dataActionStatus={dataActionStatus}
+          exportWorking={exportWorking}
+          onExport={handleExport}
+          importWorking={importWorking}
+          onImport={handleImport}
+          onOpenDeleteModal={() => { setShowDeleteModal(true); setDeleteError(''); setDeletePassword(''); setDeleteConfirmed(false); }}
+        />
       )}
 
       {/* Delete account modal */}
