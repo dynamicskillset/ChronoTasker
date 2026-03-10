@@ -32,7 +32,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
   const [tag, setTag] = useState('');
   const [details, setDetails] = useState('');
   const [showDetails, setShowDetails] = useState(false);
-  const [showMore, setShowMore] = useState(false);
+  const [showMore, setShowMore] = useState(true);
   const [recurrencePattern, setRecurrencePattern] = useState<Task['recurrencePattern']>(undefined);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
@@ -58,9 +58,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
       setShowDetails(!!editingTask.details);
       setRecurrencePattern(editingTask.recurrencePattern);
 
-      // Auto-expand "More options" if any optional fields are set
-      const hasOptionalFields = editingTask.important || !!editingTask.tag || !!editingTask.details || !!editingTask.fixedStartTime || !!editingTask.recurrencePattern;
-      setShowMore(hasOptionalFields);
+      setShowMore(true);
 
       const isPreset = (DURATION_PRESETS as readonly number[]).includes(editingTask.durationMinutes);
       if (!isPreset) {
@@ -99,7 +97,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
     setTag('');
     setDetails('');
     setShowDetails(false);
-    setShowMore(false);
+    setShowMore(true);
     setRecurrencePattern(undefined);
     titleInputRef.current?.focus();
   }

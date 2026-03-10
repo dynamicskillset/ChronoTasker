@@ -107,14 +107,15 @@ export default function UnfinishedTasksModal({
                 <div className="unfinished-modal__item-info">
                   <span className="unfinished-modal__item-title">
                     {task.title}
-                    {task.tag && (
+                    {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
                       <span
+                        key={i}
                         className="unfinished-modal__tag"
-                        style={{ color: tagColor(task.tag), backgroundColor: tagBgColor(task.tag) }}
+                        style={{ color: tagColor(t), backgroundColor: tagBgColor(t) }}
                       >
-                        {task.tag}
+                        {t}
                       </span>
-                    )}
+                    ))}
                   </span>
                   <span className="unfinished-modal__item-duration">
                     {formatDuration(task.durationMinutes)}

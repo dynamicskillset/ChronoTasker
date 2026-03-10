@@ -11,7 +11,7 @@ import { usePomodoro } from './hooks/usePomodoro';
 import { useSync } from './hooks/useSync';
 import { scheduleTasks, findNonOverflowOrdering, type ScheduledTask } from './utils/scheduling';
 import { formatDuration, tagColor, tagBgColor } from './utils/format';
-import { todayString, tomorrowString, formatDate, nearestWorkingDay } from './utils/scheduling';
+import { todayString, tomorrowString, getWeekMonday, weekDayDate, shiftDate } from './utils/scheduling';
 import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
 import * as storage from './services/storage';
 import { parseIcalEvents } from './utils/ical';
@@ -154,7 +154,10 @@ function App({ user, onLogout }: AppProps) {
     date,
     onTasksUpdated: setTasks,
     onSessionsUpdated: setSessions,
-    onSettingsUpdated: setSettings,
+    onSettingsUpdated: (s) => setSettings(
+      // Migrate removed 'yellow' scheme to 'berry'
+      (s as any).colorScheme === 'yellow' ? { ...s, colorScheme: 'berry' } : s
+    ),
     onAuthRequired: onLogout,
     enableRecurringTasks: settings.enableRecurringTasks,
     paused: demoMode,
@@ -789,12 +792,13 @@ function App({ user, onLogout }: AppProps) {
 
   // Date navigation
   const goToday = () => setDate(todayString());
-  const goPrev = () => {
-    setDate(nearestWorkingDay(date, settings.workingDays, 'prev'));
-  };
-  const goNext = () => {
-    setDate(nearestWorkingDay(date, settings.workingDays, 'next'));
-  };
+  const weekMonday = useMemo(() => getWeekMonday(date), [date]);
+  const visibleDays = useMemo(() => {
+    const days = settings.workingDays.length > 0 ? settings.workingDays : [1, 2, 3, 4, 5];
+    return days.map(isoDay => weekDayDate(weekMonday, isoDay));
+  }, [weekMonday, settings.workingDays]);
+  const goPrevWeek = () => setDate(shiftDate(weekMonday, -7));
+  const goNextWeek = () => setDate(shiftDate(weekMonday, 7));
 
   // Demo mode
   const enterDemoMode = useCallback(() => {
@@ -973,7 +977,7 @@ function App({ user, onLogout }: AppProps) {
           <div className="settings-row settings-row--featured">
             <div className="settings-row__label-group">
               <span className="settings-row__label">Advanced mode</span>
-              <span className="settings-row__hint">Fixed-time scheduling, calendar, recurring tasks</span>
+              <span className="settings-row__hint">Unlock calendar feeds, recurring tasks, backlog, and Pomodoro timer</span>
             </div>
             <label className="toggle-switch">
               <input type="checkbox" aria-label="Advanced mode" checked={settings.advancedMode} onChange={e => { const s = { ...settings, advancedMode: e.target.checked }; setSettings(s); debouncedPushSettings(s); }} />
@@ -1030,9 +1034,9 @@ function App({ user, onLogout }: AppProps) {
               <div className="settings-row">
                 <span className="settings-row__label">Highlight colour</span>
                 <div className="colour-swatches" role="radiogroup" aria-label="Highlight colour">
-                  {(['yellow', 'nord', 'aurora', 'frost', 'evergreen', 'berry'] as const).map(scheme => (
-                    <label key={scheme} className={`colour-swatch colour-swatch--${scheme}${(settings.colorScheme || 'yellow') === scheme ? ' colour-swatch--active' : ''}`} title={scheme.charAt(0).toUpperCase() + scheme.slice(1)} aria-label={scheme.charAt(0).toUpperCase() + scheme.slice(1)}>
-                      <input type="radio" name="colorScheme" value={scheme} checked={(settings.colorScheme || 'yellow') === scheme}
+                  {(['berry', 'nord', 'aurora', 'frost', 'evergreen'] as const).map(scheme => (
+                    <label key={scheme} className={`colour-swatch colour-swatch--${scheme}${(settings.colorScheme || 'berry') === scheme ? ' colour-swatch--active' : ''}`} title={scheme.charAt(0).toUpperCase() + scheme.slice(1)} aria-label={scheme.charAt(0).toUpperCase() + scheme.slice(1)}>
+                      <input type="radio" name="colorScheme" value={scheme} checked={(settings.colorScheme || 'berry') === scheme}
                         onChange={() => { const s = { ...settings, colorScheme: scheme as AppSettings['colorScheme'] }; setSettings(s); debouncedPushSettings(s); }} />
                       <span className="colour-swatch__dot" />
                     </label>
@@ -1117,6 +1121,7 @@ function App({ user, onLogout }: AppProps) {
 
                 <div className="settings-row settings-row--stacked">
                   <span className="settings-row__label">Calendar feeds</span>
+                  <span className="settings-hint">Paste a secret/private iCal URL. Google Calendar: Settings → [calendar] → "Secret address in iCal format". Apple Calendar: right-click → Share → Public Calendar link. Proton Calendar: Settings → [calendar] → "Link to this calendar".</span>
                   {icalUrlInputs.map((url, i) => (
                     <div key={i} className="ical-feed-entry">
                       <div className="ical-input-row">
@@ -1339,12 +1344,29 @@ function App({ user, onLogout }: AppProps) {
         </div>
       )}
 
-      <div className="date-nav">
-        <button onClick={goPrev} aria-label="Previous day" title="Previous day">
+      <div className="date-nav" role="navigation" aria-label="Date navigation">
+        <button className="date-nav__week-btn" onClick={goPrevWeek} aria-label="Previous week">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
-        <span className="current-date">{formatDate(date)}</span>
-        <button onClick={goNext} aria-label="Next day" title="Next day">
+        {visibleDays.map(d => {
+          const dayLabel = new Date(d + 'T00:00:00').toLocaleDateString('en', { weekday: 'short' });
+          const dayNum = new Date(d + 'T00:00:00').getDate();
+          const isActive = d === date;
+          const isToday = d === todayString();
+          return (
+            <button
+              key={d}
+              className={`date-nav__day${isActive ? ' date-nav__day--active' : ''}${isToday && !isActive ? ' date-nav__day--today' : ''}`}
+              onClick={() => setDate(d)}
+              aria-pressed={isActive}
+              aria-label={`${dayLabel} ${dayNum}${isToday ? ' (today)' : ''}`}
+            >
+              <span className="date-nav__day-name">{dayLabel}</span>
+              <span className="date-nav__day-num">{dayNum}</span>
+            </button>
+          );
+        })}
+        <button className="date-nav__week-btn" onClick={goNextWeek} aria-label="Next week">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
         {date !== todayString() && (
@@ -1559,7 +1581,7 @@ function App({ user, onLogout }: AppProps) {
                             editingTask={editingTask}
                             onCancel={editingTask ? () => setEditingTask(undefined) : undefined}
                             date={date}
-                            existingTags={[...new Set(tasks.map(t => t.tag).filter((t): t is string => !!t))]}
+                            existingTags={[...new Set(tasks.flatMap(t => t.tag ? t.tag.split(',').map(s => s.trim()).filter(Boolean) : []))]}
                             calendarEvents={calendarEvents}
                             meetingBufferMinutes={settings.meetingBufferMinutes}
                             use24Hour={settings.use24Hour}
@@ -1675,7 +1697,7 @@ function App({ user, onLogout }: AppProps) {
                   editingTask={editingTask}
                   onCancel={editingTask ? () => setEditingTask(undefined) : undefined}
                   date={date}
-                  existingTags={[...new Set(tasks.map(t => t.tag).filter((t): t is string => !!t))]}
+                  existingTags={[...new Set(tasks.flatMap(t => t.tag ? t.tag.split(',').map(s => s.trim()).filter(Boolean) : []))]}
                   calendarEvents={calendarEvents}
                   meetingBufferMinutes={settings.meetingBufferMinutes}
                   use24Hour={settings.use24Hour}

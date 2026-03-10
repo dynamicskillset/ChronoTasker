@@ -226,14 +226,15 @@ const TaskItem = memo(function TaskItem({
               ↻
             </span>
           )}
-          {task.tag && (
+          {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
             <span
+              key={i}
               className="task-list__tag"
-              style={{ color: tagColor(task.tag), backgroundColor: tagBgColor(task.tag) }}
+              style={{ color: tagColor(t), backgroundColor: tagBgColor(t) }}
             >
-              {task.tag}
+              {t}
             </span>
-          )}
+          ))}
         </span>
         <span className="task-list__meta">
           <span className="task-list__duration">{formatDuration(task.durationMinutes)}</span>

@@ -41,6 +41,28 @@ export function nearestWorkingDay(
   return dateStr; // fallback: no working day found in range
 }
 
+/** Returns the YYYY-MM-DD of the Monday of the ISO week containing dateStr. */
+export function getWeekMonday(dateStr: string): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  const isoDay = toIsoDay(d.getDay()); // 1=Mon … 7=Sun
+  d.setDate(d.getDate() - (isoDay - 1));
+  return toLocalDateString(d);
+}
+
+/** Returns the YYYY-MM-DD for a given ISO weekday (1=Mon … 7=Sun) within the week of weekMonday. */
+export function weekDayDate(weekMonday: string, isoWeekday: number): string {
+  const d = new Date(weekMonday + 'T00:00:00');
+  d.setDate(d.getDate() + (isoWeekday - 1));
+  return toLocalDateString(d);
+}
+
+/** Steps dateStr by `days` calendar days and returns the resulting YYYY-MM-DD. */
+export function shiftDate(dateStr: string, days: number): string {
+  const d = new Date(dateStr + 'T00:00:00');
+  d.setDate(d.getDate() + days);
+  return toLocalDateString(d);
+}
+
 export interface ScheduledTask extends Task {
   scheduledStart: number; // minutes from midnight
   scheduledEnd: number;   // minutes from midnight

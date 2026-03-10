@@ -58,7 +58,7 @@ export interface AppSettings {
   use24Hour: boolean;
   autoAdvance: boolean;
   theme: 'light' | 'dark' | 'system';
-  colorScheme: 'nord' | 'aurora' | 'frost' | 'evergreen' | 'berry' | 'yellow';
+  colorScheme: 'nord' | 'aurora' | 'frost' | 'evergreen' | 'berry';
   icalUrl?: string;
   icalUrls: string[];
   meetingBufferMinutes: number; // gap after calendar events, default 15
