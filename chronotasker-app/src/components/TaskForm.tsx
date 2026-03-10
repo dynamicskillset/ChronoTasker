@@ -267,10 +267,11 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
                 value={fixedStartTime}
                 onChange={(e) => setFixedStartTime(e.target.value)}
                 aria-label="Fixed start time"
+                aria-describedby={meetingConflict ? 'task-form-conflict-desc' : undefined}
               />
             )}
             {meetingConflict && (
-              <span className="task-form__conflict-warning" role="alert">
+              <span id="task-form-conflict-desc" className="task-form__conflict-warning" role="alert">
                 <span aria-hidden="true">⚠</span> Overlaps with: {meetingConflict.summary} ({minutesToTime(meetingConflict.startMinutes, use24Hour)}–{minutesToTime(meetingConflict.endMinutes, use24Hour)})
               </span>
             )}

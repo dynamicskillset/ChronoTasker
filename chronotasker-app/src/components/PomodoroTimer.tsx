@@ -71,18 +71,33 @@ export default function PomodoroTimer({
 
   // Milestone: show a brief message when a long break is earned
   const [showMilestone, setShowMilestone] = useState(false);
+  const [phaseAnnouncement, setPhaseAnnouncement] = useState('');
   const prevTypeRef = useRef(type);
   useEffect(() => {
-    if (prevTypeRef.current !== 'longBreak' && type === 'longBreak') {
-      setShowMilestone(true);
-      const t = setTimeout(() => setShowMilestone(false), 3000);
-      return () => clearTimeout(t);
+    if (prevTypeRef.current !== type) {
+      const labels: Record<typeof type, string> = {
+        work: 'Focus session started',
+        shortBreak: 'Short break — take a breather',
+        longBreak: 'Long break — well done',
+      };
+      setPhaseAnnouncement(labels[type]);
+      const clear = setTimeout(() => setPhaseAnnouncement(''), 4000);
+      if (type === 'longBreak') {
+        setShowMilestone(true);
+        const t = setTimeout(() => setShowMilestone(false), 3000);
+        return () => { clearTimeout(t); clearTimeout(clear); };
+      }
+      return () => clearTimeout(clear);
     }
     prevTypeRef.current = type;
   }, [type]);
 
   return (
     <div className="pomodoro-timer">
+      {/* Phase-change announcements for screen readers (not every tick) */}
+      <span className="sr-only" aria-live="assertive" aria-atomic="true">
+        {phaseAnnouncement}
+      </span>
       {/* Progress ring */}
       <div className="pomodoro-timer__ring-container">
         <svg
@@ -112,7 +127,7 @@ export default function PomodoroTimer({
           >
             {showMilestone ? 'Cycle done' : PHASE_LABELS[type]}
           </span>
-          <span className="pomodoro-timer__time" role="timer" aria-live="polite" aria-atomic="true" aria-label="Pomodoro timer">
+          <span className="pomodoro-timer__time" role="timer" aria-label="Pomodoro timer">
             {formatTime(timeRemainingSeconds)}
           </span>
           {currentTaskTitle && (

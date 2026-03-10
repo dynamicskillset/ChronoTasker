@@ -176,13 +176,6 @@ const TaskItem = memo(function TaskItem({
       onDragEnd={onDragEnd}
       onDrop={(e) => onDrop(e, task.id)}
       onClick={() => onSelectTask(task.id)}
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          onSelectTask(task.id);
-        }
-      }}
     >
       {/* Drag handle (desktop only) */}
       {!task.completed && !task.isBreak && (

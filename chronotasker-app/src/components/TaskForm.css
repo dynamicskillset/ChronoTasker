@@ -1,4 +1,4 @@
-/* TaskForm — Add/edit task form for ChronoTasker */
+/* TaskForm — Add/edit task form for TaskDial */
 
 /* ============================================================
    Theme aliases (from global tokens in index.css)
@@ -105,7 +105,7 @@
 /* Pill toggles */
 .task-form__duration-pill {
   padding: 0.25rem 0.625rem;
-  min-height: 36px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   font-size: 0.78rem;
@@ -145,7 +145,7 @@
   width: 72px;
   padding: 0.25rem 0.375rem;
   font-size: 0.78rem;
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   color: var(--tf-text);
   background: var(--tf-input-bg);
   border: 1px solid var(--tf-input-border);
@@ -207,7 +207,7 @@
 .task-form__time-input {
   padding: 0.25rem 0.375rem;
   font-size: 0.8rem;
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   color: var(--tf-text);
   background: var(--tf-input-bg);
   border: 1px solid var(--tf-input-border);

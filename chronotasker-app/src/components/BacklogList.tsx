@@ -51,32 +51,29 @@ export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDele
           <li
             key={task.id}
             className="backlog-list__item"
-            role="button"
-            tabIndex={0}
-            aria-label={`Edit task: ${task.title}`}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                onEditTask(task);
-              }
-            }}
           >
-            <div className="backlog-list__content">
-              <span className="backlog-list__title">
-                {task.title}
-                {task.tag && (
-                  <span
-                    className="backlog-list__tag"
-                    style={{ color: tagColor(task.tag), backgroundColor: tagBgColor(task.tag) }}
-                  >
-                    {task.tag}
-                  </span>
-                )}
-              </span>
-              <span className="backlog-list__meta">
-                <span className="backlog-list__duration">{formatDuration(task.durationMinutes)}</span>
-              </span>
-            </div>
+            <button
+              className="backlog-list__row-btn"
+              aria-label={`Edit task: ${task.title}`}
+              onClick={() => onEditTask(task)}
+            >
+              <div className="backlog-list__content">
+                <span className="backlog-list__title">
+                  {task.title}
+                  {task.tag && (
+                    <span
+                      className="backlog-list__tag"
+                      style={{ color: tagColor(task.tag), backgroundColor: tagBgColor(task.tag) }}
+                    >
+                      {task.tag}
+                    </span>
+                  )}
+                </span>
+                <span className="backlog-list__meta">
+                  <span className="backlog-list__duration">{formatDuration(task.durationMinutes)}</span>
+                </span>
+              </div>
+            </button>
 
             <div className="backlog-list__actions">
               <button

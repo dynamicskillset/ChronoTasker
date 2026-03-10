@@ -140,7 +140,7 @@
 }
 
 .unfinished-modal__item-duration {
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.75rem;
   color: var(--color-text-secondary);
 }

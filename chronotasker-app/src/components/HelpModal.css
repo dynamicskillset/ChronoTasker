@@ -1,4 +1,4 @@
-/* HelpModal — "How to use" overlay for ChronoTasker */
+/* HelpModal — "How to use" overlay for TaskDial */
 
 /* ============================================================
    Overlay
@@ -228,7 +228,7 @@
   padding: 0.15em 0.35em;
   background: var(--color-surface);
   border-radius: 3px;
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
 }
 
 @keyframes help-faq-in {
@@ -282,7 +282,8 @@
   justify-content: center;
   width: 24px;
   height: 24px;
-  padding: 0;
+  padding: 10px;
+  margin: -10px -10px -10px calc(-10px + 0.5rem);
   border: 1.5px solid var(--color-border);
   border-radius: 50%;
   background: none;

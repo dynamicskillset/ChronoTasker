@@ -69,6 +69,7 @@ export interface AppSettings {
   clockPosition: 'left' | 'right';
   advancedMode: boolean;
   enableSounds: boolean;
+  workingDays: number[]; // ISO weekday numbers: 1=Mon … 7=Sun. Empty = all days.
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -91,4 +92,5 @@ export const DEFAULT_SETTINGS: AppSettings = {
   clockPosition: 'left',
   advancedMode: false,
   enableSounds: false,
+  workingDays: [1, 2, 3, 4, 5], // Mon–Fri by default
 };

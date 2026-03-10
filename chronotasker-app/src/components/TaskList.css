@@ -1,4 +1,4 @@
-/* TaskList — Task management panel for ChronoTasker */
+/* TaskList — Task management panel for TaskDial */
 
 /* ============================================================
    Theme aliases (from global tokens in index.css)
@@ -267,12 +267,12 @@
 }
 
 .task-list__duration {
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.75rem;
 }
 
 .task-list__fixed-time {
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.75rem;
   color: var(--tl-active-border);
 }
@@ -325,7 +325,7 @@
 }
 
 .task-list__details-code {
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.75rem;
   padding: 0.1em 0.35em;
   background: var(--tl-hover-bg);
@@ -429,8 +429,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
   background: none;

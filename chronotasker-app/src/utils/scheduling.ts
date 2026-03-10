@@ -1,5 +1,38 @@
 import type { Task, CalendarEvent } from '../types';
 
+/** Convert JS Date.getDay() (0=Sun) to ISO weekday (1=Mon … 7=Sun). */
+function toIsoDay(jsDay: number): number {
+  return jsDay === 0 ? 7 : jsDay;
+}
+
+/** True if the given YYYY-MM-DD date falls on one of the workingDays.
+ *  If workingDays is empty, every day is considered a working day. */
+export function isWorkingDay(dateStr: string, workingDays: number[]): boolean {
+  if (workingDays.length === 0) return true;
+  const d = new Date(dateStr + 'T00:00:00');
+  return workingDays.includes(toIsoDay(d.getDay()));
+}
+
+/** Step from dateStr in the given direction until a working day is found.
+ *  Returns the original date if workingDays is empty or already a working day.
+ *  Caps at 7 iterations to avoid infinite loops (e.g. all days disabled). */
+export function nearestWorkingDay(
+  dateStr: string,
+  workingDays: number[],
+  direction: 'prev' | 'next',
+): string {
+  if (workingDays.length === 0) return dateStr;
+  const step = direction === 'next' ? 1 : -1;
+  const d = new Date(dateStr + 'T00:00:00');
+  for (let i = 0; i < 7; i++) {
+    d.setDate(d.getDate() + step);
+    if (workingDays.includes(toIsoDay(d.getDay()))) {
+      return d.toISOString().slice(0, 10);
+    }
+  }
+  return dateStr; // fallback: no working day found in range
+}
+
 export interface ScheduledTask extends Task {
   scheduledStart: number; // minutes from midnight
   scheduledEnd: number;   // minutes from midnight

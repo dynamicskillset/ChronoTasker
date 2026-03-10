@@ -55,7 +55,7 @@
   --color-checkbox: #4C566A;
   --color-checkbox-done: #A3BE8C;
   --color-muted: #C8D2E0;
-  --color-completed-opacity: 0.5;
+  --color-completed-opacity: 0.65;
   --tag-saturation: 55%;
   --tag-text-lightness: 35%;
   --tag-bg-lightness: 88%;
@@ -83,6 +83,11 @@
   --color-accent: #88C0D0;
   --color-accent-hue: 193;
   --color-accent-light: #3B4252;
+  --color-success: #4EC97A;
+  --color-danger: #FF8585;
+  --color-warning: #FFAA6B;
+  --color-calendar: #C49FD5;
+  --color-info: #88C0D0;
   --color-task-important: hsl(0, 65%, 58%);
   --color-task-saturation: 55%;
   --color-task-lightness: 62%;
@@ -108,7 +113,7 @@
   --color-checkbox: #D8DEE9;
   --color-checkbox-done: #A3BE8C;
   --color-muted: #4C566A;
-  --color-completed-opacity: 0.4;
+  --color-completed-opacity: 0.55;
   --tag-saturation: 70%;
   --tag-text-lightness: 82%;
   --tag-bg-lightness: 28%;
@@ -151,7 +156,7 @@
   --color-checkbox: #4C566A;
   --color-checkbox-done: #A3BE8C;
   --color-muted: #C8D2E0;
-  --color-completed-opacity: 0.5;
+  --color-completed-opacity: 0.65;
   --tag-saturation: 55%;
   --tag-text-lightness: 35%;
   --tag-bg-lightness: 88%;
@@ -194,7 +199,7 @@
     --color-checkbox: #D8DEE9;
     --color-checkbox-done: #A3BE8C;
     --color-muted: #4C566A;
-    --color-completed-opacity: 0.4;
+    --color-completed-opacity: 0.55;
     --tag-saturation: 70%;
     --tag-text-lightness: 82%;
     --tag-bg-lightness: 28%;

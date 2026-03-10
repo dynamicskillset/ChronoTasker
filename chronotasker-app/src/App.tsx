@@ -11,7 +11,7 @@ import { usePomodoro } from './hooks/usePomodoro';
 import { useSync } from './hooks/useSync';
 import { scheduleTasks, findNonOverflowOrdering, type ScheduledTask } from './utils/scheduling';
 import { formatDuration, tagColor, tagBgColor } from './utils/format';
-import { todayString, tomorrowString, formatDate } from './utils/scheduling';
+import { todayString, tomorrowString, formatDate, nearestWorkingDay } from './utils/scheduling';
 import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
 import * as storage from './services/storage';
 import { parseIcalEvents } from './utils/ical';
@@ -786,14 +786,10 @@ function App({ user, onLogout }: AppProps) {
   // Date navigation
   const goToday = () => setDate(todayString());
   const goPrev = () => {
-    const d = new Date(date + 'T00:00:00');
-    d.setDate(d.getDate() - 1);
-    setDate(d.toISOString().slice(0, 10));
+    setDate(nearestWorkingDay(date, settings.workingDays, 'prev'));
   };
   const goNext = () => {
-    const d = new Date(date + 'T00:00:00');
-    d.setDate(d.getDate() + 1);
-    setDate(d.toISOString().slice(0, 10));
+    setDate(nearestWorkingDay(date, settings.workingDays, 'next'));
   };
 
   // Demo mode
@@ -1049,6 +1045,39 @@ function App({ user, onLogout }: AppProps) {
               <div className="settings-col settings-col--right">
                 <div className="settings-divider" />
                 <p className="settings-section-label">Scheduling</p>
+
+                <div className="settings-row settings-row--stacked">
+                  <div className="settings-row__label-group">
+                    <span className="settings-row__label">Working days</span>
+                    <span className="settings-row__hint">Only these days are shown when navigating</span>
+                  </div>
+                  <div className="working-days-picker" role="group" aria-label="Working days">
+                    {([
+                      { label: 'Mon', day: 1 }, { label: 'Tue', day: 2 }, { label: 'Wed', day: 3 },
+                      { label: 'Thu', day: 4 }, { label: 'Fri', day: 5 }, { label: 'Sat', day: 6 }, { label: 'Sun', day: 7 },
+                    ] as { label: string; day: number }[]).map(({ label, day }) => {
+                      const active = settings.workingDays.includes(day);
+                      return (
+                        <button
+                          key={day}
+                          type="button"
+                          className={`working-days-picker__btn${active ? ' working-days-picker__btn--active' : ''}`}
+                          aria-pressed={active}
+                          onClick={() => {
+                            const next = active
+                              ? settings.workingDays.filter(d => d !== day)
+                              : [...settings.workingDays, day].sort((a, b) => a - b);
+                            const s = { ...settings, workingDays: next };
+                            setSettings(s);
+                            debouncedPushSettings(s);
+                          }}
+                        >
+                          {label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
 
                 <div className="settings-row">
                   <div className="settings-row__label-group">
@@ -1540,6 +1569,7 @@ function App({ user, onLogout }: AppProps) {
                                   style={{ color: tagColor(tag), backgroundColor: tagBgColor(tag) }}
                                   onClick={() => setActiveTagFilter(activeTagFilter === tag ? null : tag)}
                                   aria-pressed={activeTagFilter === tag}
+                                  aria-label={`Filter by ${tag}`}
                                 >
                                   {tag}
                                 </button>

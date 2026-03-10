@@ -5,7 +5,7 @@ import { taskArcColor } from '../utils/format';
 import './ClockFace.css';
 
 /* =============================================================
-   ClockFace — Circular time visualisation for ChronoTasker
+   ClockFace — Circular time visualisation for TaskDial
    ============================================================= */
 
 interface ClockFaceProps {
@@ -526,7 +526,7 @@ const CalendarArc = React.memo(function CalendarArc({
       role={onCalendarEventClick ? 'button' : undefined}
       tabIndex={onCalendarEventClick ? 0 : undefined}
       aria-label={onCalendarEventClick ? tooltip : undefined}
-      aria-pressed={onCalendarEventClick ? isActive : undefined}
+      aria-current={onCalendarEventClick && isActive ? 'true' : undefined}
     >
       <title>{tooltip}</title>
       <path d={d} className={arcClass} />

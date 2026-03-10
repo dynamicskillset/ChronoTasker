@@ -1,4 +1,4 @@
-/* BacklogList — Backlog task pool for ChronoTasker */
+/* BacklogList — Backlog task pool for TaskDial */
 
 .backlog-list {
   width: 100%;
@@ -27,7 +27,6 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
   border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
   color: var(--color-text);
   transition: background-color var(--transition-normal);
@@ -37,19 +36,35 @@
   border-bottom: none;
 }
 
-.backlog-list__item:hover {
+.backlog-list__item:has(.backlog-list__row-btn:hover),
+.backlog-list__item:has(.backlog-list__row-btn:focus-visible) {
   background-color: var(--color-hover-bg);
 }
 
-.backlog-list__item:focus-visible {
+/* Invisible row button — fills the content area, keyboard-accessible */
+.backlog-list__row-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0 0.75rem 1rem;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.backlog-list__row-btn:focus-visible {
   outline: 2px solid var(--color-active-border);
   outline-offset: -2px;
-  background-color: var(--color-hover-bg);
+  border-radius: 2px;
 }
 
 .backlog-list__content {
   flex: 1;
   min-width: 0;
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.125rem;
@@ -85,7 +100,7 @@
 }
 
 .backlog-list__duration {
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   font-size: 0.75rem;
 }
 
@@ -94,6 +109,7 @@
   display: flex;
   align-items: center;
   gap: 0.125rem;
+  padding-right: 0.5rem;
   opacity: 0.35;
   transition: opacity var(--transition-normal);
 }

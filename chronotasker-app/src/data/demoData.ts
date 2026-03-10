@@ -455,6 +455,7 @@ export function getDemoSettings(): AppSettings {
     advancedMode: true,
     enableSounds: false,
     icalUrls: [],
+    workingDays: [1, 2, 3, 4, 5],
   };
 }
 

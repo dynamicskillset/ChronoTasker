@@ -1,4 +1,4 @@
-/* BreakForm — Compact break input for ChronoTasker */
+/* BreakForm — Compact break input for TaskDial */
 
 .break-form {
   display: flex;
@@ -27,7 +27,7 @@
 
 .break-form__pill {
   padding: 0.1875rem 0.5rem;
-  min-height: 36px;
+  min-height: 44px;
   font-size: 0.75rem;
   font-weight: 500;
   font-family: inherit;
@@ -58,7 +58,7 @@
   width: 5.5rem;
   padding: 0.1875rem 0.375rem;
   font-size: 0.75rem;
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', monospace;
   color: var(--color-text);
   background: var(--color-input-bg);
   border: 1px solid var(--color-input-border);
@@ -73,7 +73,7 @@
 .break-form__add {
   margin-left: auto;
   padding: 0.25rem 0.625rem;
-  min-height: 36px;
+  min-height: 44px;
   font-size: 0.78rem;
   font-weight: 600;
   font-family: inherit;
