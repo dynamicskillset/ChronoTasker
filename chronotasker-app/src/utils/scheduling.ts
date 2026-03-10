@@ -5,6 +5,14 @@ function toIsoDay(jsDay: number): number {
   return jsDay === 0 ? 7 : jsDay;
 }
 
+/** Format a Date as YYYY-MM-DD using LOCAL time (not UTC). */
+function toLocalDateString(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
 /** True if the given YYYY-MM-DD date falls on one of the workingDays.
  *  If workingDays is empty, every day is considered a working day. */
 export function isWorkingDay(dateStr: string, workingDays: number[]): boolean {
@@ -27,7 +35,7 @@ export function nearestWorkingDay(
   for (let i = 0; i < 7; i++) {
     d.setDate(d.getDate() + step);
     if (workingDays.includes(toIsoDay(d.getDay()))) {
-      return d.toISOString().slice(0, 10);
+      return toLocalDateString(d);
     }
   }
   return dateStr; // fallback: no working day found in range
