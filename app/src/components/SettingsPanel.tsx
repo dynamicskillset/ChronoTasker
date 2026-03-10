@@ -207,8 +207,8 @@ export function SettingsPanel({
               onClick={onClose}
               aria-label="Close settings"
             >
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
-                <path d="M3 3L13 13M13 3L3 13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+              <svg width="22" height="22" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+                <path d="M4 4L18 18M18 4L4 18" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
               </svg>
             </button>
           </div>
