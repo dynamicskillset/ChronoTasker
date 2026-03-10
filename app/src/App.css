@@ -115,16 +115,22 @@
 .settings-btn {
   background: none;
   border: none;
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   cursor: pointer;
-  padding: 0.25rem;
-  opacity: 0.6;
-  transition: opacity var(--transition-normal);
+  padding: 0;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.75;
+  border-radius: 6px;
+  transition: opacity var(--transition-normal), background var(--transition-normal);
 }
 
 .settings-btn:hover {
   opacity: 1;
-  background: none;
+  background: var(--color-hover-bg);
   border: none;
 }
 
@@ -132,7 +138,6 @@
   opacity: 1;
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
-  border-radius: 4px;
 }
 
 .settings-panel-wrapper {
@@ -1365,7 +1370,8 @@
 
 .demo-banner__exit {
   flex-shrink: 0;
-  padding: 0.3em 0.75em;
+  padding: 0.45em 0.9em;
+  min-height: 36px;
   font-size: 0.75rem;
   font-weight: 600;
   border: none;
@@ -1380,6 +1386,11 @@
   opacity: 0.85;
   background: var(--color-warning);
   border: none;
+}
+
+.demo-banner__exit:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* ============================================================
@@ -1605,7 +1616,8 @@
   color: var(--color-text-secondary);
   font-size: 0.75rem;
   cursor: pointer;
-  padding: 0.2rem 0.4rem;
+  padding: 0.3rem 0.5rem;
+  min-height: 32px;
   border-radius: 4px;
   line-height: 1;
   transition: color var(--transition-normal);
@@ -1613,6 +1625,11 @@
 
 .tag-filter__clear:hover {
   color: var(--color-text);
+}
+
+.tag-filter__clear:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* ── Undo/Redo bar ── */
@@ -1639,13 +1656,19 @@
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.2rem 0.5rem;
+  padding: 0.35rem 0.6rem;
+  min-height: 36px;
   border-radius: 6px;
   transition: background var(--transition-normal);
 }
 
 .undo-bar__btn:hover {
   background: var(--color-hover-bg);
+}
+
+.undo-bar__btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .undo-bar__btn--redo {
@@ -1950,7 +1973,10 @@
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   text-decoration: none;
-  padding: 0.2rem 0.4rem;
+  padding: 0.35rem 0.6rem;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
   border: 1px solid var(--color-border);
   border-radius: 4px;
   transition: color 0.15s, border-color 0.15s;
@@ -1959,6 +1985,11 @@
 .header-admin-link:hover {
   color: var(--color-text);
   border-color: var(--color-text-secondary);
+}
+
+.header-admin-link:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 /* ── Admin dashboard ───────────────────────────────────────────────────────── */
