@@ -1130,8 +1130,8 @@ function App({ user, onLogout }: AppProps) {
         <section className="clock-section">
           <ClockFace
             tasks={scheduledTasks}
-            calendarEvents={calendarEvents}
-            meetingBufferMinutes={settings.meetingBufferMinutes}
+            calendarEvents={settings.advancedMode ? calendarEvents : []}
+            meetingBufferMinutes={settings.advancedMode ? settings.meetingBufferMinutes : 0}
             autoAdvance={settings.autoAdvance}
             isToday={isToday}
             dayStartHour={settings.dayStartHour}
@@ -1146,7 +1146,7 @@ function App({ user, onLogout }: AppProps) {
             onSlotsResolved={setClockColorMap}
           />
           {clockPanelOrder.map(panelId => {
-            if (panelId === 'calendar' && calendarEvents.length === 0) return null;
+            if (panelId === 'calendar' && (!settings.advancedMode || calendarEvents.length === 0)) return null;
             if (panelId === 'summary' && !daySummary) return null;
             const clockDragHandle = (
               <span className="panel-drag-handle" aria-hidden="true">

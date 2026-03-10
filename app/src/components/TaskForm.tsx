@@ -245,70 +245,74 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
 
       {showMore && (
         <>
-          {/* Options row: important + fixed time */}
-          <div className="task-form__row task-form__row--options">
-            <label className="task-form__time-toggle">
-              <input
-                type="checkbox"
-                checked={hasFixedTime}
-                onChange={(e) => {
-                  setHasFixedTime(e.target.checked);
-                  if (!e.target.checked) setFixedStartTime('');
-                }}
-              />
-              <span>Fixed time</span>
-            </label>
-            {hasFixedTime && (
-              <input
-                type="time"
-                className="task-form__time-input"
-                value={fixedStartTime}
-                onChange={(e) => setFixedStartTime(e.target.value)}
-                aria-label="Fixed start time"
-                aria-describedby={meetingConflict ? 'task-form-conflict-desc' : undefined}
-              />
-            )}
-            {meetingConflict && (
-              <span id="task-form-conflict-desc" className="task-form__conflict-warning" role="alert">
-                <span aria-hidden="true">⚠</span> Overlaps with: {meetingConflict.summary} ({minutesToTime(meetingConflict.startMinutes, use24Hour)}–{minutesToTime(meetingConflict.endMinutes, use24Hour)})
-              </span>
-            )}
-            <label className="task-form__important-toggle">
-              <input
-                type="checkbox"
-                checked={important}
-                onChange={(e) => setImportant(e.target.checked)}
-              />
-              <span className="task-form__important-label">
-                <span className="task-form__important-icon">!</span>
-                Important
-              </span>
-            </label>
-          </div>
+          {/* Options row: important + fixed time — advanced only */}
+          {advancedMode && (
+            <div className="task-form__row task-form__row--options">
+              <label className="task-form__time-toggle">
+                <input
+                  type="checkbox"
+                  checked={hasFixedTime}
+                  onChange={(e) => {
+                    setHasFixedTime(e.target.checked);
+                    if (!e.target.checked) setFixedStartTime('');
+                  }}
+                />
+                <span>Fixed time</span>
+              </label>
+              {hasFixedTime && (
+                <input
+                  type="time"
+                  className="task-form__time-input"
+                  value={fixedStartTime}
+                  onChange={(e) => setFixedStartTime(e.target.value)}
+                  aria-label="Fixed start time"
+                  aria-describedby={meetingConflict ? 'task-form-conflict-desc' : undefined}
+                />
+              )}
+              {meetingConflict && (
+                <span id="task-form-conflict-desc" className="task-form__conflict-warning" role="alert">
+                  <span aria-hidden="true">⚠</span> Overlaps with: {meetingConflict.summary} ({minutesToTime(meetingConflict.startMinutes, use24Hour)}–{minutesToTime(meetingConflict.endMinutes, use24Hour)})
+                </span>
+              )}
+              <label className="task-form__important-toggle">
+                <input
+                  type="checkbox"
+                  checked={important}
+                  onChange={(e) => setImportant(e.target.checked)}
+                />
+                <span className="task-form__important-label">
+                  <span className="task-form__important-icon">!</span>
+                  Important
+                </span>
+              </label>
+            </div>
+          )}
 
-          {/* Tag */}
-          <div className="task-form__row task-form__row--tag">
-            <label className="task-form__label">Tag</label>
-            <input
-              type="text"
-              className="task-form__tag-input"
-              placeholder="e.g. admin, deep work"
-              value={tag}
-              onChange={(e) => setTag(e.target.value)}
-              list="tag-suggestions"
-              autoComplete="off"
-              aria-label="Tag"
-            />
-            {existingTags.length > 0 && (
-              <datalist id="tag-suggestions">
-                {existingTags.map((t) => (
-                  <option key={t} value={t} />
-                ))}
-              </datalist>
-            )}
-          </div>
+          {/* Tag — advanced only */}
+          {advancedMode && (
+            <div className="task-form__row task-form__row--tag">
+              <label className="task-form__label">Tag</label>
+              <input
+                type="text"
+                className="task-form__tag-input"
+                placeholder="e.g. admin, deep work"
+                value={tag}
+                onChange={(e) => setTag(e.target.value)}
+                list="tag-suggestions"
+                autoComplete="off"
+                aria-label="Tag"
+              />
+              {existingTags.length > 0 && (
+                <datalist id="tag-suggestions">
+                  {existingTags.map((t) => (
+                    <option key={t} value={t} />
+                  ))}
+                </datalist>
+              )}
+            </div>
+          )}
 
-          {/* Repeat (only when advanced + recurring tasks enabled) */}
+          {/* Repeat — advanced + recurring tasks enabled */}
           {advancedMode && enableRecurring && (
             <div className="task-form__row task-form__row--repeat">
               <label className="task-form__label">Repeat</label>

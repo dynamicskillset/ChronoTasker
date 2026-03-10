@@ -52,19 +52,19 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: none;
-  background: transparent;
-  color: var(--color-text-secondary);
+  border: 1.5px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-border) 40%, transparent);
+  color: var(--color-text);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, color 0.15s;
+  transition: background 0.15s, border-color 0.15s;
 }
 
 .sp-header__close:hover {
-  background: var(--color-hover-bg);
-  color: var(--color-text);
+  background: color-mix(in srgb, var(--color-border) 70%, transparent);
+  border-color: color-mix(in srgb, var(--color-border) 80%, var(--color-text));
 }
 
 .sp-header__close:focus-visible {

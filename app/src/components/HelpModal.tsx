@@ -142,44 +142,42 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
           <div className="help-modal__divider" />
 
           <p className="help-modal__intro">
-            TaskDial is a visual time-planning tool. Instead of a flat to-do list,
-            you see your day as a clock — each task is a coloured arc. A built-in
-            Pomodoro timer helps you work in focused bursts.
+            TaskDial shows your day as a clock. Each task is a coloured arc on the ring,
+            so you can see at a glance whether your plan is realistic. A built-in Pomodoro
+            timer helps you work in focused blocks.
           </p>
 
           <div className="help-modal__section">
             <h3>The clock face</h3>
             <p>
-              The ring shows your scheduled day. Coloured arcs are your tasks; tap one to
-              select it. The hand tracks the current time in your chosen highlight colour.
-              If you connect a calendar feed, those events appear as purple arcs behind
-              your tasks.
+              The ring shows your day. Each coloured arc is a task; tap one to select it.
+              The hand shows the current time. Connect a calendar feed and your meetings
+              appear as arcs behind your tasks.
             </p>
           </div>
 
           <div className="help-modal__section">
             <h3>Adding and managing tasks</h3>
             <p>
-              Use the form on the right to add a task with a name and duration. You can
-              optionally pin it to a fixed start time. Once added, tasks can be reordered
-              by dragging, marked complete, flagged as important, or moved to another day
-              using the calendar icon. If the task order you have causes overflow, a banner
-              will suggest a reordering that fits.
+              Add a task using the form on the right. Give it a name and duration, and
+              optionally pin it to a fixed start time. Drag tasks up or down to reorder
+              them, mark them complete, flag as important, or move to another day with
+              the calendar icon.
             </p>
           </div>
 
           <div className="help-modal__section">
             <h3>The Pomodoro timer</h3>
             <p>
-              Select a task, then start the timer. Work for 25 minutes, take a short break,
-              and repeat. After four cycles a longer break kicks in. Enable it and adjust
-              durations in Settings under <strong>Pomodoro</strong>.{' '}
+              Select a task and start the timer. Work for 25 minutes, take a short break,
+              and repeat. Every four sessions a longer break kicks in. Enable it and adjust
+              durations in Settings under <strong>Timer</strong>.{' '}
               <a
                 href="https://francescocirillo.com/products/the-pomodoro-technique"
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Read more about the technique.
+                Learn more about the technique.
               </a>
             </p>
           </div>
@@ -187,11 +185,9 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
           <div className="help-modal__section">
             <h3>Settings</h3>
             <p>
-              Click the <strong>&#9881; gear icon</strong> (top right). The panel appears
-              beneath it, aligned to the task list. Toggle switches control boolean options;
-              use the +/− steppers for durations. The coloured dots let you pick a highlight
-              colour. Turn on <strong>Advanced mode</strong> to unlock calendar integration,
-              recurring tasks, fixed-time scheduling, and the Pomodoro timer.
+              Click the <strong>gear icon</strong> in the top right. Use the tabs to find
+              what you need. Turn on <strong>Advanced mode</strong> to unlock calendar
+              feeds, recurring tasks, and the Pomodoro timer.
             </p>
           </div>
 
@@ -202,77 +198,74 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
 
             <FaqItem question="Does it work offline?">
               <p>
-                Yes. Tasks are saved to your browser first, then synced to the server when
-                online. The status pill in the header shows the current state.
+                Yes. Tasks are saved locally first and synced to the server when you are
+                back online. The status indicator in the header shows the current state.
               </p>
             </FaqItem>
 
             <FaqItem question="How do I connect my calendar?">
               <p>
-                Open Settings, turn on Advanced mode, then paste an iCal feed URL (ending
-                in <code>.ics</code>, from Google Calendar or Proton Calendar sharing) into
-                the Calendar feed field and press <strong>Load</strong>. Events appear on
-                the clock as purple arcs and the feed refreshes every five minutes.
+                Open Settings and turn on Advanced mode. In the Calendars tab, paste an
+                iCal URL from Google Calendar, Proton Calendar, or any other app that
+                provides one, then press <strong>Load</strong>. Events appear on the clock
+                and the feed refreshes every five minutes.
               </p>
             </FaqItem>
 
             <FaqItem question="What does 'auto-advance' do?">
               <p>
-                When on, flexible tasks are scheduled from the current time rather than the
-                day start — so your plan always looks forward. Turn it off in Settings if
-                you prefer tasks to always start from your day's start hour.
+                When on, tasks are scheduled from the current time rather than the start
+                of your day, so your plan always looks forward. Turn it off in Settings
+                if you want tasks to start from your day's set start time instead.
               </p>
             </FaqItem>
 
             <FaqItem question="Can I move a task to a different day?">
               <p>
-                Yes. Hover over (or tap) a task and click the calendar icon. Send it to
-                tomorrow with one click, or pick any date. Use the arrow buttons in the
-                date bar to browse days; the <strong>↵ Today</strong> button returns you
-                to the current day.
+                Yes. Tap a task and click the calendar icon to move it. Send it to
+                tomorrow with one click, or pick any date. Use the arrows in the date bar
+                to browse days, or click <strong>Today</strong> to come back.
               </p>
             </FaqItem>
 
             <FaqItem question="What does the meeting buffer do?">
               <p>
-                With a calendar feed connected, the scheduler adds a gap after each meeting
-                before placing the next flexible task. Adjust the duration (in minutes)
-                with the +/− stepper in Settings, or set it to 0 to disable.
+                With a calendar connected, TaskDial leaves a gap after each meeting before
+                placing your next task. Set the gap length in Settings under Calendars,
+                or set it to 0 to turn it off.
               </p>
             </FaqItem>
 
             <FaqItem question="Does TaskDial read my calendar data?">
               <p>
-                Your calendar feed is fetched directly from your browser — TaskDial
-                never stores or transmits calendar data to the server. Events are only
-                held in memory while the app is open and are not saved alongside your
-                tasks.
+                No. Your calendar feed is fetched by your browser directly. TaskDial never
+                sends calendar data to the server; events are held in memory while the app
+                is open and discarded when you close it.
               </p>
             </FaqItem>
 
             <FaqItem question="What data does TaskDial store about me?">
               <p>
-                Your account email, a hashed password, your settings, and Pomodoro session
-                records. Task titles, tags, and notes are encrypted on your device before
-                reaching the server — the encryption key is derived from your password and
-                never leaves your browser. The server stores only ciphertext and cannot
-                read your task content. We also keep a security audit log (login events,
-                admin actions) which is automatically deleted after 12 months. We do not
-                use trackers, share data with third parties, or use your data to train AI
-                models. See the full{' '}
+                Your email, a hashed password, your settings, and Pomodoro session records.
+                Task titles, tags, and notes are encrypted on your device before they reach
+                the server. The encryption key comes from your password and never leaves
+                your browser, so the server cannot read your task content. We keep a
+                security log (sign-in events, admin actions) that is deleted after 12
+                months. We do not use trackers, share data with third parties, or use your
+                data to train AI models. See the{' '}
                 <a href="/privacy" target="_blank" rel="noopener noreferrer">
                   Privacy Policy
                 </a>{' '}
-                for details.
+                for full details.
               </p>
             </FaqItem>
 
             <FaqItem question="What's the backlog?">
               <p>
-                The backlog holds tasks that aren't assigned to a specific day. Add
-                something to the backlog when you know you want to do it eventually but
-                haven't decided when. You can move backlog items to any day using the
-                calendar icon, or drag them directly into the task list.
+                The backlog holds tasks that are not tied to a specific day. Add something
+                there when you want to do it eventually but have not decided when. Move
+                backlog items to any day using the calendar icon, or drag them into the
+                task list.
               </p>
             </FaqItem>
           </div>
