@@ -84,11 +84,6 @@ export default function LoginPage({ onSuccess, expired = false }: LoginPageProps
           <p className="auth-notice">Your session has expired. Please log in again.</p>
         )}
 
-        <p className="auth-privacy-notice">
-          By using TaskDial you agree to our{' '}
-          <a href="/privacy" className="auth-privacy-notice__link">Privacy Policy</a>.
-        </p>
-
         {view === 'login' ? (
           <form className="auth-form" onSubmit={handleLogin} noValidate>
             <h2 className="auth-form__title">Log in</h2>
@@ -192,6 +187,11 @@ export default function LoginPage({ onSuccess, expired = false }: LoginPageProps
             </p>
           </form>
         )}
+
+        <p className="auth-privacy-notice">
+          By using TaskDial you agree to our{' '}
+          <a href="/privacy" className="auth-privacy-notice__link">Privacy Policy</a>.
+        </p>
       </div>
     </div>
   );
