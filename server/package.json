@@ -1,7 +1,7 @@
 {
-  "name": "chronotasker-server",
+  "name": "taskdial-server",
   "version": "1.0.0",
-  "description": "ChronoTasker sync server — time-planning app with Pomodoro timer",
+  "description": "TaskDial sync server — visual time-planning app with Pomodoro timer",
   "main": "dist/index.js",
   "scripts": {
     "dev": "tsx watch src/index.ts",
