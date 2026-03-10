@@ -119,12 +119,17 @@ function getYesterdayEvents(): CalendarEvent[] {
 // ── Today ────────────────────────────────────────────────────
 
 function getTodayTasks(date: string, now: string): Task[] {
+  // Mark tasks complete if the current time is past when they would have finished,
+  // so the demo clock always looks realistic regardless of time of day.
+  const nowMin = new Date().getHours() * 60 + new Date().getMinutes();
+  const done = (endMin: number) => nowMin > endMin;
+
   return [
     {
       id: 'demo-1',
       title: 'Morning review',
       durationMinutes: 15,
-      completed: true,
+      completed: done(8 * 60 + 15),   // ends ~08:15
       important: false,
       isBreak: false,
       tag: 'admin',
@@ -138,7 +143,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       title: 'Write project proposal',
       durationMinutes: 50,
       fixedStartTime: '09:30',
-      completed: false,
+      completed: done(10 * 60 + 20),  // ends 10:20
       important: true,
       isBreak: false,
       tag: 'deep work',
@@ -153,7 +158,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       title: 'Team standup',
       durationMinutes: 15,
       fixedStartTime: '10:30',
-      completed: false,
+      completed: done(10 * 60 + 45),  // ends 10:45
       important: false,
       isBreak: false,
       sortOrder: 2,
@@ -165,7 +170,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       id: 'demo-4',
       title: 'Design new landing page',
       durationMinutes: 25,
-      completed: false,
+      completed: done(11 * 60 + 25),  // ends ~11:25
       important: false,
       isBreak: false,
       tag: 'design',
@@ -179,7 +184,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       id: 'demo-5',
       title: 'Email follow-ups',
       durationMinutes: 15,
-      completed: false,
+      completed: done(11 * 60 + 45),  // ends ~11:45
       important: false,
       isBreak: false,
       tag: 'admin',
@@ -192,7 +197,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       id: 'demo-6',
       title: 'Lunch break',
       durationMinutes: 45,
-      completed: false,
+      completed: done(12 * 60 + 45),  // ends ~12:45
       important: false,
       isBreak: true,
       sortOrder: 5,
@@ -204,7 +209,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       id: 'demo-7',
       title: 'Code review',
       durationMinutes: 25,
-      completed: false,
+      completed: done(13 * 60 + 25),  // ends ~13:25
       important: false,
       isBreak: false,
       tag: 'dev',
@@ -217,7 +222,7 @@ function getTodayTasks(date: string, now: string): Task[] {
       id: 'demo-8',
       title: 'Plan tomorrow',
       durationMinutes: 15,
-      completed: false,
+      completed: done(13 * 60 + 45),  // ends ~13:45
       important: false,
       isBreak: false,
       sortOrder: 7,
