@@ -602,6 +602,28 @@
   animation: task-complete 0.4s ease forwards;
 }
 
+/* Animated checkmark draw — runs once when the path enters the DOM */
+.task-list__checkmark-path {
+  stroke-dasharray: 12;
+  stroke-dashoffset: 12;
+  animation: checkmark-draw 0.22s cubic-bezier(0.22, 1, 0.36, 1) 0.04s forwards;
+}
+
+@keyframes checkmark-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* All-done ✓ mark — pops in with a quick scale */
+.task-list__all-done-mark {
+  display: inline-block;
+  animation: all-done-mark 0.35s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+}
+
+@keyframes all-done-mark {
+  0%   { transform: scale(0.4) rotate(-12deg); opacity: 0; }
+  100% { transform: scale(1)   rotate(0deg);  opacity: 1; }
+}
+
 /* ============================================================
    Responsive
    ============================================================ */
@@ -659,8 +681,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .task-list__item--completed {
+  .task-list__item--completed,
+  .task-list__all-done-mark {
     animation: none;
+  }
+  .task-list__checkmark-path {
+    animation: none;
+    stroke-dashoffset: 0;
   }
 }
 

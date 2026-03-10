@@ -42,6 +42,16 @@ TaskDial encrypts your task content (titles, tags, and notes) on your device bef
 
 ## Changelog
 
+### v1.2.6 — 2026-03-10
+
+- **Advanced mode now hides calendar events**: turning off Advanced mode removes calendar arcs from the clock and hides the calendar panel, so the view stays focused when you are not using calendar feeds.
+- **Simpler task form**: fixed time, important flag, tag, and repeat options are now hidden in the task form unless Advanced mode is on.
+- **Animated tick on task completion**: the checkmark draws itself when you mark a task done, giving a small moment of satisfaction.
+- **Warmer empty and all-done states**: when your task list is empty the copy is friendlier, and the "All done" confirmation now has a brief pop animation on the tick.
+- **Help modal rewritten in plain language**: all sections and FAQ answers are shorter and clearer.
+- **Settings panel close button**: now a plain cross rather than a filled circle, consistent with the rest of the UI.
+- **More space under the day picker**: breathing room between the date strip and the task area.
+
 ### v1.2.5 — 2026-03-10
 
 - **Redesigned settings panel**: settings are now organised into five tabs — Look, Schedule, Calendars, Timer, and Account — so each group of options is easy to find without scrolling past unrelated controls.

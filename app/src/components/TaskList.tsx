@@ -210,7 +210,7 @@ const TaskItem = memo(function TaskItem({
         {task.completed ? (
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
             <rect x="1" y="1" width="16" height="16" rx="3" stroke="currentColor" strokeWidth="1.5" fill="currentColor" fillOpacity="0.15" />
-            <path d="M5 9.5L7.5 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path className="task-list__checkmark-path" d="M5 9.5L7.5 12L13 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         ) : (
           <svg width="18" height="18" viewBox="0 0 18 18" fill="none" aria-hidden="true">
@@ -590,7 +590,7 @@ export default function TaskList({
     }
     return (
       <div className="task-list task-list--empty">
-        <p className="task-list__empty-message">Nothing scheduled yet. Add your first task above.</p>
+        <p className="task-list__empty-message">Your day is clear. Add a task to get started.</p>
       </div>
     );
   }
@@ -629,7 +629,9 @@ export default function TaskList({
   if (allTasksDone) {
     return (
       <div className="task-list task-list--all-done">
-        <p className="task-list__all-done-message">All done for today. ✓</p>
+        <p className="task-list__all-done-message">
+          All done for today. <span className="task-list__all-done-mark" aria-hidden="true">✓</span>
+        </p>
         <ul ref={listRef} className="task-list__items task-list__items--done" role="list" aria-label="Completed tasks">
           {sortedTasks.map((task) => renderItem(task))}
         </ul>

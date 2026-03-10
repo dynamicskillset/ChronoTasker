@@ -51,20 +51,20 @@
 .sp-header__close {
   width: 30px;
   height: 30px;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-border);
-  background: color-mix(in srgb, var(--color-border) 40%, transparent);
-  color: var(--color-text);
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-secondary);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s;
+  transition: color 0.15s, background 0.15s;
 }
 
 .sp-header__close:hover {
-  background: color-mix(in srgb, var(--color-border) 70%, transparent);
-  border-color: color-mix(in srgb, var(--color-border) 80%, var(--color-text));
+  color: var(--color-text);
+  background: var(--color-hover-bg);
 }
 
 .sp-header__close:focus-visible {
