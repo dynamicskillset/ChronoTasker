@@ -9,6 +9,8 @@ import { jwtAuth, signAccessToken, JwtPayload } from '../middleware/jwtAuth';
 
 const router = Router();
 
+const BCRYPT_ROUNDS = 10;
+
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 10,
@@ -79,7 +81,7 @@ function isValidInviteCodeFormat(code: string): boolean {
 // ── Routes ────────────────────────────────────────────────────────────────────
 
 // POST /api/auth/register
-router.post('/register', authLimiter, (req: Request, res: Response) => {
+router.post('/register', authLimiter, async (req: Request, res: Response) => {
   const { email, password, invite_code } = req.body;
   const ip = getClientIp(req);
 
@@ -127,7 +129,7 @@ router.post('/register', authLimiter, (req: Request, res: Response) => {
 
   const now = new Date().toISOString();
   const userId = uuidv4();
-  const passwordHash = bcrypt.hashSync(password, 12);
+  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
   const doRegister = db.transaction(() => {
     db.prepare(`
@@ -153,7 +155,7 @@ router.post('/register', authLimiter, (req: Request, res: Response) => {
 });
 
 // POST /api/auth/login
-router.post('/login', authLimiter, (req: Request, res: Response) => {
+router.post('/login', authLimiter, async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const ip = getClientIp(req);
 
@@ -177,9 +179,9 @@ router.post('/login', authLimiter, (req: Request, res: Response) => {
   } | undefined;
 
   // Always run bcrypt compare to avoid timing attacks (use dummy hash if user not found)
-  const DUMMY_HASH = '$2b$12$invalidhashfortimingnnnnnnnnnnnnnnnnnnnnnnn';
+  const DUMMY_HASH = '$2b$10$invalidhashfortimingnnnnnnnnnnnnnnnnnnnnnnnn';
   const hashToCompare = user?.password_hash || DUMMY_HASH;
-  const passwordMatch = bcrypt.compareSync(password, hashToCompare);
+  const passwordMatch = await bcrypt.compare(password, hashToCompare);
 
   if (!user || !passwordMatch || !user.is_active || user.deleted_at) {
     writeAuditLog(user?.id || null, 'login_fail', { email: normalEmail }, ip);
@@ -188,6 +190,12 @@ router.post('/login', authLimiter, (req: Request, res: Response) => {
   }
 
   writeAuditLog(user.id, 'login_ok', { email: normalEmail }, ip);
+
+  // Progressively upgrade hashes stored with a higher cost factor
+  if (user.password_hash.startsWith('$2') && !user.password_hash.startsWith(`$2b$${BCRYPT_ROUNDS}$`)) {
+    const upgraded = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    getDb().prepare('UPDATE users SET password_hash = ? WHERE id = ?').run(upgraded, user.id);
+  }
 
   const accessToken = signAccessToken(user);
   const refreshToken = issueRefreshToken(user.id);
