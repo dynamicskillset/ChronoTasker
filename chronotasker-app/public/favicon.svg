@@ -1,24 +1,36 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <!-- Background circle -->
-  <circle cx="50" cy="50" r="48" fill="#2E3440"/>
+  <!-- Dark disc -->
+  <circle cx="50" cy="50" r="49" fill="#2E3440"/>
 
-  <!-- Task ring (segmented arc representing time blocks) -->
-  <circle cx="50" cy="50" r="38" fill="none" stroke="#434C5E" stroke-width="12"/>
+  <!-- Base ring track -->
+  <circle cx="50" cy="50" r="35" fill="none" stroke="#3B4252" stroke-width="12"/>
 
-  <!-- Coloured task segments — three arcs suggesting a planned day -->
-  <!-- Morning block (8-10 o'clock position, ~60deg) -->
-  <path d="M 50 12 A 38 38 0 0 1 82.9 31" fill="none" stroke="#88C0D0" stroke-width="12" stroke-linecap="butt"/>
-  <!-- Mid block (10-11 o'clock position, ~30deg) -->
-  <path d="M 82.9 31 A 38 38 0 0 1 88 50" fill="none" stroke="#A3BE8C" stroke-width="12" stroke-linecap="butt"/>
-  <!-- Afternoon block (11-1 o'clock position, ~60deg) -->
-  <path d="M 88 50 A 38 38 0 0 1 69 82.9" fill="none" stroke="#5E81AC" stroke-width="12" stroke-linecap="butt"/>
+  <!-- Arc 1: Nord blue — 355° to 85° (~90°, top-right to right) -->
+  <path d="M 46.9 15.1 A 35 35 0 0 1 84.9 46.9"
+        fill="none" stroke="#5E81AC" stroke-width="12" stroke-linecap="butt"/>
+
+  <!-- Arc 2: Nord teal — 95° to 175° (~80°, right to bottom-right) -->
+  <path d="M 84.9 53.1 A 35 35 0 0 1 53.1 84.9"
+        fill="none" stroke="#88C0D0" stroke-width="12" stroke-linecap="butt"/>
+
+  <!-- Arc 3: Nord green — 185° to 270° (~85°, bottom-left to left) -->
+  <path d="M 46.9 84.9 A 35 35 0 0 1 15 50"
+        fill="none" stroke="#A3BE8C" stroke-width="12" stroke-linecap="butt"/>
 
   <!-- Hour markers at 12, 3, 6, 9 -->
-  <line x1="50" y1="6" x2="50" y2="10" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
-  <line x1="94" y1="50" x2="90" y2="50" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
-  <line x1="50" y1="94" x2="50" y2="90" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
-  <line x1="6" y1="50" x2="10" y2="50" stroke="#D8DEE9" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="50" cy="5" r="2" fill="#D8DEE9"/>
+  <circle cx="95" cy="50" r="2" fill="#D8DEE9"/>
+  <circle cx="50" cy="95" r="2" fill="#D8DEE9"/>
+  <circle cx="5" cy="50" r="2" fill="#D8DEE9"/>
 
-  <!-- Checkmark (task completion motif) — sits in the centre -->
-  <polyline points="39,52 46,59 62,41" fill="none" stroke="#A3BE8C" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Clock hands at 10:10 — hands frame the open top-left gap -->
+  <!-- Hour hand: 10 o'clock (300°), length 21 -->
+  <line x1="50" y1="50" x2="31.8" y2="39.5"
+        stroke="#ECEFF4" stroke-width="3.5" stroke-linecap="round"/>
+  <!-- Minute hand: 2 o'clock (60°), length 24 -->
+  <line x1="50" y1="50" x2="70.8" y2="38"
+        stroke="#ECEFF4" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Centre pivot -->
+  <circle cx="50" cy="50" r="4" fill="#ECEFF4"/>
 </svg>

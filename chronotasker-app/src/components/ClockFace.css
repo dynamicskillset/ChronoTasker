@@ -26,8 +26,8 @@
   --clock-calendar-opacity: 0.7;
 }
 
-/* Dark mode adjustments (only values that differ from defaults) */
-.dark .clock-face {
+/* Dark mode adjustments */
+:root[data-theme="dark"] .clock-face {
   --clock-ring-bg: var(--color-hover-bg);
   --clock-working-day-fill: var(--color-border);
   --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
@@ -39,28 +39,19 @@
   --color-task-lightness: 74%;
 }
 
+/* No-JS fallback for system dark preference */
 @media (prefers-color-scheme: dark) {
-  .clock-face {
+  :root:not([data-theme="light"]):not([data-theme="dark"]) .clock-face {
     --clock-ring-bg: var(--color-hover-bg);
     --clock-working-day-fill: var(--color-border);
     --clock-break-bg: color-mix(in srgb, var(--color-text-secondary) 30%, var(--color-border));
     --clock-hover-brightness: 1.2;
-    --clock-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+    --clock-shadow: 0 2px 16px rgba(0, 0, 0, 0.32);
     --clock-calendar-opacity: 0.85;
     --clock-task-opacity: 1;
     --color-task-saturation: 72%;
     --color-task-lightness: 74%;
   }
-}
-
-/* Reset to light defaults when user explicitly picks light on a dark OS */
-.light .clock-face {
-  --clock-ring-bg: var(--color-border);
-  --clock-working-day-fill: var(--color-bg);
-  --clock-break-bg: color-mix(in srgb, var(--color-border) 35%, var(--color-bg));
-  --clock-hover-brightness: 1.12;
-  --clock-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
-  --clock-calendar-opacity: 0.7;
 }
 
 /* ============================================================
@@ -124,7 +115,7 @@
 
 .clock-face__hour-label {
   fill: var(--clock-text-secondary);
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   font-size: 12px;
   font-weight: 500;
   text-anchor: middle;
@@ -283,7 +274,7 @@ g:focus-visible .clock-face__calendar-arc {
    ============================================================ */
 .clock-face__center-date {
   fill: var(--clock-text-secondary);
-  font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   font-size: 11px;
   font-weight: 500;
   text-anchor: middle;
@@ -293,7 +284,7 @@ g:focus-visible .clock-face__calendar-arc {
 
 .clock-face__center-time {
   fill: var(--clock-text);
-  font-family: 'Space Mono', 'SF Mono', 'Fira Code', monospace;
+  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
   font-size: 22px;
   font-weight: 700;
   text-anchor: middle;
