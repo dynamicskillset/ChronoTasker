@@ -42,6 +42,15 @@ TaskDial encrypts your task content (titles, tags, and notes) on your device bef
 
 ## Changelog
 
+### v1.2.4 — 2026-03-10
+
+- **Month in the date strip**: the current month and year now appear in the week navigation bar, so you always know where you are. When a week spans two months, both are shown.
+- **Tag colours**: tags on the same day are now always clearly distinct colours. Previously two tags could end up looking identical if they happened to map to the same colour slot.
+- **Smoother day switching**: switching to a different day now updates the task list immediately, rather than briefly showing the previous day's tasks while the sync catches up.
+- **Delete user confirmation**: the admin dashboard now requires a second click to confirm before deleting a user account, preventing accidental deletions.
+- **Privacy policy**: the data controller is now listed as Dynamic Skillset Ltd.
+- **Help page**: the privacy answer in the help panel now explains that task content is encrypted on your device and the server cannot read it.
+
 ### v1.2.3 — 2026-03-10
 
 - **End-to-end encryption**: task titles, tags, and notes are encrypted on your device before being sent to the server. The encryption key is derived from your password and never leaves your browser. The server stores only ciphertext.
