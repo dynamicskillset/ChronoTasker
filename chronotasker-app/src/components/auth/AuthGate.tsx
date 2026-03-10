@@ -4,12 +4,17 @@ import { getUser, setUser, clearUser, isAdmin, type AuthUser } from '../../servi
 import { setStorageUser, clearStorageUser, migrateAnonymousData } from '../../services/storage';
 import LoginPage from './LoginPage';
 import AdminDashboard from './AdminDashboard';
+import PrivacyPage from './PrivacyPage';
 import App from '../../App';
 
 type View = 'loading' | 'login' | 'app' | 'admin';
 
 function wantsAdmin(): boolean {
   return window.location.pathname.startsWith('/admin');
+}
+
+function wantsPrivacy(): boolean {
+  return window.location.pathname.startsWith('/privacy');
 }
 
 export default function AuthGate() {
@@ -74,6 +79,10 @@ export default function AuthGate() {
   async function handleLogout() {
     await logout();
     goToLogin(false);
+  }
+
+  if (wantsPrivacy()) {
+    return <PrivacyPage />;
   }
 
   if (view === 'loading') {

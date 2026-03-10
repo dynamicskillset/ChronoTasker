@@ -250,6 +250,20 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
               </p>
             </FaqItem>
 
+            <FaqItem question="What data does ChronoTasker store about me?">
+              <p>
+                Your account email, a hashed password, your tasks, settings, and Pomodoro
+                session records. We also keep a security audit log (login events, admin
+                actions) which is automatically deleted after 12 months. We do not use
+                trackers, share data with third parties, or use your data to train AI
+                models. See the full{' '}
+                <a href="/privacy" target="_blank" rel="noopener noreferrer">
+                  Privacy Policy
+                </a>{' '}
+                for details.
+              </p>
+            </FaqItem>
+
             <FaqItem question="What's the backlog?">
               <p>
                 The backlog holds tasks that aren't assigned to a specific day. Add
