@@ -1,6 +1,6 @@
 # ChronoTasker
 
-![ChronoTasker screenshot](chronotasker-screenshot.png)
+![TaskDial screenshot](taskdial-screenshot.png)
 
 Most to-do apps show you a list. ChronoTasker shows you your day as a clock: tasks are coloured arcs, so you can see at a glance whether your plan is realistic, where the gaps are, and where you're overloading yourself.
 
@@ -19,7 +19,7 @@ There's a built-in Pomodoro timer too, so focused work and planning live in the 
 - **Backlog** — a place for tasks that don't belong to any particular day yet; move them to today when you're ready
 - **Undo/redo** — change your mind freely; undo or redo any action
 - **Works offline** — tasks save locally first and sync when you're back online; installable as a PWA
-- **Five colour schemes** — Nord, Aurora, Frost, Evergreen, Berry
+- **Six colour schemes** — Berry (default), Nord, Aurora, Frost, Evergreen, Yellow
 - **Accessible** — keyboard navigable and screen-reader friendly
 
 ---
@@ -41,6 +41,13 @@ ChronoTasker stores your tasks and settings on the server so they sync across yo
 ---
 
 ## Changelog
+
+### v1.2.1 — 2026-03-10
+
+- **Berry is now the default colour scheme** for new users, replacing the previous warm gold default.
+- **Working days** (advanced settings): choose which days of the week you work; the previous/next day arrows skip non-working days automatically.
+- **Accessibility**: clock face task arcs now report their active state to screen readers; the task list announces that drag-to-reorder is available; links in the help panel show a focus ring when navigating by keyboard; action buttons on the backlog list are now a full 44×44px touch target; settings panel collapses to a single column on narrow screens.
+- **Performance**: reduced unnecessary recalculations when switching between tasks on the same minute.
 
 ### v1.1.1 — 2026-03-10
 

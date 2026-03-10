@@ -143,6 +143,15 @@
   overflow-anchor: none;
 }
 
+@media (max-width: 900px) {
+  .settings-panel-wrapper {
+    grid-template-columns: 1fr;
+  }
+  .settings-panel {
+    grid-column: 1;
+  }
+}
+
 .settings-panel-wrapper--simple {
   display: flex;
   justify-content: flex-end;
@@ -728,35 +737,56 @@
   flex-wrap: wrap;
 }
 
-.working-days-picker__btn {
+/* Each day is a <label> wrapping a hidden checkbox + visible <span> */
+.working-days-picker__day {
   display: flex;
   align-items: center;
   justify-content: center;
   min-width: 44px;
   min-height: 44px;
   padding: 0 0.5rem;
-  border: 1.5px solid var(--color-text-secondary);
+  border: 1.5px solid var(--color-border);
   border-radius: 6px;
-  background: none;
-  color: var(--color-text);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  user-select: none;
+  transition: background-color 0.1s, color 0.1s, border-color 0.1s;
 }
 
-.working-days-picker__btn--active {
+/* Hide the actual checkbox */
+.working-days-picker__day input[type="checkbox"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Hover — clear accent tint */
+.working-days-picker__day:hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
+/* Checked — solid fill */
+.working-days-picker__day:has(input:checked) {
   background-color: var(--color-text);
   border-color: var(--color-text);
   color: var(--color-bg);
 }
 
-.working-days-picker__btn:hover:not(.working-days-picker__btn--active) {
-  border-color: var(--color-text);
-  background-color: color-mix(in srgb, var(--color-text) 8%, transparent);
+.working-days-picker__day:has(input:checked):hover {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
 }
 
-.working-days-picker__btn:focus-visible {
+/* Keyboard focus */
+.working-days-picker__day:has(input:focus-visible) {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -944,7 +974,8 @@
 }
 
 .day-summary__value {
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
   color: var(--color-text);
 }
@@ -1066,7 +1097,8 @@
 }
 
 .calendar-events__time {
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.7rem;
   color: var(--color-text-secondary);
   white-space: nowrap;
@@ -1142,7 +1174,8 @@
 .collapsible-section__summary {
   font-size: 0.75rem;
   font-weight: 500;
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   padding: 0.125rem 0.5rem;
   border-radius: 999px;
   white-space: nowrap;

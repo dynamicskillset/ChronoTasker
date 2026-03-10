@@ -418,6 +418,7 @@ const TaskArc = React.memo(function TaskArc({
       }}
       role="button"
       tabIndex={0}
+      aria-pressed={isActive}
       aria-label={tooltip}
     >
       <title>{tooltip}</title>
@@ -504,7 +505,7 @@ const CalendarArc = React.memo(function CalendarArc({
     const bufferD = describeArc(CX, CY, CAL_INNER_R, CAL_OUTER_R, bufferStartAngle, bufferEndAngle);
 
     bufferArc = (
-      <g>
+      <g aria-hidden="true">
         <title>{meetingBufferMinutes} min buffer</title>
         <path d={bufferD} fill="url(#break-hatch)" className="clock-face__task-arc--break" />
       </g>
@@ -526,7 +527,7 @@ const CalendarArc = React.memo(function CalendarArc({
       role={onCalendarEventClick ? 'button' : undefined}
       tabIndex={onCalendarEventClick ? 0 : undefined}
       aria-label={onCalendarEventClick ? tooltip : undefined}
-      aria-current={onCalendarEventClick && isActive ? 'true' : undefined}
+      aria-pressed={onCalendarEventClick ? isActive : undefined}
     >
       <title>{tooltip}</title>
       <path d={d} className={arcClass} />

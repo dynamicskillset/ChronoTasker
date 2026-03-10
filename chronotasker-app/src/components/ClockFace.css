@@ -284,7 +284,8 @@ g:focus-visible .clock-face__calendar-arc {
 
 .clock-face__center-time {
   fill: var(--clock-text);
-  font-family: 'SF Mono', 'Fira Code', ui-monospace, monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 22px;
   font-weight: 700;
   text-anchor: middle;

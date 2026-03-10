@@ -100,7 +100,8 @@
 }
 
 .backlog-list__duration {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
 }
 
@@ -110,7 +111,7 @@
   align-items: center;
   gap: 0.125rem;
   padding-right: 0.5rem;
-  opacity: 0.35;
+  opacity: 0.55;
   transition: opacity var(--transition-normal);
 }
 
@@ -142,8 +143,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: none;
   background: none;

@@ -267,12 +267,14 @@
 }
 
 .task-list__duration {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
 }
 
 .task-list__fixed-time {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
   color: var(--tl-active-border);
 }
@@ -407,7 +409,7 @@
   display: flex;
   align-items: center;
   gap: 0.125rem;
-  opacity: 0.35;
+  opacity: 0.55;
   transition: opacity var(--transition-normal);
 }
 

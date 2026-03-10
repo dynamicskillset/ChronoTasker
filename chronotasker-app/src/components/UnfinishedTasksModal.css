@@ -140,7 +140,8 @@
 }
 
 .unfinished-modal__item-duration {
-  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-family: inherit;
+  font-variant-numeric: tabular-nums;
   font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
@@ -171,7 +172,7 @@
 
 .unfinished-modal__action-btn--accent:hover {
   background-color: var(--color-accent);
-  color: var(--color-submit-text, #fff);
+  color: var(--color-submit-text, #2E3440);
 }
 
 .unfinished-modal__action-btn--secondary {
@@ -190,7 +191,7 @@
 
 .unfinished-modal__action-btn--danger:hover {
   background-color: var(--color-danger);
-  color: var(--color-submit-text, #fff);
+  color: var(--color-submit-text, #2E3440);
 }
 
 /* Focus-visible for keyboard navigation */
@@ -238,7 +239,7 @@
 
 .unfinished-modal__bulk-btn--accent {
   background: var(--color-accent);
-  color: var(--color-submit-text, #fff);
+  color: var(--color-submit-text, #2E3440);
 }
 
 .unfinished-modal__bulk-btn--secondary {
@@ -248,7 +249,7 @@
 
 .unfinished-modal__bulk-btn--danger {
   background: var(--color-danger);
-  color: var(--color-submit-text, #fff);
+  color: var(--color-submit-text, #2E3440);
 }
 
 /* Responsive */

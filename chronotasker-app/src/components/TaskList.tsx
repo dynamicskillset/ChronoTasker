@@ -151,6 +151,10 @@ const TaskItem = memo(function TaskItem({
   onDragEnd,
   onDrop,
 }: TaskItemProps) {
+  const itemStyle = useMemo(
+    () => arcColor ? { '--task-color': arcColor } as React.CSSProperties : undefined,
+    [arcColor]
+  );
   return (
     <li
       data-task-id={task.id}
@@ -165,7 +169,7 @@ const TaskItem = memo(function TaskItem({
       ]
         .filter(Boolean)
         .join(' ')}
-      style={arcColor ? { '--task-color': arcColor } as React.CSSProperties : undefined}
+      style={itemStyle}
       draggable={!task.completed && !task.isBreak}
       onDragStart={(e) => {
         e.stopPropagation();
@@ -611,7 +615,7 @@ export default function TaskList({
     return (
       <div className="task-list task-list--all-done">
         <p className="task-list__all-done-message">All done for today. ✓</p>
-        <ul ref={listRef} className="task-list__items task-list__items--done" role="list">
+        <ul ref={listRef} className="task-list__items task-list__items--done" role="list" aria-label="Completed tasks">
           {sortedTasks.map((task) => renderItem(task))}
         </ul>
       </div>
@@ -620,7 +624,7 @@ export default function TaskList({
 
   return (
     <div className="task-list">
-      <ul ref={listRef} className="task-list__items" role="list">
+      <ul ref={listRef} className="task-list__items" role="list" aria-label="Tasks — drag to reorder or use arrow buttons">
         {sortedTasks.map((task) => renderItem(task))}
       </ul>
       {onMoveAllToTomorrow && unfinishedCount > 0 && (

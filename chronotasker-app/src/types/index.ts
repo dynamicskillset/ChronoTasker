@@ -82,7 +82,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   use24Hour: true,
   autoAdvance: true,
   theme: 'system',
-  colorScheme: 'yellow',
+  colorScheme: 'berry',
   icalUrls: [],
   meetingBufferMinutes: 15,
   enableRecurringTasks: false,

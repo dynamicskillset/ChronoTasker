@@ -315,7 +315,10 @@ function App({ user, onLogout }: AppProps) {
 
   // Schedule tasks for the clock — only recalculate when minute changes
   const isToday = date === todayString();
-  const currentMinuteKey = `${currentTime.getHours()}:${currentTime.getMinutes()}`;
+  const currentMinuteKey = useMemo(
+    () => `${currentTime.getHours()}:${currentTime.getMinutes()}`,
+    [currentTime]
+  );
   const scheduledTasks = useMemo(
     () => scheduleTasks(tasks, settings.dayStartHour, settings.dayEndHour, currentTime, settings.autoAdvance, calendarEvents, settings.meetingBufferMinutes, isToday),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -887,7 +890,21 @@ function App({ user, onLogout }: AppProps) {
       <header className="app-header">
         <div className="app-title-group">
           <h1 className="app-title">
-            <img src="/favicon.svg" alt="" className="app-logo" aria-hidden="true" />
+            {/* Inline SVG so currentColor inherits the theme-aware text colour */}
+            <svg className="app-logo" viewBox="0 0 100 100" aria-hidden="true" focusable="false">
+              {/* Arc track */}
+              <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="9" opacity="0.15"/>
+              {/* Outer border */}
+              <circle cx="50" cy="50" r="47" fill="none" stroke="currentColor" strokeWidth="1.5" opacity="0.2"/>
+              {/* Arc 1: Nord blue */}
+              <path d="M 46.9 15.1 A 35 35 0 0 1 84.9 46.9" fill="none" stroke="#5E81AC" strokeWidth="9" strokeLinecap="butt"/>
+              {/* Arc 2: Nord teal */}
+              <path d="M 84.9 53.1 A 35 35 0 0 1 53.1 84.9" fill="none" stroke="#88C0D0" strokeWidth="9" strokeLinecap="butt"/>
+              {/* Arc 3: Nord green */}
+              <path d="M 46.9 84.9 A 35 35 0 0 1 15 50" fill="none" stroke="#A3BE8C" strokeWidth="9" strokeLinecap="butt"/>
+              {/* Checkmark */}
+              <path d="M 32 50 L 44 63 L 68 37" fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
             <span className="app-title__wordmark">TaskDial</span>
           </h1>
           <div className="app-title-meta">
@@ -1060,23 +1077,28 @@ function App({ user, onLogout }: AppProps) {
                       { label: 'Thu', day: 4 }, { label: 'Fri', day: 5 }, { label: 'Sat', day: 6 }, { label: 'Sun', day: 7 },
                     ] as { label: string; day: number }[]).map(({ label, day }) => {
                       const active = settings.workingDays.includes(day);
+                      const id = `wd-${day}`;
                       return (
-                        <button
+                        <label
                           key={day}
-                          type="button"
-                          className={`working-days-picker__btn${active ? ' working-days-picker__btn--active' : ''}`}
-                          aria-pressed={active}
-                          onClick={() => {
-                            const next = active
-                              ? settings.workingDays.filter(d => d !== day)
-                              : [...settings.workingDays, day].sort((a, b) => a - b);
-                            const s = { ...settings, workingDays: next };
-                            setSettings(s);
-                            debouncedPushSettings(s);
-                          }}
+                          htmlFor={id}
+                          className="working-days-picker__day"
                         >
-                          {label}
-                        </button>
+                          <input
+                            type="checkbox"
+                            id={id}
+                            checked={active}
+                            onChange={() => {
+                              const next = active
+                                ? settings.workingDays.filter(d => d !== day)
+                                : [...settings.workingDays, day].sort((a, b) => a - b);
+                              const s = { ...settings, workingDays: next };
+                              setSettings(s);
+                              debouncedPushSettings(s);
+                            }}
+                          />
+                          <span>{label}</span>
+                        </label>
                       );
                     })}
                   </div>
