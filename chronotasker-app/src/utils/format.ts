@@ -21,6 +21,39 @@ export function tagBgColor(tag: string): string {
   return `hsl(${tagHue(tag)}, var(--tag-saturation, 55%), var(--tag-bg-lightness, 92%))`;
 }
 
+export function tagColorFromHue(hue: number): string {
+  return `hsl(${hue}, var(--tag-saturation, 55%), var(--tag-text-lightness, 40%))`;
+}
+
+export function tagBgColorFromHue(hue: number): string {
+  return `hsl(${hue}, var(--tag-saturation, 55%), var(--tag-bg-lightness, 92%))`;
+}
+
+/**
+ * Assign distinct hues to a list of tags, ensuring no two assigned hues are
+ * within 30° of each other. Falls back to the hash-based hue if no conflicts.
+ */
+export function buildTagHueMap(tags: string[]): Map<string, number> {
+  const map = new Map<string, number>();
+  const assigned: number[] = [];
+  const MIN_ANGLE = 30;
+
+  const tooClose = (h: number) =>
+    assigned.some(a => Math.abs(((h - a + 180 + 360) % 360) - 180) < MIN_ANGLE);
+
+  for (const tag of tags) {
+    const preferred = tagHue(tag);
+    let chosen = preferred;
+    if (tooClose(preferred)) {
+      const alt = TAG_HUES.find(h => !tooClose(h));
+      if (alt !== undefined) chosen = alt;
+    }
+    assigned.push(chosen);
+    map.set(tag, chosen);
+  }
+  return map;
+}
+
 /**
  * Read the accent hue from the CSS custom property --color-accent-hue.
  * Falls back to 210 (Nord blue) if not set.

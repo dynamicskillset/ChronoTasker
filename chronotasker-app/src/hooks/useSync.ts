@@ -30,6 +30,10 @@ export function useSync({
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const sync = useCallback(async () => {
+    // Immediately show locally-cached data for the current date so the UI
+    // never briefly shows the previous day's tasks while the API responds.
+    onTasksUpdated(storage.getLocalTasks(date));
+
     setIsSyncing(true);
     try {
       const online = await api.healthCheck();

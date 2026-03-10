@@ -252,10 +252,13 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
 
             <FaqItem question="What data does TaskDial store about me?">
               <p>
-                Your account email, a hashed password, your tasks, settings, and Pomodoro
-                session records. We also keep a security audit log (login events, admin
-                actions) which is automatically deleted after 12 months. We do not use
-                trackers, share data with third parties, or use your data to train AI
+                Your account email, a hashed password, your settings, and Pomodoro session
+                records. Task titles, tags, and notes are encrypted on your device before
+                reaching the server — the encryption key is derived from your password and
+                never leaves your browser. The server stores only ciphertext and cannot
+                read your task content. We also keep a security audit log (login events,
+                admin actions) which is automatically deleted after 12 months. We do not
+                use trackers, share data with third parties, or use your data to train AI
                 models. See the full{' '}
                 <a href="/privacy" target="_blank" rel="noopener noreferrer">
                   Privacy Policy

@@ -10,7 +10,7 @@ import BacklogList from './components/BacklogList';
 import { usePomodoro } from './hooks/usePomodoro';
 import { useSync } from './hooks/useSync';
 import { scheduleTasks, findNonOverflowOrdering, type ScheduledTask } from './utils/scheduling';
-import { formatDuration, tagColor, tagBgColor } from './utils/format';
+import { formatDuration, tagColor, tagBgColor, buildTagHueMap, tagColorFromHue, tagBgColorFromHue } from './utils/format';
 import { todayString, tomorrowString, getWeekMonday, weekDayDate, shiftDate } from './utils/scheduling';
 import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
 import * as storage from './services/storage';
@@ -50,6 +50,13 @@ function App({ user, onLogout }: AppProps) {
   const [editingTask, setEditingTask] = useState<Task | undefined>();
   const [activeTaskId, setActiveTaskId] = useState<string | null>(null);
   const [activeCalendarUid, setActiveCalendarUid] = useState<string | null>(null);
+  // Clear task/calendar selection when navigating to a different day
+  const [prevDate, setPrevDate] = useState(date);
+  if (prevDate !== date) {
+    setPrevDate(date);
+    setActiveTaskId(null);
+    setActiveCalendarUid(null);
+  }
   const calendarListRef = useRef<HTMLUListElement>(null);
   useEffect(() => {
     if (!activeCalendarUid || !calendarListRef.current) return;
@@ -414,6 +421,17 @@ function App({ user, onLogout }: AppProps) {
     [...new Set(tasksWithScheduleInfo.map(t => t.tag).filter((t): t is string => !!t))].sort(),
     [tasksWithScheduleInfo]
   );
+
+  // All individual tags (after splitting comma-separated values) for colour assignment
+  const allIndividualTags = useMemo(() =>
+    [...new Set(tasksWithScheduleInfo
+      .flatMap(t => t.tag ? t.tag.split(',').map(s => s.trim()).filter(Boolean) : [])
+    )].sort(),
+    [tasksWithScheduleInfo]
+  );
+
+  // Colour map ensuring no two visible tags share a similar hue
+  const tagHueMap = useMemo(() => buildTagHueMap(allIndividualTags), [allIndividualTags]);
 
   // Filtered task list (apply tag filter if active)
   const filteredTasks = useMemo(() =>
@@ -814,6 +832,19 @@ function App({ user, onLogout }: AppProps) {
   }, [weekMonday, settings.workingDays]);
   const goPrevWeek = () => setDate(shiftDate(weekMonday, -7));
   const goNextWeek = () => setDate(shiftDate(weekMonday, 7));
+
+  // Month label for the week nav — shows both months when the week spans a boundary
+  const weekMonthLabel = useMemo(() => {
+    if (visibleDays.length === 0) return '';
+    const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const first = new Date(visibleDays[0] + 'T00:00:00');
+    const last = new Date(visibleDays[visibleDays.length - 1] + 'T00:00:00');
+    const year = first.getFullYear();
+    if (first.getMonth() === last.getMonth()) {
+      return `${MONTHS[first.getMonth()]} ${year}`;
+    }
+    return `${MONTHS[first.getMonth()]} / ${MONTHS[last.getMonth()]}`;
+  }, [visibleDays]);
 
   // Demo mode
   const enterDemoMode = useCallback(() => {
@@ -1360,6 +1391,7 @@ function App({ user, onLogout }: AppProps) {
       )}
 
       <div className="date-nav" role="navigation" aria-label="Date navigation">
+        <span className="date-nav__month-label" aria-label={weekMonthLabel}>{weekMonthLabel}</span>
         <button className="date-nav__week-btn" onClick={goPrevWeek} aria-label="Previous week">
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 3L5 7L9 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </button>
@@ -1638,18 +1670,24 @@ function App({ user, onLogout }: AppProps) {
                           )}
                           {taskTags.length > 1 && (
                             <div className="tag-filter" role="group" aria-label="Filter by tag">
-                              {taskTags.map(tag => (
-                                <button
-                                  key={tag}
-                                  className={`tag-filter__pill${activeTagFilter === tag ? ' tag-filter__pill--active' : ''}`}
-                                  style={{ color: tagColor(tag), backgroundColor: tagBgColor(tag) }}
-                                  onClick={() => setActiveTagFilter(activeTagFilter === tag ? null : tag)}
-                                  aria-pressed={activeTagFilter === tag}
-                                  aria-label={`Filter by ${tag}`}
-                                >
-                                  {tag}
-                                </button>
-                              ))}
+                              {taskTags.map(tag => {
+                                const hue = tagHueMap.get(tag);
+                                return (
+                                  <button
+                                    key={tag}
+                                    className={`tag-filter__pill${activeTagFilter === tag ? ' tag-filter__pill--active' : ''}`}
+                                    style={{
+                                      color: hue !== undefined ? tagColorFromHue(hue) : tagColor(tag),
+                                      backgroundColor: hue !== undefined ? tagBgColorFromHue(hue) : tagBgColor(tag),
+                                    }}
+                                    onClick={() => setActiveTagFilter(activeTagFilter === tag ? null : tag)}
+                                    aria-pressed={activeTagFilter === tag}
+                                    aria-label={`Filter by ${tag}`}
+                                  >
+                                    {tag}
+                                  </button>
+                                );
+                              })}
                               {activeTagFilter && (
                                 <button className="tag-filter__clear" onClick={() => setActiveTagFilter(null)} aria-label="Clear tag filter">✕</button>
                               )}
@@ -1658,6 +1696,7 @@ function App({ user, onLogout }: AppProps) {
                           <TaskList
                             tasks={filteredTasks}
                             colorMap={clockColorMap}
+                            tagHueMap={tagHueMap}
                             activeTaskId={activeTaskId}
                             allTasksDone={allTasksDone}
                             onToggleComplete={handleToggleComplete}
@@ -1736,17 +1775,23 @@ function App({ user, onLogout }: AppProps) {
                 )}
                 {taskTags.length > 1 && (
                   <div className="tag-filter" role="group" aria-label="Filter by tag">
-                    {taskTags.map(tag => (
-                      <button
-                        key={tag}
-                        className={`tag-filter__pill${activeTagFilter === tag ? ' tag-filter__pill--active' : ''}`}
-                        style={{ color: tagColor(tag), backgroundColor: tagBgColor(tag) }}
-                        onClick={() => setActiveTagFilter(activeTagFilter === tag ? null : tag)}
-                        aria-pressed={activeTagFilter === tag}
-                      >
-                        {tag}
-                      </button>
-                    ))}
+                    {taskTags.map(tag => {
+                      const hue = tagHueMap.get(tag);
+                      return (
+                        <button
+                          key={tag}
+                          className={`tag-filter__pill${activeTagFilter === tag ? ' tag-filter__pill--active' : ''}`}
+                          style={{
+                            color: hue !== undefined ? tagColorFromHue(hue) : tagColor(tag),
+                            backgroundColor: hue !== undefined ? tagBgColorFromHue(hue) : tagBgColor(tag),
+                          }}
+                          onClick={() => setActiveTagFilter(activeTagFilter === tag ? null : tag)}
+                          aria-pressed={activeTagFilter === tag}
+                        >
+                          {tag}
+                        </button>
+                      );
+                    })}
                     {activeTagFilter && (
                       <button className="tag-filter__clear" onClick={() => setActiveTagFilter(null)} aria-label="Clear tag filter">✕</button>
                     )}
@@ -1755,6 +1800,7 @@ function App({ user, onLogout }: AppProps) {
                 <TaskList
                   tasks={filteredTasks}
                   colorMap={clockColorMap}
+                  tagHueMap={tagHueMap}
                   activeTaskId={activeTaskId}
                   allTasksDone={allTasksDone}
                   onToggleComplete={handleToggleComplete}

@@ -845,6 +845,20 @@
   flex-wrap: wrap;
 }
 
+.date-nav__month-label {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  padding: 0 0.5rem;
+  align-self: center;
+  flex-shrink: 0;
+  min-width: 4.5rem;
+  text-align: center;
+}
+
 .date-nav__week-btn {
   width: 36px;
   height: 44px;

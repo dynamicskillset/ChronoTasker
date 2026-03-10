@@ -9,7 +9,7 @@ export default function PrivacyPage() {
         <p>TaskDial is a personal productivity tool. This policy explains what information is collected when you use it, why, and what rights you have over it.</p>
 
         <h2>Who is responsible for your data</h2>
-        <p>TaskDial is operated by Doug Belshaw. For the purposes of the GDPR, Doug Belshaw is the data controller.</p>
+        <p>TaskDial is operated by Dynamic Skillset Ltd. For the purposes of the GDPR, Dynamic Skillset Ltd is the data controller.</p>
         <p>If you have any questions or want to exercise your rights, contact: <a href="mailto:privacy@dynamicskillset.com">privacy@dynamicskillset.com</a></p>
 
         <h2>What data is collected and why</h2>

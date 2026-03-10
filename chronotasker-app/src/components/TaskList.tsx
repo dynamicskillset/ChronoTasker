@@ -2,12 +2,13 @@ import { useState, useEffect, useCallback, useRef, useMemo, memo, type ReactNode
 import type { Task } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
-import { formatDuration, tagColor, tagBgColor } from '../utils/format';
+import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue } from '../utils/format';
 import './TaskList.css';
 
 interface TaskListProps {
   tasks: ScheduledTask[];
   colorMap?: Map<string, string>;
+  tagHueMap?: Map<string, number>;
   activeTaskId: string | null;
   allTasksDone?: boolean;
   onToggleComplete: (taskId: string) => void;
@@ -101,6 +102,7 @@ function renderMarkdown(text: string): ReactNode {
 interface TaskItemProps {
   task: ScheduledTask;
   arcColor?: string;
+  tagHueMap?: Map<string, number>;
   isActive: boolean;
   isFirst: boolean;
   isLast: boolean;
@@ -128,6 +130,7 @@ interface TaskItemProps {
 const TaskItem = memo(function TaskItem({
   task,
   arcColor,
+  tagHueMap,
   isActive,
   isFirst,
   isLast,
@@ -226,15 +229,21 @@ const TaskItem = memo(function TaskItem({
               ↻
             </span>
           )}
-          {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
-            <span
-              key={i}
-              className="task-list__tag"
-              style={{ color: tagColor(t), backgroundColor: tagBgColor(t) }}
-            >
-              {t}
-            </span>
-          ))}
+          {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => {
+            const hue = tagHueMap?.get(t);
+            return (
+              <span
+                key={i}
+                className="task-list__tag"
+                style={{
+                  color: hue !== undefined ? tagColorFromHue(hue) : tagColor(t),
+                  backgroundColor: hue !== undefined ? tagBgColorFromHue(hue) : tagBgColor(t),
+                }}
+              >
+                {t}
+              </span>
+            );
+          })}
         </span>
         <span className="task-list__meta">
           <span className="task-list__duration">{formatDuration(task.durationMinutes)}</span>
@@ -407,6 +416,7 @@ const TaskItem = memo(function TaskItem({
 export default function TaskList({
   tasks,
   colorMap,
+  tagHueMap,
   activeTaskId,
   allTasksDone,
   onToggleComplete,
@@ -587,6 +597,7 @@ export default function TaskList({
       key={task.id}
       task={task}
       arcColor={colorMap?.get(task.id)}
+      tagHueMap={tagHueMap}
       isActive={task.id === activeTaskId}
       isFirst={!task.completed && task.id === incompleteTasks[0]?.id}
       isLast={!task.completed && task.id === incompleteTasks[incompleteTasks.length - 1]?.id}

@@ -30,6 +30,7 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
   const [newCode, setNewCode] = useState<string | null>(null);
   const [inviteExpiry, setInviteExpiry] = useState('');
   const [generatingInvite, setGeneratingInvite] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [confirmPurge, setConfirmPurge] = useState<string | null>(null);
   const [showDeleted, setShowDeleted] = useState(false);
   const [activeTab, setActiveTab] = useState<'users' | 'invites' | 'audit'>('users');
@@ -65,6 +66,11 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
   }
 
   async function handleDelete(id: string) {
+    if (confirmDelete !== id) {
+      setConfirmDelete(id);
+      return;
+    }
+    setConfirmDelete(null);
     await deleteUser(id).catch(() => {});
     load();
   }
@@ -165,7 +171,12 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
                           ? <button className="admin-btn admin-btn--warn" onClick={() => handleDisable(u.id)}>Disable</button>
                           : <button className="admin-btn" onClick={() => handleEnable(u.id)}>Enable</button>
                         }
-                        <button className="admin-btn admin-btn--danger" onClick={() => handleDelete(u.id)}>Delete</button>
+                        <button
+                          className={`admin-btn admin-btn--danger${confirmDelete === u.id ? ' admin-btn--confirm' : ''}`}
+                          onClick={() => handleDelete(u.id)}
+                        >
+                          {confirmDelete === u.id ? 'Confirm delete' : 'Delete'}
+                        </button>
                       </>
                     )}
                   </td>
