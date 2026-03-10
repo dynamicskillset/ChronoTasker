@@ -42,6 +42,16 @@ TaskDial encrypts your task content (titles, tags, and notes) on your device bef
 
 ## Changelog
 
+### v1.2.5 — 2026-03-10
+
+- **Redesigned settings panel**: settings are now organised into five tabs — Look, Schedule, Calendars, Timer, and Account — so each group of options is easy to find without scrolling past unrelated controls.
+- **Theme picker**: Light, System, and Dark now appear as three clear buttons rather than a small segmented control.
+- **Colour scheme picker**: each swatch now shows its name, making it easier to tell Berry from Frost at a glance.
+- **Pomodoro cycle length**: you can now set how many focus sessions to complete before a long break. Previously this was fixed and could not be changed.
+- **Account tab**: export, import, and account deletion are now always visible rather than hidden behind a collapsible section.
+- **Performance**: the clock face now redraws once per minute instead of once per second, and several other render optimisations reduce unnecessary work in the background.
+- **Click outside to close**: clicking anywhere outside the settings panel now closes it.
+
 ### v1.2.4 — 2026-03-10
 
 - **Month in the date strip**: the current month and year now appear in the week navigation bar, so you always know where you are. When a week spans two months, both are shown.
