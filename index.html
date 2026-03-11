@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskDial — plan your day visually</title>
+  <meta name="description" content="TaskDial maps your tasks onto a clock face so you can see your whole day at a glance, work in focused Pomodoro blocks, and sync across devices.">
+  <meta property="og:title" content="TaskDial — plan your day visually">
+  <meta property="og:description" content="See your day as a clock, not a list. Visual time-blocking with a built-in Pomodoro timer.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://taskdial.dynamicskillset.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='35' fill='none' stroke='%234C566A' stroke-width='9'/%3E%3Cpath d='M 46.9 15.1 A 35 35 0 0 1 84.9 46.9' fill='none' stroke='%235E81AC' stroke-width='9' stroke-linecap='butt'/%3E%3Cpath d='M 84.9 53.1 A 35 35 0 0 1 53.1 84.9' fill='none' stroke='%2388C0D0' stroke-width='9' stroke-linecap='butt'/%3E%3Cpath d='M 46.9 84.9 A 35 35 0 0 1 15 50' fill='none' stroke='%23A3BE8C' stroke-width='9' stroke-linecap='butt'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --bg:       #2E3440;
+      --surface:  #3B4252;
+      --elevated: #434C5E;
+      --border:   #4C566A;
+      --text:     #ECEFF4;
+      --muted:    #8D9AB5;
+      --blue:     #5E81AC;
+      --frost:    #88C0D0;
+      --green:    #A3BE8C;
+      --max-width: 720px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* ── Nav ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.01em;
+    }
+
+    .nav-brand svg { color: var(--frost); flex-shrink: 0; }
+
+    .nav-links { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      display: inline-block;
+      padding: 7px 16px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: opacity 0.15s;
+      white-space: nowrap;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary  { background: var(--blue);        color: #ECEFF4;      border-color: var(--blue); }
+    .btn-secondary { background: transparent;       color: var(--text);  border-color: var(--border); }
+
+    /* ── Hero ── */
+    #hero {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 80px 24px 64px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--frost);
+      background: color-mix(in srgb, var(--frost) 12%, transparent);
+      border: 1px solid color-mix(in srgb, var(--frost) 25%, transparent);
+      border-radius: 20px;
+      padding: 3px 10px;
+      margin-bottom: 20px;
+      letter-spacing: 0.01em;
+    }
+
+    .hero-title {
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      line-height: 1.12;
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .hero-title span { color: var(--frost); }
+
+    .hero-desc {
+      font-size: 18px;
+      color: var(--muted);
+      max-width: 520px;
+      margin-bottom: 32px;
+      line-height: 1.55;
+    }
+
+    .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-ctas .btn { font-size: 15px; padding: 10px 22px; }
+
+    /* ── Clock preview ── */
+    .hero-clock {
+      margin-top: 52px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .clock-preview {
+      position: relative;
+      width: 220px;
+      height: 220px;
+    }
+
+    /* ── Callouts ── */
+    #callouts {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px 64px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+    }
+
+    .callout {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .callout-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+
+    .callout h3 { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .callout p  { font-size: 13px; color: var(--muted); line-height: 1.5; }
+
+    /* ── How it works ── */
+    #how {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    #how h2 { font-size: 20px; font-weight: 600; margin-bottom: 24px; }
+
+    .steps { display: flex; flex-direction: column; gap: 14px; }
+
+    .step { display: flex; gap: 16px; align-items: flex-start; }
+
+    .step-num {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #1E2D3D;
+      color: var(--frost);
+      font-size: 13px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 2px;
+      border: 1px solid color-mix(in srgb, var(--frost) 30%, transparent);
+    }
+
+    .step p { font-size: 15px; color: var(--muted); line-height: 1.5; }
+    .step p strong { color: var(--text); font-weight: 500; }
+    .step a { color: var(--frost); text-underline-offset: 2px; }
+    .step a:hover { opacity: 0.8; }
+
+    /* ── Self-host strip ── */
+    #selfhost {
+      max-width: var(--max-width);
+      margin: 0 auto 80px;
+      padding: 0 24px;
+    }
+
+    .selfhost-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .selfhost-card p {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .selfhost-card p strong { color: var(--text); }
+
+    /* ── Footer ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    footer a { color: var(--muted); text-underline-offset: 2px; }
+    footer a:hover { color: var(--text); }
+  </style>
+</head>
+<body>
+
+  <nav>
+    <a class="nav-brand" href="https://taskdial.dynamicskillset.com">
+      <svg width="22" height="22" viewBox="0 0 100 100" aria-hidden="true">
+        <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" stroke-width="9" opacity="0.25"/>
+        <path d="M 46.9 15.1 A 35 35 0 0 1 84.9 46.9" fill="none" stroke="#5E81AC" stroke-width="9" stroke-linecap="butt"/>
+        <path d="M 84.9 53.1 A 35 35 0 0 1 53.1 84.9" fill="none" stroke="#88C0D0" stroke-width="9" stroke-linecap="butt"/>
+        <path d="M 46.9 84.9 A 35 35 0 0 1 15 50"    fill="none" stroke="#A3BE8C" stroke-width="9" stroke-linecap="butt"/>
+      </svg>
+      TaskDial
+    </a>
+    <div class="nav-links">
+      <a class="btn btn-secondary" href="https://github.com/dynamicskillset/TaskDial" target="_blank" rel="noopener">GitHub</a>
+      <a class="btn btn-primary"   href="https://taskdial.dynamicskillset.com" target="_blank" rel="noopener">Open app</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <section id="hero">
+      <div class="hero-eyebrow">
+        <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+          <circle cx="5" cy="5" r="4" fill="currentColor"/>
+        </svg>
+        Invite-only · open source
+      </div>
+      <h1 class="hero-title">Your day as a<br><span>clock</span>, not a list</h1>
+      <p class="hero-desc">TaskDial maps your tasks onto a 12-hour clock face so you can see exactly where your time is going, work in focused blocks, and actually finish what you planned.</p>
+      <div class="hero-ctas">
+        <a class="btn btn-primary"   href="https://taskdial.dynamicskillset.com" target="_blank" rel="noopener">Open app</a>
+        <a class="btn btn-secondary" href="https://github.com/dynamicskillset/TaskDial" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+
+      <div class="hero-clock" aria-hidden="true">
+        <svg class="clock-preview" viewBox="0 0 220 220" width="220" height="220">
+          <!-- Outer ring -->
+          <circle cx="110" cy="110" r="100" fill="#3B4252" stroke="#4C566A" stroke-width="1"/>
+
+          <!-- Hour markers -->
+          <g stroke="#4C566A" stroke-width="1.5" stroke-linecap="round">
+            <line x1="110" y1="16"  x2="110" y2="26"/>
+            <line x1="160" y1="27"  x2="155" y2="36"/>
+            <line x1="193" y1="60"  x2="184" y2="65"/>
+            <line x1="204" y1="110" x2="194" y2="110"/>
+            <line x1="193" y1="160" x2="184" y2="155"/>
+            <line x1="160" y1="193" x2="155" y2="184"/>
+            <line x1="110" y1="204" x2="110" y2="194"/>
+            <line x1="60"  y1="193" x2="65"  y2="184"/>
+            <line x1="27"  y1="160" x2="36"  y2="155"/>
+            <line x1="16"  y1="110" x2="26"  y2="110"/>
+            <line x1="27"  y1="60"  x2="36"  y2="65"/>
+            <line x1="60"  y1="27"  x2="65"  y2="36"/>
+          </g>
+
+          <!-- Arc track -->
+          <circle cx="110" cy="110" r="72" fill="none" stroke="#4C566A" stroke-width="14" opacity="0.35"/>
+
+          <!-- Task arc 1: blue — 7am–9am (210°–270°) -->
+          <path d="M 74 146 A 72 72 0 0 1 110 38" fill="none" stroke="#5E81AC" stroke-width="14" stroke-linecap="butt" opacity="0.9"/>
+
+          <!-- Task arc 2: frost — 9am–10:30am (270°–315°) -->
+          <path d="M 110 38 A 72 72 0 0 1 161 59" fill="none" stroke="#88C0D0" stroke-width="14" stroke-linecap="butt" opacity="0.9"/>
+
+          <!-- Task arc 3: green — 11am–12pm (345°–30°) -->
+          <path d="M 182 110 A 72 72 0 0 1 146 74" fill="none" stroke="#A3BE8C" stroke-width="14" stroke-linecap="butt" opacity="0.9"/>
+
+          <!-- Task arc 4: orange — 1pm–2:30pm (30°–75°) -->
+          <path d="M 146 146 A 72 72 0 0 1 182 110" fill="none" stroke="#D08770" stroke-width="14" stroke-linecap="butt" opacity="0.9"/>
+
+          <!-- Clock hands -->
+          <!-- Hour hand (pointing ~10 o'clock) -->
+          <line x1="110" y1="110" x2="72" y2="68" stroke="#ECEFF4" stroke-width="3" stroke-linecap="round" opacity="0.9"/>
+          <!-- Minute hand (pointing ~2 o'clock) -->
+          <line x1="110" y1="110" x2="148" y2="56" stroke="#ECEFF4" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+          <!-- Second hand -->
+          <line x1="110" y1="110" x2="130" y2="168" stroke="#D08770" stroke-width="1.5" stroke-linecap="round" opacity="0.8"/>
+          <!-- Centre dot -->
+          <circle cx="110" cy="110" r="4" fill="#ECEFF4"/>
+        </svg>
+      </div>
+    </section>
+
+    <section id="callouts">
+      <div class="callout">
+        <div class="callout-icon" style="background:color-mix(in srgb,#5E81AC 15%,transparent);">🕐</div>
+        <h3>See your whole day</h3>
+        <p>Tasks appear as coloured arcs on a clock face. At a glance you can see how your day fills up and where the gaps are.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-icon" style="background:color-mix(in srgb,#88C0D0 15%,transparent);">🍅</div>
+        <h3>Work in focus blocks</h3>
+        <p>A built-in Pomodoro timer runs alongside your plan. 25-minute sessions, timed breaks, no separate app needed.</p>
+      </div>
+      <div class="callout">
+        <div class="callout-icon" style="background:color-mix(in srgb,#A3BE8C 15%,transparent);">🔄</div>
+        <h3>Syncs across devices</h3>
+        <p>Log in from any browser and your plan is there. Tasks, settings, and progress all follow you automatically.</p>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2>How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <p><strong>Get an invite.</strong> TaskDial is currently invite-only. <a href="https://github.com/dynamicskillset/TaskDial/issues" target="_blank" rel="noopener">Request access on GitHub</a>, or self-host using the open source code.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <p><strong>Add your tasks.</strong> Type what you need to do and how long each will take. TaskDial schedules them onto the clock, with fixed-time slots for meetings.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <p><strong>Work through your day.</strong> The clock hand advances in real time. Start a Pomodoro session on any task and mark it done when you're finished.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="selfhost">
+      <div class="selfhost-card">
+        <div>
+          <p><strong>Want to self-host?</strong> TaskDial is open source under the MIT licence. The backend is a lightweight Node.js server; the frontend is a static PWA. Full instructions are in the repository.</p>
+        </div>
+        <a class="btn btn-secondary" href="https://github.com/dynamicskillset/TaskDial" target="_blank" rel="noopener" style="flex-shrink:0;">View on GitHub</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    TaskDial v1.3.1
+    &middot;
+    <a href="https://github.com/dynamicskillset/TaskDial/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+    &middot;
+    <a href="https://github.com/dynamicskillset/TaskDial" target="_blank" rel="noopener">GitHub</a>
+    &middot;
+    Made by <a href="https://dynamicskillset.com" target="_blank" rel="noopener">Dynamic Skillset</a>
+  </footer>
+
+</body>
+</html>
