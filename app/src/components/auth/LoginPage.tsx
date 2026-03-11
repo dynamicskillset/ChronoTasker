@@ -172,7 +172,7 @@ export default function LoginPage({ onSuccess, expired = false, resetToken }: Lo
                 <label htmlFor="login-password" className="auth-field__label">Password</label>
                 <button
                   type="button"
-                  className="auth-switch__link auth-field__forgot"
+                  className="auth-field__forgot"
                   onClick={() => switchView('forgot')}
                 >
                   Forgot password?
