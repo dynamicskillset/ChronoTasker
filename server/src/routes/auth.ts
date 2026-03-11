@@ -6,6 +6,7 @@ import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import { getDb, writeAuditLog, incrementUsageStat } from '../db';
 import { jwtAuth, signAccessToken, JwtPayload } from '../middleware/jwtAuth';
+import { sendEmail } from '../services/email';
 
 const router = Router();
 
@@ -25,6 +26,14 @@ const refreshLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many refresh attempts, please try again later' },
+});
+
+const resetLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many attempts, please try again later' },
 });
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -336,6 +345,134 @@ router.post('/refresh', refreshLimiter, (req: Request, res: Response) => {
 // GET /api/auth/me
 router.get('/me', jwtAuth, (req: Request, res: Response) => {
   res.json({ id: req.user!.id, email: req.user!.email, role: req.user!.role });
+});
+
+// POST /api/auth/forgot-password
+// Always returns 200 — never reveals whether the email exists.
+router.post('/forgot-password', resetLimiter, async (req: Request, res: Response) => {
+  const { email } = req.body;
+  const ip = getClientIp(req);
+
+  if (!email || typeof email !== 'string' || !isValidEmail(email)) {
+    res.json({ success: true });
+    return;
+  }
+
+  const db = getDb();
+  const normalEmail = email.trim().toLowerCase();
+
+  const user = db.prepare(
+    'SELECT id, email, is_active, deleted_at FROM users WHERE email = ?'
+  ).get(normalEmail) as { id: string; email: string; is_active: number; deleted_at: string | null } | undefined;
+
+  if (!user || !user.is_active || user.deleted_at) {
+    writeAuditLog(null, 'forgot_password_noop', { email: normalEmail }, ip);
+    res.json({ success: true });
+    return;
+  }
+
+  const now = new Date().toISOString();
+
+  // Invalidate any existing unused tokens for this user
+  db.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE user_id = ? AND used_at IS NULL')
+    .run(now, user.id);
+
+  // Generate new token
+  const raw = crypto.randomBytes(32).toString('hex');
+  const tokenHash = hashToken(raw);
+  const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 hour
+
+  db.prepare(`
+    INSERT INTO password_reset_tokens (id, user_id, token_hash, expires_at, created_at)
+    VALUES (?, ?, ?, ?, ?)
+  `).run(uuidv4(), user.id, tokenHash, expiresAt, now);
+
+  const appUrl = (process.env.APP_ORIGIN || 'http://localhost:5173').replace(/\/$/, '');
+  const resetUrl = `${appUrl}/reset-password?token=${raw}`;
+
+  try {
+    await sendEmail({
+      to: user.email,
+      subject: 'Reset your TaskDial password',
+      text: [
+        `Hi,`,
+        ``,
+        `Someone requested a password reset for your TaskDial account (${user.email}).`,
+        ``,
+        `Click the link below to reset your password. This link expires in 1 hour.`,
+        ``,
+        resetUrl,
+        ``,
+        `If you did not request this, you can safely ignore this email.`,
+        `Your password will not change unless you follow the link above.`,
+      ].join('\n'),
+    });
+  } catch (err) {
+    console.error('[auth] Failed to send password reset email:', err);
+  }
+
+  writeAuditLog(user.id, 'forgot_password_sent', null, ip);
+  res.json({ success: true });
+});
+
+// POST /api/auth/reset-password
+router.post('/reset-password', resetLimiter, async (req: Request, res: Response) => {
+  const { token, password } = req.body;
+  const ip = getClientIp(req);
+
+  if (!token || typeof token !== 'string') {
+    res.status(400).json({ error: 'Reset token is required' });
+    return;
+  }
+  if (!password || typeof password !== 'string' || password.length < 12) {
+    res.status(400).json({ error: 'Password must be at least 12 characters' });
+    return;
+  }
+
+  const tokenHash = hashToken(token);
+  const db = getDb();
+
+  const stored = db.prepare(`
+    SELECT prt.id, prt.user_id, prt.expires_at, prt.used_at,
+           u.email, u.is_active, u.deleted_at
+    FROM password_reset_tokens prt
+    JOIN users u ON u.id = prt.user_id
+    WHERE prt.token_hash = ?
+  `).get(tokenHash) as {
+    id: string; user_id: string; expires_at: string; used_at: string | null;
+    email: string; is_active: number; deleted_at: string | null;
+  } | undefined;
+
+  if (!stored || stored.used_at || new Date(stored.expires_at) < new Date() || !stored.is_active || stored.deleted_at) {
+    writeAuditLog(null, 'reset_password_fail', { reason: 'invalid_token' }, ip);
+    res.status(400).json({ error: 'This reset link is invalid or has expired' });
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+  // Rotate key_salt so the old E2EE key cannot be re-derived from the previous password
+  const newKeySalt = crypto.randomBytes(32).toString('hex');
+  const now = new Date().toISOString();
+
+  const doReset = db.transaction(() => {
+    db.prepare(`
+      UPDATE users
+      SET password_hash = ?, key_salt = ?, token_version = token_version + 1, updated_at = ?
+      WHERE id = ?
+    `).run(passwordHash, newKeySalt, now, stored.user_id);
+
+    db.prepare('UPDATE password_reset_tokens SET used_at = ? WHERE id = ?')
+      .run(now, stored.id);
+
+    // Revoke all active sessions
+    db.prepare('UPDATE refresh_tokens SET revoked = 1 WHERE user_id = ?')
+      .run(stored.user_id);
+  });
+
+  doReset();
+
+  writeAuditLog(stored.user_id, 'reset_password_ok', null, ip);
+  res.json({ success: true });
 });
 
 export default router;

@@ -18,6 +18,10 @@ function wantsPrivacy(): boolean {
   return window.location.pathname.startsWith('/privacy');
 }
 
+function wantsReset(): boolean {
+  return window.location.pathname.startsWith('/reset-password');
+}
+
 export default function AuthGate() {
   const [view, setView] = useState<View>('loading');
   const [user, setUserState] = useState<AuthUser | null>(null);
@@ -90,6 +94,11 @@ export default function AuthGate() {
 
   if (wantsPrivacy()) {
     return <PrivacyPage />;
+  }
+
+  if (wantsReset()) {
+    const token = new URLSearchParams(window.location.search).get('token');
+    return <LoginPage onSuccess={goToApp} resetToken={token} />;
   }
 
   if (view === 'loading') {

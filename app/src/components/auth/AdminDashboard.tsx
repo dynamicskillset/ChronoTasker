@@ -280,20 +280,30 @@ export default function AdminDashboard({ user, onLogout }: AdminDashboardProps) 
             </thead>
             <tbody>
               {invites.map(inv => {
-                const isUsed = !!inv.used_at;
-                const isExpired = inv.expires_at ? new Date(inv.expires_at) < new Date() : false;
-                const status = isUsed
-                  ? `Used by ${inv.used_by_email || '?'}`
-                  : isExpired ? 'Expired' : 'Unused';
+                const isRevoked = !!inv.revoked;
+                const isExpired = inv.expiresAt ? new Date(inv.expiresAt) < new Date() : false;
+                const isFull = inv.useLimit !== null && inv.useCount >= inv.useLimit;
+                const isInactive = isRevoked || isExpired || isFull;
+                let status: string;
+                if (isRevoked) {
+                  status = 'Revoked';
+                } else if (isExpired) {
+                  status = 'Expired';
+                } else if (inv.useCount > 0) {
+                  const limit = inv.useLimit !== null ? `/${inv.useLimit}` : '';
+                  status = `Used ${inv.useCount}${limit}×`;
+                } else {
+                  status = 'Unused';
+                }
                 return (
-                  <tr key={inv.id} className={isUsed || isExpired ? 'admin-table__row--disabled' : ''}>
+                  <tr key={inv.id} className={isInactive ? 'admin-table__row--disabled' : ''}>
                     <td><code className="admin-code">{inv.code}</code></td>
-                    <td>{inv.created_by_email}</td>
-                    <td>{formatDate(inv.created_at)}</td>
-                    <td>{inv.expires_at ? formatDate(inv.expires_at) : 'Never'}</td>
+                    <td>{inv.createdByEmail}</td>
+                    <td>{formatDate(inv.createdAt)}</td>
+                    <td>{inv.expiresAt ? formatDate(inv.expiresAt) : 'Never'}</td>
                     <td>{status}</td>
                     <td className="admin-table__actions">
-                      {!isUsed && !isExpired && (
+                      {!isInactive && (
                         <button className="admin-btn admin-btn--warn" onClick={() => handleRevoke(inv.id)}>
                           Revoke
                         </button>

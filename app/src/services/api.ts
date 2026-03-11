@@ -344,11 +344,13 @@ export interface AdminUser {
 export interface AdminInvite {
   id: string;
   code: string;
-  expires_at: string | null;
-  created_at: string;
-  used_at: string | null;
-  created_by_email: string;
-  used_by_email: string | null;
+  expiresAt: string | null;
+  createdAt: string;
+  useLimit: number | null;
+  useCount: number;
+  revoked: number;
+  createdByEmail: string;
+  uses: Array<{ email: string; usedAt: string }>;
 }
 
 export interface AuditEntry {
@@ -370,6 +372,30 @@ export interface AdminStats {
 
 async function adminRequest<T>(path: string, options: RequestInit = {}): Promise<T> {
   return request<T>(`/api/admin${path}`, options);
+}
+
+export async function forgotPassword(email: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).error || 'Request failed');
+  }
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  const res = await fetch(`${API_URL}/api/auth/reset-password`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token, password }),
+  });
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}));
+    throw new Error((body as any).error || 'Password reset failed');
+  }
 }
 
 export async function fetchAdminUsers(): Promise<{ active: AdminUser[]; deleted: AdminUser[] }> {
