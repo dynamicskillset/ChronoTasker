@@ -1394,6 +1394,67 @@
 }
 
 /* ============================================================
+   Maintenance banner
+   ============================================================ */
+
+.maintenance-banner {
+  padding: 0.55rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-danger) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ============================================================
+   What's new banner
+   ============================================================ */
+
+.whats-new-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+  border: 1px solid color-mix(in srgb, var(--color-accent) 25%, transparent);
+  font-size: 0.8rem;
+  color: var(--color-text);
+  box-shadow: var(--shadow-sm);
+}
+
+.whats-new-banner__link {
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.whats-new-banner__link:hover {
+  text-decoration: underline;
+}
+
+.whats-new-banner__dismiss {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text);
+  opacity: 0.5;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.3rem;
+  line-height: 1;
+}
+
+.whats-new-banner__dismiss:hover {
+  opacity: 1;
+}
+
+/* ============================================================
    Install banner (fixed bottom floating bar)
    ============================================================ */
 .install-banner {
@@ -1868,7 +1929,7 @@
   font-size: 0.75rem;
   color: var(--color-text-secondary);
   text-align: center;
-  margin: 0;
+  margin: 1.5rem 0 0;
 }
 
 .auth-privacy-notice__link {

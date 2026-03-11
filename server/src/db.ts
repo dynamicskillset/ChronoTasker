@@ -80,11 +80,25 @@ function initTables(): void {
       used_at TEXT,
       expires_at TEXT,
       created_at TEXT NOT NULL,
+      use_limit INTEGER,
+      use_count INTEGER NOT NULL DEFAULT 0,
+      revoked INTEGER NOT NULL DEFAULT 0,
       FOREIGN KEY (created_by) REFERENCES users(id),
       FOREIGN KEY (used_by) REFERENCES users(id)
     );
 
     CREATE INDEX IF NOT EXISTS idx_invite_code ON invite_codes(code);
+
+    CREATE TABLE IF NOT EXISTS invite_code_uses (
+      id TEXT PRIMARY KEY,
+      invite_code_id TEXT NOT NULL,
+      used_by TEXT NOT NULL,
+      used_at TEXT NOT NULL,
+      FOREIGN KEY (invite_code_id) REFERENCES invite_codes(id),
+      FOREIGN KEY (used_by) REFERENCES users(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_invite_uses_code ON invite_code_uses(invite_code_id);
 
     CREATE TABLE IF NOT EXISTS refresh_tokens (
       id TEXT PRIMARY KEY,
@@ -131,6 +145,18 @@ function initTables(): void {
   // Migrations for existing databases
   try { db.exec('ALTER TABLE users ADD COLUMN key_salt TEXT'); } catch { /* already exists */ }
   try { db.exec('DROP TABLE IF EXISTS analytics_events'); } catch { /* ignore */ }
+  try { db.exec('ALTER TABLE invite_codes ADD COLUMN use_limit INTEGER'); } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE invite_codes ADD COLUMN use_count INTEGER NOT NULL DEFAULT 0'); } catch { /* already exists */ }
+  try { db.exec('ALTER TABLE invite_codes ADD COLUMN revoked INTEGER NOT NULL DEFAULT 0'); } catch { /* already exists */ }
+  try { db.exec(`CREATE TABLE IF NOT EXISTS invite_code_uses (
+    id TEXT PRIMARY KEY,
+    invite_code_id TEXT NOT NULL,
+    used_by TEXT NOT NULL,
+    used_at TEXT NOT NULL,
+    FOREIGN KEY (invite_code_id) REFERENCES invite_codes(id),
+    FOREIGN KEY (used_by) REFERENCES users(id) ON DELETE CASCADE
+  )`); } catch { /* already exists */ }
+  try { db.exec('CREATE INDEX IF NOT EXISTS idx_invite_uses_code ON invite_code_uses(invite_code_id)'); } catch { /* already exists */ }
   try { db.exec('ALTER TABLE tasks ADD COLUMN is_break INTEGER NOT NULL DEFAULT 0'); } catch { /* already exists */ }
   try { db.exec('ALTER TABLE tasks ADD COLUMN tag TEXT'); } catch { /* already exists */ }
   try { db.exec('ALTER TABLE tasks ADD COLUMN details TEXT'); } catch { /* already exists */ }

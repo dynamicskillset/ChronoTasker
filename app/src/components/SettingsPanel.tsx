@@ -661,10 +661,29 @@ export function SettingsPanel({
                   <span className="sp-account-action__label">Signed in as</span>
                   <span className="sp-account-action__desc">{userEmail}</span>
                 </div>
-                <button className="sp-action-btn" onClick={onLogout}>
+                <button className="sp-action-btn sp-action-btn--signout" onClick={onLogout}>
                   Sign out
                 </button>
               </div>
+
+              {settings.advancedMode && (
+                <>
+                  <Divider />
+                  <SectionLabel>Feedback</SectionLabel>
+                  <p className="sp-feedback-note">
+                    Found a bug or have a feature idea?{' '}
+                    <a
+                      href="https://github.com/dynamicskillset/TaskDial/issues/new/choose"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="sp-feedback-note__link"
+                    >
+                      Open an issue on GitHub
+                    </a>
+                    {' '}(requires a free GitHub account).
+                  </p>
+                </>
+              )}
 
               <Divider />
               <SectionLabel>Your data</SectionLabel>

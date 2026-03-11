@@ -12,7 +12,7 @@ import { useSync } from './hooks/useSync';
 import { scheduleTasks, findNonOverflowOrdering, type ScheduledTask } from './utils/scheduling';
 import { formatDuration, tagColor, tagBgColor, buildTagHueMap, tagColorFromHue, tagBgColorFromHue } from './utils/format';
 import { todayString, tomorrowString, getWeekMonday, weekDayDate, shiftDate } from './utils/scheduling';
-import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent } from './services/api';
+import { fetchCalendar, fetchTasks as apiFetchTasks, logInstallEvent, refreshToken } from './services/api';
 import * as storage from './services/storage';
 import { parseIcalEvents } from './utils/ical';
 import { playTick } from './utils/audio';
@@ -76,6 +76,18 @@ function App({ user, onLogout }: AppProps) {
   const [showBacklog, setShowBacklog] = useState(false);
   const [recurringDeleteTask, setRecurringDeleteTask] = useState<Task | null>(null);
   const [demoMode, setDemoMode] = useState(false);
+
+  // What's new banner — show once per DEFAULT (minor) version bump
+  const CHANGELOG_URL = 'https://github.com/dynamicskillset/TaskDial?tab=readme-ov-file#changelog';
+  const WHATS_NEW_KEY = 'td_whats_new_seen';
+  const defaultVersion = APP_VERSION.split('.').slice(0, 2).join('.');
+  const [showWhatsNew, setShowWhatsNew] = useState(() => {
+    try { return localStorage.getItem(WHATS_NEW_KEY) !== defaultVersion; } catch { return false; }
+  });
+  function dismissWhatsNew() {
+    try { localStorage.setItem(WHATS_NEW_KEY, defaultVersion); } catch { /* ignore */ }
+    setShowWhatsNew(false);
+  }
 
   // Theme (light / system / dark)
   const [tdTheme, setTdTheme] = useState<'light' | 'system' | 'dark'>(() => {
@@ -157,8 +169,18 @@ function App({ user, onLogout }: AppProps) {
     return () => clearInterval(timer);
   }, []);
 
+  // Refresh auth token when the tab becomes visible again (handles tab-snoozed browsers)
+  useEffect(() => {
+    if (demoMode) return;
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') refreshToken();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => document.removeEventListener('visibilitychange', handleVisibility);
+  }, [demoMode]);
+
   // Undo/redo
-  const { push: pushUndo, handleUndo, handleRedo, canUndo, canRedo, undoLabel } = useUndoRedo();
+  const { push: pushUndo, handleUndo, handleRedo, canUndo, canRedo, undoLabel, undoBarVisible } = useUndoRedo();
 
   // Pomodoro
   const pomodoro = usePomodoro(settings);
@@ -982,7 +1004,14 @@ function App({ user, onLogout }: AppProps) {
             >
               ?
             </button>
-            <span className="app-version" aria-label={`Version ${APP_VERSION}`}>v{APP_VERSION}</span>
+            <a
+              href={CHANGELOG_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="app-version"
+              aria-label={`Version ${APP_VERSION} — view changelog`}
+              title="View changelog"
+            >v{APP_VERSION}</a>
           </div>
         </div>
         <div className="header-status">
@@ -1004,6 +1033,22 @@ function App({ user, onLogout }: AppProps) {
         <div className="demo-banner" role="status">
           <span className="demo-banner__text">Demo mode: exploring with sample data. Your real tasks are safe.</span>
           <button className="demo-banner__exit" onClick={exitDemoMode}>Exit demo</button>
+        </div>
+      )}
+
+      {!isOnline && !demoMode && (
+        <div className="maintenance-banner" role="status" aria-live="polite">
+          TaskDial is updating — your changes are saved locally and will sync when we're back.
+        </div>
+      )}
+
+      {showWhatsNew && !demoMode && (
+        <div className="whats-new-banner" role="status">
+          <span>✨ TaskDial has been updated to v{APP_VERSION}.</span>
+          <a href={CHANGELOG_URL} target="_blank" rel="noopener noreferrer" className="whats-new-banner__link">
+            See what's changed
+          </a>
+          <button className="whats-new-banner__dismiss" onClick={dismissWhatsNew} aria-label="Dismiss">✕</button>
         </div>
       )}
 
@@ -1534,7 +1579,7 @@ function App({ user, onLogout }: AppProps) {
         />
       </Suspense>
 
-      {(canUndo || canRedo) && (
+      {undoBarVisible && (canUndo || canRedo) && (
         <div className="undo-bar" role="status" aria-live="polite">
           {canUndo && (
             <button className="undo-bar__btn" onClick={handleUndo} aria-label={`Undo: ${undoLabel}`}>

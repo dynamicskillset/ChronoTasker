@@ -245,35 +245,36 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
 
       {showMore && (
         <>
-          {/* Options row: important + fixed time — advanced only */}
-          {advancedMode && (
-            <div className="task-form__row task-form__row--options">
-              <label className="task-form__time-toggle">
-                <input
-                  type="checkbox"
-                  checked={hasFixedTime}
-                  onChange={(e) => {
-                    setHasFixedTime(e.target.checked);
-                    if (!e.target.checked) setFixedStartTime('');
-                  }}
-                />
-                <span>Fixed time</span>
-              </label>
-              {hasFixedTime && (
-                <input
-                  type="time"
-                  className="task-form__time-input"
-                  value={fixedStartTime}
-                  onChange={(e) => setFixedStartTime(e.target.value)}
-                  aria-label="Fixed start time"
-                  aria-describedby={meetingConflict ? 'task-form-conflict-desc' : undefined}
-                />
-              )}
-              {meetingConflict && (
-                <span id="task-form-conflict-desc" className="task-form__conflict-warning" role="alert">
-                  <span aria-hidden="true">⚠</span> Overlaps with: {meetingConflict.summary} ({minutesToTime(meetingConflict.startMinutes, use24Hour)}–{minutesToTime(meetingConflict.endMinutes, use24Hour)})
-                </span>
-              )}
+          {/* Fixed time — available in all modes */}
+          <div className="task-form__row task-form__row--options">
+            <label className="task-form__time-toggle">
+              <input
+                type="checkbox"
+                checked={hasFixedTime}
+                onChange={(e) => {
+                  setHasFixedTime(e.target.checked);
+                  if (!e.target.checked) setFixedStartTime('');
+                }}
+              />
+              <span>Fixed time</span>
+            </label>
+            {hasFixedTime && (
+              <input
+                type="time"
+                className="task-form__time-input"
+                value={fixedStartTime}
+                onChange={(e) => setFixedStartTime(e.target.value)}
+                aria-label="Fixed start time"
+                aria-describedby={meetingConflict ? 'task-form-conflict-desc' : undefined}
+              />
+            )}
+            {meetingConflict && (
+              <span id="task-form-conflict-desc" className="task-form__conflict-warning" role="alert">
+                <span aria-hidden="true">⚠</span> Overlaps with: {meetingConflict.summary} ({minutesToTime(meetingConflict.startMinutes, use24Hour)}–{minutesToTime(meetingConflict.endMinutes, use24Hour)})
+              </span>
+            )}
+            {/* Important flag — advanced only */}
+            {advancedMode && (
               <label className="task-form__important-toggle">
                 <input
                   type="checkbox"
@@ -285,8 +286,8 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
                   Important
                 </span>
               </label>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Tag — advanced only */}
           {advancedMode && (
@@ -343,7 +344,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
             ) : (
               <textarea
                 className="task-form__details-input"
-                placeholder="Notes, links, context..."
+                placeholder="Notes, links, context… (Markdown supported)"
                 value={details}
                 onChange={(e) => setDetails(e.target.value)}
                 rows={2}

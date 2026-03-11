@@ -40,7 +40,30 @@ TaskDial encrypts your task content (titles, tags, and notes) on your device bef
 
 ---
 
+## Versioning
+
+TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
+
+- **PROUD** — bump when the release is something to be proud of
+- **DEFAULT** — bump for routine, functional releases
+- **SHAME** — bump when fixing embarrassing bugs
+
+---
+
 ## Changelog
+
+### v1.3.0 — 2026-03-11
+
+- **Fixed time in basic mode**: the fixed time toggle is now available without enabling Advanced mode.
+- **Undo bar auto-dismisses**: the undo/redo bar disappears after 10 seconds of inactivity.
+- **Invite token overhaul**: tokens are now multi-use with optional use limits, per-redemption usage tracking, and working revocation.
+- **Session stays alive after tab snooze**: the app refreshes its auth token when a snoozed tab wakes up, preventing unexpected sign-outs in browsers like Zen.
+- **Maintenance banner**: a banner appears automatically when the server is briefly unreachable during an update.
+- **What's new banner**: a dismissable notice appears once after each minor version update, linking to the changelog.
+- **Clickable version number**: the version in the top corner links to the GitHub changelog.
+- **Feedback links**: a GitHub issue link appears in the Help modal and in Settings → Account (Advanced mode).
+- **Markdown hint**: the Details field in the task form notes that Markdown is supported.
+- **PrideVer**: the project now uses [PrideVer](https://pridever.org) (`PROUD.DEFAULT.SHAME`) versioning.
 
 ### v1.2.6 — 2026-03-10
 

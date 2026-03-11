@@ -117,9 +117,11 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
 
   // Validate invite code (deliberately vague on failure reason)
   const invite = db.prepare(`
-    SELECT id, used_by, expires_at FROM invite_codes
-    WHERE code = ? AND used_by IS NULL AND (expires_at IS NULL OR expires_at > ?)
-  `).get(codeUpper, new Date().toISOString()) as { id: string; used_by: string | null; expires_at: string | null } | undefined;
+    SELECT id, expires_at, use_limit, use_count FROM invite_codes
+    WHERE code = ? AND revoked = 0
+      AND (expires_at IS NULL OR expires_at > ?)
+      AND (use_limit IS NULL OR use_count < use_limit)
+  `).get(codeUpper, new Date().toISOString()) as { id: string; expires_at: string | null; use_limit: number | null; use_count: number } | undefined;
 
   if (!invite) {
     writeAuditLog(null, 'register_fail', { reason: 'invalid_invite' }, ip);
@@ -147,8 +149,13 @@ router.post('/register', authLimiter, async (req: Request, res: Response) => {
     `).run(userId, normalEmail, passwordHash, keySalt, now, now);
 
     db.prepare(`
-      UPDATE invite_codes SET used_by = ?, used_at = ? WHERE id = ?
+      UPDATE invite_codes SET use_count = use_count + 1, used_by = ?, used_at = ? WHERE id = ?
     `).run(userId, now, invite.id);
+
+    db.prepare(`
+      INSERT INTO invite_code_uses (id, invite_code_id, used_by, used_at)
+      VALUES (?, ?, ?, ?)
+    `).run(uuidv4(), invite.id, userId, now);
   });
 
   doRegister();

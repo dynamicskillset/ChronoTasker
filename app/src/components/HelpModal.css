@@ -350,7 +350,35 @@
   opacity: 0.4;
   letter-spacing: 0.02em;
   color: var(--color-text-secondary, var(--color-text));
-  user-select: none;
+  text-decoration: none;
+  transition: opacity 0.15s;
+}
+
+.app-version:hover {
+  opacity: 0.8;
+}
+
+/* ============================================================
+   Feedback footer
+   ============================================================ */
+
+.help-feedback {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--color-border);
+  font-size: 0.82rem;
+  color: var(--color-text-secondary, var(--color-text));
+  opacity: 0.8;
+  text-align: center;
+}
+
+.help-feedback__link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.help-feedback__link:hover {
+  text-decoration: underline;
 }
 
 /* ============================================================

@@ -187,23 +187,40 @@ router.get('/invites', (req: Request, res: Response) => {
   const invites = db.prepare(`
     SELECT
       ic.id, ic.code, ic.expires_at, ic.created_at,
-      ic.used_at,
-      creator.email as created_by_email,
-      redeemer.email as used_by_email
+      ic.use_limit, ic.use_count, ic.revoked,
+      creator.email as created_by_email
     FROM invite_codes ic
     JOIN users creator ON creator.id = ic.created_by
-    LEFT JOIN users redeemer ON redeemer.id = ic.used_by
     ORDER BY ic.created_at DESC
   `).all();
 
-  res.json(invites);
+  // Attach list of users who redeemed each code
+  const uses = db.prepare(`
+    SELECT icu.invite_code_id, u.email, icu.used_at
+    FROM invite_code_uses icu
+    JOIN users u ON u.id = icu.used_by
+    ORDER BY icu.used_at ASC
+  `).all() as Array<{ invite_code_id: string; email: string; used_at: string }>;
+
+  const usesByCode = new Map<string, Array<{ email: string; used_at: string }>>();
+  for (const u of uses) {
+    if (!usesByCode.has(u.invite_code_id)) usesByCode.set(u.invite_code_id, []);
+    usesByCode.get(u.invite_code_id)!.push({ email: u.email, used_at: u.used_at });
+  }
+
+  const result = (invites as Array<Record<string, unknown>>).map(ic => ({
+    ...ic,
+    uses: usesByCode.get(ic.id as string) ?? [],
+  }));
+
+  res.json(result);
 });
 
 // POST /api/admin/invites
 router.post('/invites', (req: Request, res: Response) => {
   const adminId = req.user!.id;
   const ip = getClientIp(req);
-  const { expires_at } = req.body;
+  const { expires_at, use_limit } = req.body;
 
   // Validate optional expiry
   if (expires_at !== undefined && expires_at !== null) {
@@ -217,19 +234,29 @@ router.post('/invites', (req: Request, res: Response) => {
     }
   }
 
+  // Validate optional use limit
+  if (use_limit !== undefined && use_limit !== null) {
+    const limit = parseInt(use_limit, 10);
+    if (isNaN(limit) || limit < 1) {
+      res.status(400).json({ error: 'use_limit must be a positive integer' });
+      return;
+    }
+  }
+
   const db = getDb();
   const code = generateInviteCode();
   const id = uuidv4();
   const now = new Date().toISOString();
+  const limitVal = use_limit ? parseInt(use_limit, 10) : null;
 
   db.prepare(`
-    INSERT INTO invite_codes (id, code, created_by, expires_at, created_at)
-    VALUES (?, ?, ?, ?, ?)
-  `).run(id, code, adminId, expires_at || null, now);
+    INSERT INTO invite_codes (id, code, created_by, expires_at, use_limit, created_at)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `).run(id, code, adminId, expires_at || null, limitVal, now);
 
-  writeAuditLog(adminId, 'invite_created', { code, expires_at: expires_at || null }, ip);
+  writeAuditLog(adminId, 'invite_created', { code, expires_at: expires_at || null, use_limit: limitVal }, ip);
 
-  res.status(201).json({ id, code, expires_at: expires_at || null, created_at: now });
+  res.status(201).json({ id, code, expires_at: expires_at || null, use_limit: limitVal, use_count: 0, created_at: now });
 });
 
 // DELETE /api/admin/invites/:id — revoke
@@ -239,19 +266,19 @@ router.delete('/invites/:id', (req: Request, res: Response) => {
   const ip = getClientIp(req);
   const db = getDb();
 
-  const invite = db.prepare('SELECT id, code, used_by FROM invite_codes WHERE id = ?').get(id) as
-    { id: string; code: string; used_by: string | null } | undefined;
+  const invite = db.prepare('SELECT id, code, revoked FROM invite_codes WHERE id = ?').get(id) as
+    { id: string; code: string; revoked: number } | undefined;
 
   if (!invite) {
     res.status(404).json({ error: 'Invite code not found' });
     return;
   }
-  if (invite.used_by) {
-    res.status(400).json({ error: 'Cannot revoke an invite code that has already been used' });
+  if (invite.revoked) {
+    res.status(400).json({ error: 'Invite code is already revoked' });
     return;
   }
 
-  db.prepare('DELETE FROM invite_codes WHERE id = ?').run(id);
+  db.prepare('UPDATE invite_codes SET revoked = 1 WHERE id = ?').run(id);
 
   writeAuditLog(adminId, 'invite_revoked', { code: invite.code }, ip);
   res.json({ success: true });

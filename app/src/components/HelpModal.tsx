@@ -269,6 +269,21 @@ export default function HelpModal({ open, onClose, demoMode, onToggleDemoMode }:
               </p>
             </FaqItem>
           </div>
+
+          <div className="help-feedback">
+            <p>
+              Found a bug or have a feature idea?{' '}
+              <a
+                href="https://github.com/dynamicskillset/TaskDial/issues/new/choose"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="help-feedback__link"
+              >
+                Open an issue on GitHub
+              </a>
+              {' '}(requires a free GitHub account).
+            </p>
+          </div>
         </div>
       </div>
     </div>

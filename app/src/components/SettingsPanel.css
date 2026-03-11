@@ -845,6 +845,11 @@ details[open] .sp-ical-guide__summary::before {
   cursor: not-allowed;
 }
 
+.sp-action-btn--signout {
+  border-color: color-mix(in srgb, var(--color-text) 35%, transparent);
+  font-weight: 600;
+}
+
 .sp-action-btn--danger {
   border-color: color-mix(in srgb, var(--color-danger) 45%, transparent);
   color: var(--color-danger);
@@ -858,6 +863,22 @@ details[open] .sp-ical-guide__summary::before {
 .sp-action-btn:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
+}
+
+.sp-feedback-note {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, var(--color-text));
+  margin: 0;
+  line-height: 1.5;
+}
+
+.sp-feedback-note__link {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+
+.sp-feedback-note__link:hover {
+  text-decoration: underline;
 }
 
 .sp-link-btn {
