@@ -1478,6 +1478,7 @@ function App({ user, onLogout }: AppProps) {
                         <div className="collapsible-section__body collapsible-section__body--flush">
                           <BacklogList
                             tasks={backlogTasks}
+                            tagHueMap={tagHueMap}
                             onAssignToToday={handleAssignBacklogToDate}
                             onEditTask={handleEditBacklogTask}
                             onDeleteTask={handleDeleteBacklogTask}

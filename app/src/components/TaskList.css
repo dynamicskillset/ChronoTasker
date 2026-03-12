@@ -225,12 +225,11 @@
 .task-list__title {
   font-size: 0.9rem;
   font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   display: flex;
   align-items: center;
   gap: 0.375rem;
+  flex-wrap: wrap;
+  word-break: break-word;
 }
 
 .task-list__recurrence-badge {
@@ -402,20 +401,51 @@
 }
 
 /* ============================================================
-   Action buttons (reorder, edit, delete)
+   Actions — ellipsis trigger + popover menu
    ============================================================ */
-.task-list__actions {
+.task-list__actions-wrapper {
+  position: relative;
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  gap: 0.125rem;
-  opacity: 0.55;
-  transition: opacity var(--transition-normal);
 }
 
-.task-list__item:hover .task-list__actions,
-.task-list__item:focus-within .task-list__actions {
-  opacity: 1;
+.task-list__actions-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--tl-text-secondary);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.task-list__actions-trigger:hover,
+.task-list__actions-trigger[aria-expanded="true"] {
+  background-color: var(--tl-btn-hover-bg);
+  color: var(--tl-text);
+}
+
+.task-list__actions-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.125rem;
+  padding: 0.25rem;
+  background: var(--tl-bg);
+  border: 1px solid var(--tl-border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  overflow: visible;
 }
 
 /* Reorder buttons — hidden on desktop (use drag-and-drop instead) */
@@ -628,8 +658,10 @@
    Responsive
    ============================================================ */
 @media (hover: none) {
-  .task-list__actions {
+  .task-list__actions-trigger {
     opacity: 1;
+    width: 44px;
+    height: 44px;
   }
 
   /* On touch devices, use up/down buttons instead of drag */
@@ -637,11 +669,7 @@
     display: flex;
   }
 
-  .task-list__reorder-btn {
-    width: 44px;
-    height: 44px;
-  }
-
+  .task-list__reorder-btn,
   .task-list__edit-btn,
   .task-list__delete-btn,
   .task-list__reschedule-btn {
@@ -655,15 +683,6 @@
   }
 }
 
-@media (max-width: 768px) {
-  .task-list__edit-btn,
-  .task-list__delete-btn,
-  .task-list__reschedule-btn {
-    width: 44px;
-    height: 44px;
-  }
-}
-
 @media (max-width: 480px) {
   .task-list__item {
     padding: 0.5rem;
@@ -672,11 +691,6 @@
 
   .task-list__title {
     font-size: 0.85rem;
-    white-space: normal;
-    overflow: visible;
-    text-overflow: unset;
-    flex-wrap: wrap;
-    word-break: break-word;
   }
 }
 

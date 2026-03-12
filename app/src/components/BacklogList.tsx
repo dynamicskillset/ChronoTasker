@@ -1,18 +1,33 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import type { Task } from '../types';
-import { formatDuration, tagColor, tagBgColor } from '../utils/format';
+import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue } from '../utils/format';
 import './BacklogList.css';
 
 interface BacklogListProps {
   tasks: Task[];
+  tagHueMap?: Map<string, number>;
   onAssignToToday: (taskId: string) => void;
   onEditTask: (task: Task) => void;
   onDeleteTask: (taskId: string) => void;
 }
 
-export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDeleteTask }: BacklogListProps) {
+export default function BacklogList({ tasks, tagHueMap, onAssignToToday, onEditTask, onDeleteTask }: BacklogListProps) {
   const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const confirmingDeleteRef = useRef<string | null>(null);
+  const [filterTag, setFilterTag] = useState<string | null>(null);
+
+  const uniqueTags = useMemo(() =>
+    [...new Set(tasks.flatMap(t =>
+      t.tag ? t.tag.split(',').map(s => s.trim()).filter(Boolean) : []
+    ))].sort(),
+    [tasks]
+  );
+
+  const activeFilter = filterTag && uniqueTags.includes(filterTag) ? filterTag : null;
+
+  const visibleTasks = activeFilter
+    ? tasks.filter(t => t.tag?.split(',').map(s => s.trim()).filter(Boolean).includes(activeFilter))
+    : tasks;
 
   const handleDeleteClick = useCallback((taskId: string) => {
     if (confirmingDeleteRef.current === taskId) {
@@ -46,8 +61,33 @@ export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDele
 
   return (
     <div className="backlog-list">
+      {uniqueTags.length >= 2 && (
+        <div className="tag-filter" role="group" aria-label="Filter by tag">
+          {uniqueTags.map(tag => {
+            const hue = tagHueMap?.get(tag);
+            return (
+              <button
+                key={tag}
+                className={`tag-filter__pill${activeFilter === tag ? ' tag-filter__pill--active' : ''}`}
+                style={{
+                  color: hue !== undefined ? tagColorFromHue(hue) : tagColor(tag),
+                  backgroundColor: hue !== undefined ? tagBgColorFromHue(hue) : tagBgColor(tag),
+                }}
+                onClick={() => setFilterTag(filterTag === tag ? null : tag)}
+                aria-pressed={activeFilter === tag}
+                aria-label={`Filter by ${tag}`}
+              >
+                {tag}
+              </button>
+            );
+          })}
+          {activeFilter && (
+            <button className="tag-filter__clear" onClick={() => setFilterTag(null)} aria-label="Clear tag filter">✕</button>
+          )}
+        </div>
+      )}
       <ul className="backlog-list__items" role="list">
-        {tasks.map((task) => (
+        {visibleTasks.map((task) => (
           <li
             key={task.id}
             className="backlog-list__item"
@@ -60,15 +100,21 @@ export default function BacklogList({ tasks, onAssignToToday, onEditTask, onDele
               <div className="backlog-list__content">
                 <span className="backlog-list__title">
                   {task.title}
-                  {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => (
-                    <span
-                      key={i}
-                      className="backlog-list__tag"
-                      style={{ color: tagColor(t), backgroundColor: tagBgColor(t) }}
-                    >
-                      {t}
-                    </span>
-                  ))}
+                  {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => {
+                    const hue = tagHueMap?.get(t);
+                    return (
+                      <span
+                        key={i}
+                        className="backlog-list__tag"
+                        style={{
+                          color: hue !== undefined ? tagColorFromHue(hue) : tagColor(t),
+                          backgroundColor: hue !== undefined ? tagBgColorFromHue(hue) : tagBgColor(t),
+                        }}
+                      >
+                        {t}
+                      </span>
+                    );
+                  })}
                 </span>
                 <span className="backlog-list__meta">
                   <span className="backlog-list__duration">{formatDuration(task.durationMinutes)}</span>
