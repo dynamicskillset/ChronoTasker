@@ -171,13 +171,21 @@ function App({ user, onLogout }: AppProps) {
     return () => clearInterval(timer);
   }, []);
 
-  // Refresh auth token when the tab becomes visible again (handles tab-snoozed browsers).
+  // Refresh auth token and jump to today when the tab becomes visible again.
   // Throttled to once per 10 s to prevent rapid-fire calls on mobile OS visibility cycling (Bug #27).
+  // Auto-jumps to today if the user left the tab open on a previous day (Issue #23).
   const lastVisibilityRefreshRef = useRef(0);
+  const dateRef = useRef(date);
+  useEffect(() => { dateRef.current = date; }, [date]);
   useEffect(() => {
     if (demoMode) return;
     const handleVisibility = () => {
       if (document.visibilityState !== 'visible') return;
+      // Jump to today if the displayed date is in the past
+      if (dateRef.current !== todayString()) {
+        setDate(todayString());
+      }
+      // Throttled token refresh
       const now = Date.now();
       if (now - lastVisibilityRefreshRef.current < 10_000) return;
       lastVisibilityRefreshRef.current = now;
