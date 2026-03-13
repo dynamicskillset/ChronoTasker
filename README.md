@@ -52,6 +52,11 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ## Changelog
 
+### v1.4.0 — 2026-03-13
+
+- **Flash when time's up**: overrunning task arcs pulse on the clock; a toast lets you extend by 15 minutes, mark done, or dismiss. Browser notification fires once per task.
+- **Onboarding walkthrough**: five-step guided tour for new users, with a live demo clock. Replayable from Settings → Account.
+
 ### v1.3.3 — 2026-03-13
 
 Bug fixes: mobile logouts, encrypted blobs on login, repeated desktop notifications, time removal not syncing, "What's new?" firing on patch releases, move-to submenu requiring two taps.

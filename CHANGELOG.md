@@ -4,6 +4,13 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.4.0 — 2026-03-13
+
+- **Flash when time's up**: the clock arc for an overrunning task pulses to draw your attention. A toast appears with options to extend by 15 minutes, mark it done, or dismiss. A browser notification fires once per task (if you've granted permission). The flash can be turned off in Settings → Look.
+- **Onboarding walkthrough**: new users get a five-step guided tour that spotlights the clock, task list, task form, and settings button. The tour launches in demo mode so the clock is populated from the start. You can replay it any time from Settings → Account.
+
+---
+
 ### v1.3.3 — 2026-03-13
 
 Bug fixes.
