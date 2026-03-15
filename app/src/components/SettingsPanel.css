@@ -699,6 +699,16 @@ details[open] .sp-ical-guide__summary::before {
   font-weight: 600;
 }
 
+.sp-ical-guide__steps a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sp-ical-guide__steps a:hover {
+  opacity: 0.8;
+}
+
 /* ── iCal feeds ─────────────────────────────────────────────────────────────── */
 
 .sp-ical-entry {

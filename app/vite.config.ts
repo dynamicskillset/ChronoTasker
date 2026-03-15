@@ -6,6 +6,11 @@ import { readFileSync } from 'node:fs'
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'))
 
 export default defineConfig({
+  server: {
+    proxy: {
+      '/api': 'http://localhost:3001',
+    },
+  },
   define: {
     APP_VERSION: JSON.stringify(pkg.version),
   },

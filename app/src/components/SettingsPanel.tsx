@@ -451,9 +451,10 @@ export function SettingsPanel({
                   <div className="sp-ical-guide__provider">
                     <span className="sp-ical-guide__provider-name">Proton Calendar</span>
                     <ol className="sp-ical-guide__steps">
-                      <li>Go to Settings and open a calendar</li>
-                      <li>Under <strong>Other settings</strong>, find <strong>Link to this calendar</strong></li>
-                      <li>Copy the link</li>
+                      <li>Open <a href="https://calendar.proton.me/u/0/settings/calendars" target="_blank" rel="noopener noreferrer">Proton Calendar settings</a></li>
+                      <li>Select a calendar and scroll to <strong>Other settings</strong></li>
+                      <li>Find <strong>Link to this calendar</strong> and copy the link</li>
+                      <li>Paste the link in the field below and click <strong>Load</strong></li>
                     </ol>
                   </div>
                   <div className="sp-ical-guide__provider">

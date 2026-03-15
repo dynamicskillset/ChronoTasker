@@ -4,6 +4,21 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.4.1 — 2026-03-15
+
+Bug fixes and UX polish following Stephen Downes' Firefox/Windows 11 testing of v1.4.0.
+
+- **Clockface shows correct date when viewing other days**: the centre of the clock now displays the day you're viewing (not always today's date); the real-time clock hand is suppressed on non-today views.
+- **Calendar events no longer disappear on refresh**: a transient network failure during a calendar sync no longer wipes out events that were already loaded; the cache is preserved and only updated on successful fetches.
+- **Calendar events no longer disappear when navigating days**: same root cause as above — fixed together.
+- **Task edit form uses the task's own date**: when you edit a task scheduled for a different day, conflict detection now checks that day's schedule rather than the day you're currently viewing. The form also shows which date the task is scheduled for.
+- **Theme background colour updates correctly**: the `<html>` element now inherits the background colour CSS variable, so switching colour schemes no longer leaves a mismatched strip behind the app content.
+- **Layout shift on view switch fixed**: `scrollbar-gutter: stable` reserves space for the scrollbar so the page doesn't jump when switching between views with and without overflow.
+- **"Your day is clear" is now tappable**: tapping the empty-state message opens the task form directly, the same as the + button.
+- **iCal guide links styled and expanded**: links in the calendar setup guide are now coloured and underlined rather than appearing as plain text. The Google Calendar step links to the web app; the Proton Calendar step links directly to calendar settings. Step-by-step instructions now include "Paste the link and click Load".
+
+---
+
 ### v1.4.0 — 2026-03-13
 
 - **Flash when time's up**: the clock arc for an overrunning task pulses to draw your attention. A toast appears with options to extend by 15 minutes, mark it done, or dismiss. A browser notification fires once per task (if you've granted permission). The flash can be turned off in Settings → Look.
