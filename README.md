@@ -52,6 +52,10 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ## Changelog
 
+### v1.4.2 — 2026-03-15
+
+Bug fixes: onboarding tooltip jump, week nav oversized hit area, week-start-day preference (Mon/Sun), calendar sync confirmation message.
+
 ### v1.4.1 — 2026-03-15
 
 Bug fixes: clockface date on non-today views, calendar events disappearing on refresh or day navigation, task edit form using wrong date for conflict detection, theme background colour not updating, layout shift on view switch, tappable empty state, iCal guide link styling and expanded instructions.

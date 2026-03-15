@@ -4,6 +4,17 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.4.2 — 2026-03-15
+
+Bug fixes and UX polish following Stephen Downes' Firefox/Windows 11 testing (continued).
+
+- **Onboarding tooltips no longer jump** (#30): removed `scrollIntoView` (the primary cause — it shifted the page after positions were already calculated); tooltip now fades in at each step without any layout change.
+- **Week nav arrow hit area fixed** (#38): the `‹` / `›` buttons are now 28×28 px, matching the 14×14 arrow SVG they contain.
+- **Week-start-day preference** (#33): new Monday/Sunday control in Settings → Schedule. Defaults to Monday. The week bar updates immediately and the preference syncs across devices.
+- **Calendar sync confirms success** (#36): after loading, the status line now reads "3 events today · Synced 14:32" (or "No events for this date · Synced 14:32"), so you can confirm the sync worked even when today has no events.
+
+---
+
 ### v1.4.1 — 2026-03-15
 
 Bug fixes and UX polish following Stephen Downes' Firefox/Windows 11 testing of v1.4.0.
