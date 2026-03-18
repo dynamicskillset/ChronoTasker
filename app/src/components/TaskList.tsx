@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef, useMemo, memo, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import type { Task } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
@@ -108,25 +109,14 @@ interface TaskItemProps {
   arcColor?: string;
   tagHueMap?: Map<string, number>;
   isActive: boolean;
-  isFirst: boolean;
-  isLast: boolean;
-  isConfirmingDelete: boolean;
-  isRescheduling: boolean;
   isActionsMenuOpen: boolean;
   isDragging: boolean;
   isDragOver: boolean;
   isDetailsExpanded: boolean;
-  menuFixed?: { top: number; right: number } | null;
   onToggleDetails: (taskId: string) => void;
   onToggleComplete: (taskId: string) => void;
   onToggleImportant: (taskId: string) => void;
-  onEditTask: (task: Task) => void;
-  onReorder: (taskId: string, direction: 'up' | 'down') => void;
   onSelectTask: (taskId: string) => void;
-  onRescheduleTask?: (taskId: string, newDate: string) => void;
-  onDeleteClick: (taskId: string) => void;
-  onDeleteBlur: (taskId: string) => void;
-  onToggleReschedule: (taskId: string, triggerEl?: HTMLElement) => void;
   onToggleActionsMenu: (taskId: string, triggerEl?: HTMLElement) => void;
   onDragStart: (taskId: string) => void;
   onDragOver: (e: React.DragEvent, taskId: string) => void;
@@ -139,25 +129,14 @@ const TaskItem = memo(function TaskItem({
   arcColor,
   tagHueMap,
   isActive,
-  isFirst,
-  isLast,
-  isConfirmingDelete,
-  isRescheduling,
   isActionsMenuOpen,
   isDragging,
   isDragOver,
   isDetailsExpanded,
-  menuFixed,
   onToggleDetails,
   onToggleComplete,
   onToggleImportant,
-  onEditTask,
-  onReorder,
   onSelectTask,
-  onRescheduleTask,
-  onDeleteClick,
-  onDeleteBlur,
-  onToggleReschedule,
   onToggleActionsMenu,
   onDragStart,
   onDragOver,
@@ -330,111 +309,6 @@ const TaskItem = memo(function TaskItem({
             <circle cx="14" cy="2" r="1.5" />
           </svg>
         </button>
-        {isActionsMenuOpen && (
-          <div
-            className="task-list__actions-menu"
-            role="menu"
-            style={menuFixed ? { position: 'fixed', top: menuFixed.top, right: menuFixed.right } as React.CSSProperties : undefined}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Reorder buttons (touch only via CSS) */}
-            {!task.completed && (
-              <div className="task-list__reorder">
-                <button
-                  className="task-list__reorder-btn"
-                  onClick={(e) => { e.stopPropagation(); onReorder(task.id, 'up'); }}
-                  disabled={isFirst}
-                  aria-label="Move up"
-                  title="Move up"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M3 9L7 5L11 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                <button
-                  className="task-list__reorder-btn"
-                  onClick={(e) => { e.stopPropagation(); onReorder(task.id, 'down'); }}
-                  disabled={isLast}
-                  aria-label="Move down"
-                  title="Move down"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-              </div>
-            )}
-
-            {/* Reschedule button (incomplete tasks only) */}
-            {!task.completed && onRescheduleTask && (
-              <div className="task-list__reschedule-wrapper">
-                <button
-                  className="task-list__reschedule-btn"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleReschedule(task.id, e.currentTarget);
-                  }}
-                  aria-label="Move to another day"
-                  title="Move to another day"
-                >
-                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                    <path d="M4.5 1.5V3.5M9.5 1.5V3.5M1.5 5.5H12.5M2.5 2.5H11.5C12.05 2.5 12.5 2.95 12.5 3.5V11.5C12.5 12.05 12.05 12.5 11.5 12.5H2.5C1.95 12.5 1.5 12.05 1.5 11.5V3.5C1.5 2.95 1.95 2.5 2.5 2.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M7 7.5L9 9.5L7 11.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </button>
-                {isRescheduling && (
-                  <div className="task-list__reschedule-popover" role="dialog" aria-label="Reschedule task" aria-modal="true" onClick={(e) => e.stopPropagation()}>
-                    <button
-                      className="task-list__reschedule-tomorrow"
-                      autoFocus
-                      onClick={() => { onRescheduleTask(task.id, tomorrowString()); }}
-                    >
-                      Tomorrow
-                    </button>
-                    <input
-                      type="date"
-                      className="task-list__reschedule-date"
-                      min={todayString()}
-                      aria-label="Reschedule to date"
-                      onChange={(e) => { if (e.target.value) onRescheduleTask(task.id, e.target.value); }}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Edit button */}
-            <button
-              className="task-list__edit-btn"
-              onClick={(e) => { e.stopPropagation(); onEditTask(task); }}
-              aria-label="Edit task"
-              title="Edit task"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                <path d="M10 2L12 4L5 11H3V9L10 2Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-
-            {/* Delete button with confirmation */}
-            <button
-              className={`task-list__delete-btn ${isConfirmingDelete ? 'task-list__delete-btn--confirming' : ''}`}
-              onClick={(e) => { e.stopPropagation(); onDeleteClick(task.id); }}
-              onBlur={() => onDeleteBlur(task.id)}
-              aria-label={isConfirmingDelete ? 'Confirm delete' : 'Delete task'}
-              title={isConfirmingDelete ? 'Click again to confirm' : 'Delete task'}
-            >
-              {isConfirmingDelete ? (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M2 7L5.5 10.5L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              ) : (
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
-                  <path d="M3 4H11M5.5 4V3C5.5 2.45 5.95 2 6.5 2H7.5C8.05 2 8.5 2.45 8.5 3V4M6 6.5V10M8 6.5V10M4 4L4.5 11.5C4.5 12.05 4.95 12.5 5.5 12.5H8.5C9.05 12.5 9.5 12.05 9.5 11.5L10 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </button>
-          </div>
-        )}
       </div>
     </li>
   );
@@ -640,6 +514,100 @@ export default function TaskList({
     setDragOverId(null);
   }, [draggingId, tasks, incompleteTasks, onReorderAll]);
 
+  // Portal menu — rendered into document.body so it escapes any stacking context
+  // (e.g. break items have opacity < 1 which would otherwise confine the menu's z-index)
+  const actionsMenuTask = actionsMenuTaskId ? tasks.find(t => t.id === actionsMenuTaskId) ?? null : null;
+  const actionsMenuPortal = actionsMenuTask && menuFixed ? createPortal(
+    <div
+      className="task-list__actions-menu"
+      role="menu"
+      style={{ position: 'fixed', top: menuFixed.top, right: menuFixed.right } as React.CSSProperties}
+      onClick={(e) => e.stopPropagation()}
+    >
+      {!actionsMenuTask.completed && (
+        <div className="task-list__reorder">
+          <button
+            className="task-list__reorder-btn"
+            onClick={(e) => { e.stopPropagation(); onReorder(actionsMenuTask.id, 'up'); }}
+            disabled={actionsMenuTask.id === incompleteTasks[0]?.id}
+            aria-label="Move up" title="Move up"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 9L7 5L11 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          <button
+            className="task-list__reorder-btn"
+            onClick={(e) => { e.stopPropagation(); onReorder(actionsMenuTask.id, 'down'); }}
+            disabled={actionsMenuTask.id === incompleteTasks[incompleteTasks.length - 1]?.id}
+            aria-label="Move down" title="Move down"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M3 5L7 9L11 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        </div>
+      )}
+      {!actionsMenuTask.completed && onRescheduleTask && (
+        <div className="task-list__reschedule-wrapper">
+          <button
+            className="task-list__reschedule-btn"
+            onClick={(e) => { e.stopPropagation(); handleToggleReschedule(actionsMenuTask.id, e.currentTarget); }}
+            aria-label="Move to another day" title="Move to another day"
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path d="M4.5 1.5V3.5M9.5 1.5V3.5M1.5 5.5H12.5M2.5 2.5H11.5C12.05 2.5 12.5 2.95 12.5 3.5V11.5C12.5 12.05 12.05 12.5 11.5 12.5H2.5C1.95 12.5 1.5 12.05 1.5 11.5V3.5C1.5 2.95 1.95 2.5 2.5 2.5Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M7 7.5L9 9.5L7 11.5" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+          {reschedulingTaskId === actionsMenuTask.id && (
+            <div className="task-list__reschedule-popover" role="dialog" aria-label="Reschedule task" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+              <button
+                className="task-list__reschedule-tomorrow"
+                autoFocus
+                onClick={() => { onRescheduleTask(actionsMenuTask.id, tomorrowString()); }}
+              >Tomorrow</button>
+              <input
+                type="date"
+                className="task-list__reschedule-date"
+                min={todayString()}
+                aria-label="Reschedule to date"
+                onChange={(e) => { if (e.target.value) onRescheduleTask(actionsMenuTask.id, e.target.value); }}
+              />
+            </div>
+          )}
+        </div>
+      )}
+      <button
+        className="task-list__edit-btn"
+        onClick={(e) => { e.stopPropagation(); onEditTask(actionsMenuTask); }}
+        aria-label="Edit task" title="Edit task"
+      >
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+          <path d="M10 2L12 4L5 11H3V9L10 2Z" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      </button>
+      <button
+        className={`task-list__delete-btn ${confirmingDeleteId === actionsMenuTask.id ? 'task-list__delete-btn--confirming' : ''}`}
+        onClick={(e) => { e.stopPropagation(); handleDeleteClick(actionsMenuTask.id); }}
+        onBlur={() => handleDeleteBlur(actionsMenuTask.id)}
+        aria-label={confirmingDeleteId === actionsMenuTask.id ? 'Confirm delete' : 'Delete task'}
+        title={confirmingDeleteId === actionsMenuTask.id ? 'Click again to confirm' : 'Delete task'}
+      >
+        {confirmingDeleteId === actionsMenuTask.id ? (
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7L5.5 10.5L12 4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M3 4H11M5.5 4V3C5.5 2.45 5.95 2 6.5 2H7.5C8.05 2 8.5 2.45 8.5 3V4M6 6.5V10M8 6.5V10M4 4L4.5 11.5C4.5 12.05 4.95 12.5 5.5 12.5H8.5C9.05 12.5 9.5 12.05 9.5 11.5L10 4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        )}
+      </button>
+    </div>,
+    document.body,
+  ) : null;
+
   if (tasks.length === 0) {
     if (isFirstVisit) {
       return (
@@ -678,25 +646,14 @@ export default function TaskList({
       arcColor={colorMap?.get(task.id)}
       tagHueMap={tagHueMap}
       isActive={task.id === activeTaskId}
-      isFirst={!task.completed && task.id === incompleteTasks[0]?.id}
-      isLast={!task.completed && task.id === incompleteTasks[incompleteTasks.length - 1]?.id}
-      isConfirmingDelete={confirmingDeleteId === task.id}
-      isRescheduling={reschedulingTaskId === task.id}
       isActionsMenuOpen={actionsMenuTaskId === task.id}
       isDragging={draggingId === task.id}
       isDragOver={dragOverId === task.id}
       isDetailsExpanded={expandedDetailsId === task.id}
-      menuFixed={actionsMenuTaskId === task.id ? menuFixed : undefined}
       onToggleDetails={handleToggleDetails}
       onToggleComplete={onToggleComplete}
       onToggleImportant={onToggleImportant}
-      onEditTask={onEditTask}
-      onReorder={onReorder}
       onSelectTask={onSelectTask}
-      onRescheduleTask={onRescheduleTask}
-      onDeleteClick={handleDeleteClick}
-      onDeleteBlur={handleDeleteBlur}
-      onToggleReschedule={handleToggleReschedule}
       onToggleActionsMenu={handleToggleActionsMenu}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
@@ -714,6 +671,7 @@ export default function TaskList({
         <ul ref={listRef} className="task-list__items task-list__items--done" role="list" aria-label="Completed tasks">
           {sortedTasks.map((task) => renderItem(task))}
         </ul>
+      {actionsMenuPortal}
       </div>
     );
   }
@@ -733,6 +691,7 @@ export default function TaskList({
           </button>
         </div>
       )}
+      {actionsMenuPortal}
     </div>
   );
 }
