@@ -228,7 +228,15 @@ async function decryptTask(task: Task): Promise<Task> {
 }
 
 async function decryptTasks(tasks: Task[]): Promise<Task[]> {
-  return Promise.all(tasks.map(decryptTask));
+  const results = await Promise.allSettled(tasks.map(decryptTask));
+  const failed = results.filter(r => r.status === 'rejected').length;
+  if (failed > 0) {
+    console.warn(`[TaskDial] ${failed} task(s) could not be decrypted — encryption key may not be ready`);
+    window.dispatchEvent(new CustomEvent('tasks:decryptionErrors', { detail: { count: failed } }));
+  }
+  return results
+    .filter((r): r is PromiseFulfilledResult<Task> => r.status === 'fulfilled')
+    .map(r => r.value);
 }
 
 // ── Tasks ─────────────────────────────────────────────────────────────────────

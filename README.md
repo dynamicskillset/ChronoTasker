@@ -52,6 +52,10 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ## Changelog
 
+### v1.5.0 — 2026-03-18
+
+Bug fixes and enhancements: break edits now persist, actions menu no longer clipped on mobile, configurable duration quick-picks in Settings → Timer, task left-border colour now matches the tag colour consistently across list and clock.
+
 ### v1.4.2 — 2026-03-15
 
 Bug fixes: onboarding tooltip jump, week nav oversized hit area, week-start-day preference (Mon/Sun), calendar sync confirmation message.

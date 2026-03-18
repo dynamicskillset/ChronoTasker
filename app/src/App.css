@@ -1604,6 +1604,36 @@
   outline-offset: 2px;
 }
 
+/* ============================================================
+   Decryption error notice
+   ============================================================ */
+.decrypt-error-notice {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background-color: color-mix(in srgb, var(--color-danger, #bf616a) 10%, var(--color-surface));
+  border-left: 3px solid var(--color-danger, #bf616a);
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+.decrypt-error-notice__dismiss {
+  margin-left: auto;
+  flex-shrink: 0;
+  padding: 0.25rem 0.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--color-muted);
+  border-radius: 4px;
+  font-size: 0.8rem;
+}
+
+.decrypt-error-notice__dismiss:hover {
+  color: var(--color-text);
+}
+
 /* Wide screens — give sidebar more room */
 @media (min-width: 1400px) {
   .app-main,

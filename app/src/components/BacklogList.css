@@ -30,6 +30,7 @@
   border-bottom: 1px solid color-mix(in srgb, var(--color-border) 50%, transparent);
   color: var(--color-text);
   transition: background-color var(--transition-normal);
+  box-shadow: inset 4px 0 0 var(--task-color, transparent);
 }
 
 .backlog-list__item:last-child {

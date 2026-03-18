@@ -91,6 +91,14 @@ export function taskArcColor(index: number, total: number, tag?: string): string
   return `hsl(${hue}, var(--color-task-saturation, 62%), var(--color-task-lightness, 68%))`;
 }
 
+/**
+ * Generate a task-arc-style HSL colour from a pre-computed hue.
+ * Used when deriving the task left-border colour directly from a tag.
+ */
+export function taskColorFromHue(hue: number): string {
+  return `hsl(${hue}, var(--color-task-saturation, 62%), var(--color-task-lightness, 68%))`;
+}
+
 export function formatDuration(minutes: number): string {
   if (minutes < 60) return `${minutes}min`;
   const h = Math.floor(minutes / 60);

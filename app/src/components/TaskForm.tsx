@@ -17,11 +17,12 @@ interface TaskFormProps {
   onSubmitToBacklog?: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'>) => void;
   onMoveToBacklog?: (taskId: string) => void;
   advancedMode?: boolean;
+  durationPresets?: number[];
 }
 
 const DURATION_PRESETS = [15, 25, 30, 45, 60] as const;
 
-export default function TaskForm({ onSubmit, editingTask, onCancel, date, existingTags = [], calendarEvents = [], meetingBufferMinutes = 0, use24Hour = true, enableRecurring = false, enableBacklog = false, onSubmitToBacklog, onMoveToBacklog, advancedMode = false }: TaskFormProps) {
+export default function TaskForm({ onSubmit, editingTask, onCancel, date, existingTags = [], calendarEvents = [], meetingBufferMinutes = 0, use24Hour = true, enableRecurring = false, enableBacklog = false, onSubmitToBacklog, onMoveToBacklog, advancedMode = false, durationPresets }: TaskFormProps) {
   const [title, setTitle] = useState('');
   const [durationMinutes, setDurationMinutes] = useState(25);
   const [customDuration, setCustomDuration] = useState('');
@@ -34,6 +35,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
   const [showDetails, setShowDetails] = useState(false);
   const [showMore, setShowMore] = useState(true);
   const [recurrencePattern, setRecurrencePattern] = useState<Task['recurrencePattern']>(undefined);
+  const [isBreak, setIsBreak] = useState(false);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -57,10 +59,12 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
       setDetails(editingTask.details ?? '');
       setShowDetails(!!editingTask.details);
       setRecurrencePattern(editingTask.recurrencePattern);
+      setIsBreak(editingTask.isBreak);
 
       setShowMore(true);
 
-      const isPreset = (DURATION_PRESETS as readonly number[]).includes(editingTask.durationMinutes);
+      const activePresets = durationPresets ?? (DURATION_PRESETS as readonly number[]);
+      const isPreset = activePresets.includes(editingTask.durationMinutes);
       if (!isPreset) {
         setIsCustomDuration(true);
         setCustomDuration(String(editingTask.durationMinutes));
@@ -99,6 +103,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
     setShowDetails(false);
     setShowMore(true);
     setRecurrencePattern(undefined);
+    setIsBreak(false);
     titleInputRef.current?.focus();
   }
 
@@ -118,7 +123,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
       fixedStartTime: hasFixedTime && fixedStartTime ? fixedStartTime : undefined,
       completed: editingTask?.completed ?? false,
       important,
-      isBreak: editingTask?.isBreak ?? false,
+      isBreak,
       tag: tag.trim() || undefined,
       details: details.trim() || undefined,
       recurrencePattern: recurrencePattern || undefined,
@@ -210,7 +215,7 @@ export default function TaskForm({ onSubmit, editingTask, onCancel, date, existi
       <div className="task-form__row task-form__row--duration">
         <label className="task-form__label">Duration</label>
         <div className="task-form__duration-options">
-          {DURATION_PRESETS.map((preset) => (
+          {(durationPresets ?? DURATION_PRESETS).map((preset) => (
             <button
               key={preset}
               type="button"

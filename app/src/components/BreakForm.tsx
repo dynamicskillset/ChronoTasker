@@ -5,11 +5,12 @@ import './BreakForm.css';
 interface BreakFormProps {
   onSubmit: (task: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'sortOrder'>) => void;
   date: string;
+  breakPresets?: number[];
 }
 
 const BREAK_PRESETS = [5, 10, 15, 30] as const;
 
-export default function BreakForm({ onSubmit, date }: BreakFormProps) {
+export default function BreakForm({ onSubmit, date, breakPresets }: BreakFormProps) {
   const [duration, setDuration] = useState(15);
   const [time, setTime] = useState('');
 
@@ -33,7 +34,7 @@ export default function BreakForm({ onSubmit, date }: BreakFormProps) {
     <form className="break-form" onSubmit={handleSubmit}>
       <span className="break-form__label">Break</span>
       <div className="break-form__presets" role="group" aria-label="Break duration">
-        {BREAK_PRESETS.map((m) => (
+        {(breakPresets ?? BREAK_PRESETS).map((m) => (
           <button
             key={m}
             type="button"

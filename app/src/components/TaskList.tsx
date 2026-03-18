@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo, memo, type ReactNode
 import type { Task } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
-import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue } from '../utils/format';
+import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue, taskColorFromHue } from '../utils/format';
 import './TaskList.css';
 
 interface TaskListProps {
@@ -116,6 +116,7 @@ interface TaskItemProps {
   isDragging: boolean;
   isDragOver: boolean;
   isDetailsExpanded: boolean;
+  menuFixed?: { top: number; right: number } | null;
   onToggleDetails: (taskId: string) => void;
   onToggleComplete: (taskId: string) => void;
   onToggleImportant: (taskId: string) => void;
@@ -146,6 +147,7 @@ const TaskItem = memo(function TaskItem({
   isDragging,
   isDragOver,
   isDetailsExpanded,
+  menuFixed,
   onToggleDetails,
   onToggleComplete,
   onToggleImportant,
@@ -162,10 +164,19 @@ const TaskItem = memo(function TaskItem({
   onDragEnd,
   onDrop,
 }: TaskItemProps) {
-  const itemStyle = useMemo(
-    () => arcColor ? { '--task-color': arcColor } as React.CSSProperties : undefined,
-    [arcColor]
-  );
+  const itemStyle = useMemo(() => {
+    // Prefer tag hue for consistent colour across task list, clock face, and backlog
+    if (task.tag) {
+      const firstTag = task.tag.split(',')[0].trim();
+      if (firstTag) {
+        const hue = tagHueMap?.get(firstTag);
+        if (hue !== undefined) {
+          return { '--task-color': taskColorFromHue(hue) } as React.CSSProperties;
+        }
+      }
+    }
+    return arcColor ? { '--task-color': arcColor } as React.CSSProperties : undefined;
+  }, [arcColor, task.tag, tagHueMap]);
   return (
     <li
       data-task-id={task.id}
@@ -323,6 +334,7 @@ const TaskItem = memo(function TaskItem({
           <div
             className="task-list__actions-menu"
             role="menu"
+            style={menuFixed ? { position: 'fixed', top: menuFixed.top, right: menuFixed.right } as React.CSSProperties : undefined}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Reorder buttons (touch only via CSS) */}
@@ -462,6 +474,7 @@ export default function TaskList({
   const rescheduleTriggerRef = useRef<HTMLElement | null>(null);
   const [actionsMenuTaskId, setActionsMenuTaskId] = useState<string | null>(null);
   const actionsMenuTriggerRef = useRef<HTMLElement | null>(null);
+  const [menuFixed, setMenuFixed] = useState<{ top: number; right: number } | null>(null);
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [dragOverId, setDragOverId] = useState<string | null>(null);
   const [expandedDetailsId, setExpandedDetailsId] = useState<string | null>(null);
@@ -469,6 +482,7 @@ export default function TaskList({
   // Dismiss actions menu on Escape or outside click
   const dismissActionsMenu = useCallback(() => {
     setActionsMenuTaskId(null);
+    setMenuFixed(null);
     actionsMenuTriggerRef.current?.focus();
     actionsMenuTriggerRef.current = null;
   }, []);
@@ -555,8 +569,21 @@ export default function TaskList({
 
   const handleToggleActionsMenu = useCallback((taskId: string, triggerEl?: HTMLElement) => {
     setActionsMenuTaskId((current) => {
-      if (current === taskId) return null;
+      if (current === taskId) {
+        setMenuFixed(null);
+        return null;
+      }
       actionsMenuTriggerRef.current = triggerEl ?? null;
+      if (triggerEl) {
+        const rect = triggerEl.getBoundingClientRect();
+        const estimatedMenuHeight = 60;
+        const top = window.innerHeight - rect.bottom >= estimatedMenuHeight + 8
+          ? rect.bottom + 4
+          : rect.top - estimatedMenuHeight - 4;
+        setMenuFixed({ top, right: window.innerWidth - rect.right });
+      } else {
+        setMenuFixed(null);
+      }
       return taskId;
     });
   }, []);
@@ -659,6 +686,7 @@ export default function TaskList({
       isDragging={draggingId === task.id}
       isDragOver={dragOverId === task.id}
       isDetailsExpanded={expandedDetailsId === task.id}
+      menuFixed={actionsMenuTaskId === task.id ? menuFixed : undefined}
       onToggleDetails={handleToggleDetails}
       onToggleComplete={onToggleComplete}
       onToggleImportant={onToggleImportant}

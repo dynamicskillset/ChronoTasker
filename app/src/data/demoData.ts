@@ -670,6 +670,8 @@ export function getDemoSettings(): AppSettings {
     icalUrls: [],
     workingDays: [1, 2, 3, 4, 5],
     weekStartDay: 1,
+    taskDurationPresets: [15, 25, 30, 45, 60],
+    breakDurationPresets: [5, 10, 15, 30],
   };
 }
 

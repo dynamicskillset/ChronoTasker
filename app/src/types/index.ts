@@ -72,6 +72,8 @@ export interface AppSettings {
   flashWhenTimeUp: boolean;
   workingDays: number[]; // ISO weekday numbers: 1=Mon … 7=Sun. Empty = all days.
   weekStartDay: 1 | 7;  // 1=Monday (default), 7=Sunday
+  taskDurationPresets: number[];  // quick-pick buttons in task form, default [15, 25, 30, 45, 60]
+  breakDurationPresets: number[]; // quick-pick buttons in break form, default [5, 10, 15, 30]
 }
 
 export const DEFAULT_SETTINGS: AppSettings = {
@@ -97,4 +99,6 @@ export const DEFAULT_SETTINGS: AppSettings = {
   flashWhenTimeUp: true,
   workingDays: [1, 2, 3, 4, 5], // Mon–Fri by default
   weekStartDay: 1,
+  taskDurationPresets: [15, 25, 30, 45, 60],
+  breakDurationPresets: [5, 10, 15, 30],
 };

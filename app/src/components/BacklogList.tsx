@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import type { Task } from '../types';
-import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue } from '../utils/format';
+import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue, taskColorFromHue } from '../utils/format';
 import './BacklogList.css';
 
 interface BacklogListProps {
@@ -91,6 +91,18 @@ export default function BacklogList({ tasks, tagHueMap, onAssignToToday, onEditT
           <li
             key={task.id}
             className="backlog-list__item"
+            style={(() => {
+              if (task.tag) {
+                const firstTag = task.tag.split(',')[0].trim();
+                if (firstTag) {
+                  const hue = tagHueMap?.get(firstTag);
+                  if (hue !== undefined) {
+                    return { '--task-color': taskColorFromHue(hue) } as React.CSSProperties;
+                  }
+                }
+              }
+              return undefined;
+            })()}
           >
             <button
               className="backlog-list__row-btn"

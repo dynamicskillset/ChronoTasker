@@ -80,6 +80,7 @@ function App({ user, onLogout }: AppProps) {
   const [showBacklog, setShowBacklog] = useState(false);
   const [recurringDeleteTask, setRecurringDeleteTask] = useState<Task | null>(null);
   const [demoMode, setDemoMode] = useState(false);
+  const [decryptionErrorCount, setDecryptionErrorCount] = useState(0);
 
   // Onboarding walkthrough — shown once to new users; can be replayed from Settings
   const [showOnboarding, setShowOnboarding] = useState(!user.onboardingComplete);
@@ -87,6 +88,16 @@ function App({ user, onLogout }: AppProps) {
   useEffect(() => {
     if (user.onboardingComplete) setShowOnboarding(false);
   }, [user.onboardingComplete]);
+
+  // Listen for decryption failures from the API layer
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const count = (e as CustomEvent<{ count: number }>).detail.count;
+      setDecryptionErrorCount(prev => prev + count);
+    };
+    window.addEventListener('tasks:decryptionErrors', handler);
+    return () => window.removeEventListener('tasks:decryptionErrors', handler);
+  }, []);
 
   // Timed-out task tracking — dismissed IDs reset when the task is resolved
   const [dismissedTimedOutIds, setDismissedTimedOutIds] = useState<Set<string>>(new Set());
@@ -1506,8 +1517,9 @@ function App({ user, onLogout }: AppProps) {
                             onSubmitToBacklog={handleAddToBacklog}
                             onMoveToBacklog={handleMoveToBacklog}
                             advancedMode={settings.advancedMode}
+                            durationPresets={settings.taskDurationPresets}
                           />
-                          <BreakForm onSubmit={handleAddTask} date={date} />
+                          <BreakForm onSubmit={handleAddTask} date={date} breakPresets={settings.breakDurationPresets} />
                         </div>
                       )}
                     </>
@@ -1528,6 +1540,13 @@ function App({ user, onLogout }: AppProps) {
                       </button>
                       {showTaskList && (
                         <div className="collapsible-section__body collapsible-section__body--flush" data-onboarding="tasklist">
+                          {decryptionErrorCount > 0 && (
+                            <div className="decrypt-error-notice" role="alert">
+                              {decryptionErrorCount} task{decryptionErrorCount !== 1 ? 's' : ''} could not be decrypted.{' '}
+                              Try refreshing the page.{' '}
+                              <button className="decrypt-error-notice__dismiss" onClick={() => setDecryptionErrorCount(0)} aria-label="Dismiss">✕</button>
+                            </div>
+                          )}
                           {showReorgBanner && (
                             <div className="reorg-banner" role="status">
                               <span className="reorg-banner__text">Tasks overflow the day, but a different order would fit.</span>
@@ -1631,8 +1650,9 @@ function App({ user, onLogout }: AppProps) {
                   onSubmitToBacklog={handleAddToBacklog}
                   onMoveToBacklog={handleMoveToBacklog}
                   advancedMode={settings.advancedMode}
+                  durationPresets={settings.taskDurationPresets}
                 />
-                <BreakForm onSubmit={handleAddTask} date={date} />
+                <BreakForm onSubmit={handleAddTask} date={date} breakPresets={settings.breakDurationPresets} />
               </div>
               <div className="sidebar-section sidebar-section--flush">
                 {showReorgBanner && (

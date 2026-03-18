@@ -4,6 +4,18 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.5.0 — 2026-03-18
+
+Four improvements: two bug fixes affecting daily use and two enhancements.
+
+- **Break edit now persists** (#47A): editing a break task (title, duration, fixed time) was silently ignored. `isBreak` is now tracked in local form state rather than read from the prop at submit time, making it resilient to any re-render between form open and submit.
+- **Actions menu no longer clipped on mobile** (#47B): the three-dot `…` menu now positions itself with `position: fixed` using coordinates from `getBoundingClientRect()`, so it is never clipped by the `overflow: hidden` container on the task list panel. Flip-upward logic prevents it going off the bottom of the screen.
+- **Configurable duration quick-picks** (#48): task and break duration presets are now editable in Settings → Timer. Add or remove slots (2–5 per row), with per-slot number inputs validated to 1–480 min for tasks and 1–120 min for breaks. Defaults remain `[15, 25, 30, 45, 60]` for tasks and `[5, 10, 15, 30]` for breaks. Syncs across devices.
+- **Task colour matches tag colour** (#49): the left-border accent on task list rows now derives its colour directly from the task's tag hue (via `tagHueMap`), exactly matching the clock-face arc colour and the tag pill colour. Backlog items get the same treatment. Untagged tasks fall back to the arc-order colour as before.
+- **Decryption errors handled gracefully** (#46 defensive fix): if one or more tasks cannot be decrypted (e.g. the key is not yet ready), those tasks are dropped individually rather than failing the entire fetch. A warning banner is shown in the task list and the count is logged to the console.
+
+---
+
 ### v1.4.2 — 2026-03-15
 
 Bug fixes and UX polish following Stephen Downes' Firefox/Windows 11 testing (continued).

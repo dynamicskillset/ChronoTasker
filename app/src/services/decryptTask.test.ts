@@ -62,13 +62,14 @@ function makeFetchResponse(body: unknown, ok = true) {
 }
 
 describe('fetchTasks — key not ready', () => {
-  it('throws an error when tasks contain encrypted values but no key is available', async () => {
+  it('returns empty array (not throws) when tasks have encrypted values but no key is available', async () => {
     fetchSpy.mockReturnValue(makeFetchResponse([mockTask()]));
 
     // Dynamically import so the vi.mock above is applied
     const { fetchTasks } = await import('./api');
 
-    await expect(fetchTasks('2026-01-01')).rejects.toThrow('Encryption key not ready');
+    // Resilient path: decryption failures are swallowed; the failed task is dropped
+    await expect(fetchTasks('2026-01-01')).resolves.toEqual([]);
   });
 
   it('does not throw when the task has no encrypted fields (plaintext / legacy data)', async () => {
