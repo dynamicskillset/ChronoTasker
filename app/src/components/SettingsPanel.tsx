@@ -439,6 +439,106 @@ export function SettingsPanel({
                   </Row>
                 </>
               )}
+
+              <Divider />
+              <SectionLabel>Duration quick-picks</SectionLabel>
+              <p className="sp-hint">Buttons shown in the task and break forms</p>
+
+              <div className="sp-presets-group">
+                <span className="sp-presets-group__label">Tasks</span>
+                <div className="sp-presets">
+                  {(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]).map((val, i) => {
+                    const presets = settings.taskDurationPresets ?? [15, 25, 30, 45, 60];
+                    return (
+                      <div key={i} className="sp-preset-pill">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          className="sp-preset-pill__input"
+                          defaultValue={val}
+                          key={`task-${i}-${val}`}
+                          onBlur={e => {
+                            const v = Math.max(1, Math.min(480, parseInt(e.target.value, 10) || val));
+                            e.target.value = String(v);
+                            if (v !== val) {
+                              const next = [...presets];
+                              next[i] = v;
+                              set({ taskDurationPresets: next });
+                            }
+                          }}
+                          aria-label={`Task preset ${i + 1} minutes`}
+                        />
+                        <span className="sp-preset-pill__unit">m</span>
+                        {presets.length > 2 && (
+                          <button
+                            type="button"
+                            className="sp-preset-pill__remove"
+                            onClick={() => set({ taskDurationPresets: presets.filter((_, j) => j !== i) })}
+                            aria-label={`Remove ${val}m preset`}
+                          >×</button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]).length < 5 && (
+                    <button
+                      type="button"
+                      className="sp-preset-add-pill"
+                      onClick={() => set({ taskDurationPresets: [...(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]), 30] })}
+                      aria-label="Add task preset"
+                    >+</button>
+                  )}
+                </div>
+              </div>
+
+              <div className="sp-presets-group">
+                <span className="sp-presets-group__label">Breaks</span>
+                <div className="sp-presets">
+                  {(settings.breakDurationPresets ?? [5, 10, 15, 30]).map((val, i) => {
+                    const presets = settings.breakDurationPresets ?? [5, 10, 15, 30];
+                    return (
+                      <div key={i} className="sp-preset-pill">
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          pattern="[0-9]*"
+                          className="sp-preset-pill__input"
+                          defaultValue={val}
+                          key={`break-${i}-${val}`}
+                          onBlur={e => {
+                            const v = Math.max(1, Math.min(120, parseInt(e.target.value, 10) || val));
+                            e.target.value = String(v);
+                            if (v !== val) {
+                              const next = [...presets];
+                              next[i] = v;
+                              set({ breakDurationPresets: next });
+                            }
+                          }}
+                          aria-label={`Break preset ${i + 1} minutes`}
+                        />
+                        <span className="sp-preset-pill__unit">m</span>
+                        {presets.length > 2 && (
+                          <button
+                            type="button"
+                            className="sp-preset-pill__remove"
+                            onClick={() => set({ breakDurationPresets: presets.filter((_, j) => j !== i) })}
+                            aria-label={`Remove ${val}m preset`}
+                          >×</button>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {(settings.breakDurationPresets ?? [5, 10, 15, 30]).length < 5 && (
+                    <button
+                      type="button"
+                      className="sp-preset-add-pill"
+                      onClick={() => set({ breakDurationPresets: [...(settings.breakDurationPresets ?? [5, 10, 15, 30]), 5] })}
+                      aria-label="Add break preset"
+                    >+</button>
+                  )}
+                </div>
+              </div>
             </div>
           )}
 
@@ -591,29 +691,6 @@ export function SettingsPanel({
                 </>
               )}
 
-              <Divider />
-
-              <Row label="Recurring tasks">
-                <Toggle
-                  checked={settings.enableRecurringTasks}
-                  onChange={v => set({ enableRecurringTasks: v })}
-                  label="Recurring tasks"
-                />
-              </Row>
-              <Row label="Backlog">
-                <Toggle
-                  checked={settings.enableBacklog}
-                  onChange={v => set({ enableBacklog: v })}
-                  label="Backlog"
-                />
-              </Row>
-              <Row label="Day time summary">
-                <Toggle
-                  checked={settings.showDaySummary}
-                  onChange={v => set({ showDaySummary: v })}
-                  label="Day time summary"
-                />
-              </Row>
             </div>
           )}
 
@@ -677,97 +754,6 @@ export function SettingsPanel({
                 </>
               )}
 
-              <Divider />
-              <SectionLabel>Duration quick-picks</SectionLabel>
-              <p className="sp-hint">Buttons shown in the task and break forms</p>
-
-              <div className="sp-presets-group">
-                <span className="sp-presets-group__label">Tasks</span>
-                <div className="sp-presets">
-                  {(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]).map((val, i) => {
-                    const presets = settings.taskDurationPresets ?? [15, 25, 30, 45, 60];
-                    return (
-                      <div key={i} className="sp-preset-pill">
-                        <input
-                          type="number"
-                          className="sp-preset-pill__input"
-                          min="1"
-                          max="480"
-                          value={val}
-                          onChange={e => {
-                            const v = Math.max(1, Math.min(480, parseInt(e.target.value, 10) || 1));
-                            const next = [...presets];
-                            next[i] = v;
-                            set({ taskDurationPresets: next });
-                          }}
-                          aria-label={`Task preset ${i + 1} minutes`}
-                        />
-                        <span className="sp-preset-pill__unit">m</span>
-                        {presets.length > 2 && (
-                          <button
-                            type="button"
-                            className="sp-preset-pill__remove"
-                            onClick={() => set({ taskDurationPresets: presets.filter((_, j) => j !== i) })}
-                            aria-label={`Remove ${val}m preset`}
-                          >×</button>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]).length < 5 && (
-                    <button
-                      type="button"
-                      className="sp-preset-add-pill"
-                      onClick={() => set({ taskDurationPresets: [...(settings.taskDurationPresets ?? [15, 25, 30, 45, 60]), 30] })}
-                      aria-label="Add task preset"
-                    >+</button>
-                  )}
-                </div>
-              </div>
-
-              <div className="sp-presets-group">
-                <span className="sp-presets-group__label">Breaks</span>
-                <div className="sp-presets">
-                  {(settings.breakDurationPresets ?? [5, 10, 15, 30]).map((val, i) => {
-                    const presets = settings.breakDurationPresets ?? [5, 10, 15, 30];
-                    return (
-                      <div key={i} className="sp-preset-pill">
-                        <input
-                          type="number"
-                          className="sp-preset-pill__input"
-                          min="1"
-                          max="120"
-                          value={val}
-                          onChange={e => {
-                            const v = Math.max(1, Math.min(120, parseInt(e.target.value, 10) || 1));
-                            const next = [...presets];
-                            next[i] = v;
-                            set({ breakDurationPresets: next });
-                          }}
-                          aria-label={`Break preset ${i + 1} minutes`}
-                        />
-                        <span className="sp-preset-pill__unit">m</span>
-                        {presets.length > 2 && (
-                          <button
-                            type="button"
-                            className="sp-preset-pill__remove"
-                            onClick={() => set({ breakDurationPresets: presets.filter((_, j) => j !== i) })}
-                            aria-label={`Remove ${val}m preset`}
-                          >×</button>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {(settings.breakDurationPresets ?? [5, 10, 15, 30]).length < 5 && (
-                    <button
-                      type="button"
-                      className="sp-preset-add-pill"
-                      onClick={() => set({ breakDurationPresets: [...(settings.breakDurationPresets ?? [5, 10, 15, 30]), 5] })}
-                      aria-label="Add break preset"
-                    >+</button>
-                  )}
-                </div>
-              </div>
             </div>
           )}
 
