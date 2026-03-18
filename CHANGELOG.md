@@ -4,6 +4,12 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.5.2 — 2026-03-18
+
+- **Backlog no longer empties on mobile**: a sync-triggered re-fetch could blank the backlog if the E2EE key wasn't ready yet — all tasks would fail to decrypt and the list would be replaced with an empty result. The fetch now detects decryption errors and preserves the current state rather than overwriting it.
+
+---
+
 ### v1.5.1 — 2026-03-18
 
 Bug fixes and settings polish.

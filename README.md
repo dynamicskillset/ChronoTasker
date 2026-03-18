@@ -52,6 +52,10 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ## Changelog
 
+### v1.5.2 — 2026-03-18
+
+Bug fix: backlog no longer empties on mobile when a sync-triggered re-fetch runs before the E2EE key is ready.
+
 ### v1.5.1 — 2026-03-18
 
 Bug fixes: actions menu no longer hidden under the next item on break tasks (React portal fix), duplicate settings rows removed from the Calendars tab, Duration quick-picks moved to Schedule and redesigned as editable pill chips.
