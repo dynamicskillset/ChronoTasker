@@ -5,12 +5,6 @@ import type { ScheduledTask } from '../utils/scheduling';
 import { tomorrowString, todayString } from '../utils/scheduling';
 import { formatDuration, tagColor, tagBgColor, tagColorFromHue, tagBgColorFromHue, taskColorFromHue } from '../utils/format';
 
-/** Extract the numeric hue from an arc colour string like 'hsl(145, ...)'. */
-function hueFromArcColor(arcColor: string | undefined): number | undefined {
-  if (!arcColor) return undefined;
-  const m = arcColor.match(/hsl\((\d+)/);
-  return m ? parseInt(m[1], 10) : undefined;
-}
 import './TaskList.css';
 
 interface TaskListProps {
@@ -151,10 +145,8 @@ const TaskItem = memo(function TaskItem({
   onDrop,
 }: TaskItemProps) {
   const itemStyle = useMemo(() => {
-    // Prefer the exact arc colour from the clock face — it's the single source of truth
-    // and already accounts for accent-hue shifting. Fall back to tagHueMap only when
-    // the clock hasn't emitted a colour yet (e.g. before first render or for off-schedule tasks).
-    if (arcColor) return { '--task-color': arcColor } as React.CSSProperties;
+    // Prefer tag hue (collision-aware, single source of truth shared with ClockFace).
+    // Fall back to arcColor for untagged tasks.
     if (task.tag) {
       const firstTag = task.tag.split(',')[0].trim();
       if (firstTag) {
@@ -164,7 +156,7 @@ const TaskItem = memo(function TaskItem({
         }
       }
     }
-    return undefined;
+    return arcColor ? { '--task-color': arcColor } as React.CSSProperties : undefined;
   }, [arcColor, task.tag, tagHueMap]);
   return (
     <li
@@ -238,9 +230,7 @@ const TaskItem = memo(function TaskItem({
             </span>
           )}
           {task.tag && task.tag.split(',').map(t => t.trim()).filter(Boolean).map((t, i) => {
-            // First tag: use the arc hue so the pill matches the clock segment exactly.
-            // Additional tags: use tagHueMap as before.
-            const hue = (i === 0 ? hueFromArcColor(arcColor) : undefined) ?? tagHueMap?.get(t);
+            const hue = tagHueMap?.get(t);
             return (
               <span
                 key={i}

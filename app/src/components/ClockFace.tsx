@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import type { PomodoroState, CalendarEvent } from '../types';
 import type { ScheduledTask } from '../utils/scheduling';
-import { taskArcColor } from '../utils/format';
+import { taskArcColor, taskColorFromHue } from '../utils/format';
 import './ClockFace.css';
 
 /* =============================================================
@@ -26,6 +26,7 @@ interface ClockFaceProps {
   onTaskClick: (taskId: string) => void;
   onCalendarEventClick?: (uid: string) => void;
   onSlotsResolved?: (colorMap: Map<string, string>) => void;
+  tagHueMap?: Map<string, number>;
 }
 
 /* ---- Constants ---- */
@@ -365,12 +366,14 @@ const TaskArc = React.memo(function TaskArc({
   isActive,
   isTimedOut,
   onTaskClick,
+  tagHueMap,
 }: {
   slot: ResolvedSlot;
   totalTasks: number;
   isActive: boolean;
   isTimedOut: boolean;
   onTaskClick: (id: string) => void;
+  tagHueMap?: Map<string, number>;
 }) {
   const { task, startHour, startMinute, endHour, endMinute, index } = slot;
 
@@ -388,11 +391,17 @@ const TaskArc = React.memo(function TaskArc({
 
   const d = describeArc(CX, CY, INNER_R, OUTER_R, startAngle, adjustedEnd);
 
+  const arcFillFromTag = (() => {
+    if (!task.tag || !tagHueMap) return undefined;
+    const firstTag = task.tag.split(',')[0].trim();
+    const hue = firstTag ? tagHueMap.get(firstTag) : undefined;
+    return hue !== undefined ? taskColorFromHue(hue) : undefined;
+  })();
   const fill = task.isBreak
     ? 'url(#break-hatch)'
     : task.important
       ? 'var(--color-task-important, hsl(0, 72%, 62%))'
-      : taskArcColor(index, totalTasks, task.tag);
+      : arcFillFromTag ?? taskArcColor(index, totalTasks, task.tag);
 
   const hasConflict = !!task.meetingConflict && !task.isBreak;
 
@@ -664,6 +673,7 @@ const ClockFace: React.FC<ClockFaceProps> = ({
   onTaskClick,
   onCalendarEventClick,
   onSlotsResolved,
+  tagHueMap,
 }) => {
   // Only recalculate when minute changes (not every second)
   const currentMinuteKey = `${currentTime.getHours()}:${currentTime.getMinutes()}`;
@@ -682,13 +692,20 @@ const ClockFace: React.FC<ClockFaceProps> = ({
     for (const slot of slots) {
       const { task, index } = slot;
       if (task.isBreak) continue;
-      const color = task.important
-        ? 'var(--color-task-important, hsl(0, 72%, 62%))'
-        : taskArcColor(index, slots.length, task.tag);
+      let color: string;
+      if (task.important) {
+        color = 'var(--color-task-important, hsl(0, 72%, 62%))';
+      } else if (task.tag && tagHueMap) {
+        const firstTag = task.tag.split(',')[0].trim();
+        const hue = firstTag ? tagHueMap.get(firstTag) : undefined;
+        color = hue !== undefined ? taskColorFromHue(hue) : taskArcColor(index, slots.length, task.tag);
+      } else {
+        color = taskArcColor(index, slots.length, task.tag);
+      }
       colorMap.set(task.id, color);
     }
     onSlotsResolvedRef.current(colorMap);
-  }, [slots]);
+  }, [slots, tagHueMap]);
   const activePomodoroTaskId =
     pomodoroState?.isRunning && pomodoroState.type === 'work'
       ? pomodoroState.currentTaskId
@@ -754,6 +771,7 @@ const ClockFace: React.FC<ClockFaceProps> = ({
             key={slot.task.id}
             slot={slot}
             totalTasks={slots.length}
+            tagHueMap={tagHueMap}
             isActive={
               slot.task.id === activeTaskId ||
               slot.task.id === activePomodoroTaskId

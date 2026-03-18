@@ -1323,6 +1323,7 @@ function App({ user, onLogout }: AppProps) {
             onTaskClick={setActiveTaskId}
             onCalendarEventClick={(uid) => setActiveCalendarUid(prev => prev === uid ? null : uid)}
             onSlotsResolved={setClockColorMap}
+            tagHueMap={tagHueMap}
           />
           {timedOutTaskId && (
             <ExtendTaskPrompt
