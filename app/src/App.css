@@ -1010,7 +1010,7 @@
 
 .day-summary__bar-segment--events { background: var(--color-accent); }
 .day-summary__bar-segment--tasks  { background: color-mix(in srgb, var(--color-text) 40%, transparent); }
-.day-summary__bar-segment--breaks { background: var(--color-border); }
+.day-summary__bar-segment--breaks { background: var(--color-muted); }
 
 .day-summary__rows {
   list-style: none;

@@ -102,7 +102,7 @@
   width: 28px;
   height: 16px;
   border-radius: 16px;
-  background: var(--color-border);
+  background: var(--color-toggle-track);
   flex-shrink: 0;
   transition: background 0.18s;
 }
@@ -324,7 +324,7 @@
   position: absolute;
   inset: 0;
   border-radius: 20px;
-  background: var(--color-border);
+  background: var(--color-toggle-track);
   transition: background 0.18s;
   cursor: pointer;
 }

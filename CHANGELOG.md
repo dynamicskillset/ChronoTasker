@@ -4,6 +4,12 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 
 ---
 
+### v1.6.0 — 2026-03-18
+
+- **Light mode is easier to read**: several elements that were too faint to read comfortably have been made more visible. Toggle switches now have a clearly visible track. Duration and tag placeholders ("Task name...", "e.g. admin, deep work") are properly readable. Completed tasks are dimmed less aggressively. The breaks segment in the Day Breakdown bar is now visible. Duration preset chips and tag filter pills stand out from the page background. The "Add to Backlog" button has a visible border so it reads as a button.
+
+---
+
 ### v1.5.3 — 2026-03-18
 
 - **Turning on Advanced mode now sets everything up at once**: when you enable Advanced mode for the first time, all the features it unlocks — recurring tasks, backlog, day summary, and the Pomodoro timer — turn on automatically. No need to enable each one individually. Any you turn off afterwards stay off.

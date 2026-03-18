@@ -46,7 +46,7 @@
   --color-input-bg: #FFFFFF;
   --color-input-border: #BCC5D6;
   --color-input-focus: #5E81AC;
-  --color-pill-bg: #E5E9F0;
+  --color-pill-bg: #D5DCEB;
   --color-pill-text: #2E3440;
   --color-pill-active-bg: #5E81AC;
   --color-pill-active-text: #FFFFFF;
@@ -55,8 +55,10 @@
   --color-submit-hover: #4C6F96;
   --color-checkbox: #4C566A;
   --color-checkbox-done: #A3BE8C;
-  --color-muted: #C8D2E0;
-  --color-completed-opacity: 0.65;
+  --color-muted: #627080;
+  --color-completed-opacity: 0.80;
+  --color-toggle-track: #7A8FA8;
+  --color-placeholder: #768595;
   --tag-saturation: 55%;
   --tag-text-lightness: 35%;
   --tag-bg-lightness: 88%;
@@ -116,6 +118,8 @@
   --color-checkbox-done: #A3BE8C;
   --color-muted: #4C566A;
   --color-completed-opacity: 0.55;
+  --color-toggle-track: #7A8A9E;
+  --color-placeholder: #8A9BAD;
   --tag-saturation: 70%;
   --tag-text-lightness: 82%;
   --tag-bg-lightness: 28%;
@@ -149,7 +153,7 @@
   --color-input-bg: #FFFFFF;
   --color-input-border: #BCC5D6;
   --color-input-focus: #5E81AC;
-  --color-pill-bg: #E5E9F0;
+  --color-pill-bg: #D5DCEB;
   --color-pill-text: #2E3440;
   --color-pill-active-bg: #5E81AC;
   --color-pill-active-text: #FFFFFF;
@@ -158,8 +162,10 @@
   --color-submit-hover: #4C6F96;
   --color-checkbox: #4C566A;
   --color-checkbox-done: #A3BE8C;
-  --color-muted: #C8D2E0;
-  --color-completed-opacity: 0.65;
+  --color-muted: #627080;
+  --color-completed-opacity: 0.80;
+  --color-toggle-track: #7A8FA8;
+  --color-placeholder: #768595;
   --tag-saturation: 55%;
   --tag-text-lightness: 35%;
   --tag-bg-lightness: 88%;
@@ -203,6 +209,8 @@
     --color-checkbox-done: #A3BE8C;
     --color-muted: #4C566A;
     --color-completed-opacity: 0.55;
+    --color-toggle-track: #7A8A9E;
+    --color-placeholder: #8A9BAD;
     --tag-saturation: 70%;
     --tag-text-lightness: 82%;
     --tag-bg-lightness: 28%;

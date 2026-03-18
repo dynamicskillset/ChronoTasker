@@ -52,6 +52,10 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ## Changelog
 
+### v1.6.0 — 2026-03-18
+
+Light mode contrast improvements: toggles, placeholders, completed tasks, the breaks bar, and pill backgrounds are all more readable.
+
 ### v1.5.3 — 2026-03-18
 
 Enabling Advanced mode for the first time now turns on all its features in one go. Task menu hover states now visible.

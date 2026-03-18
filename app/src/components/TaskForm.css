@@ -80,7 +80,8 @@
 }
 
 .task-form__title-input::placeholder {
-  color: var(--tf-text-secondary);
+  color: var(--color-placeholder);
+  opacity: 1;
 }
 
 .task-form__title-input:focus {
@@ -173,7 +174,8 @@
 }
 
 .task-form__duration-custom::placeholder {
-  color: var(--tf-text-secondary);
+  color: var(--color-placeholder);
+  opacity: 1;
   font-family: inherit;
 }
 
@@ -295,7 +297,8 @@
 }
 
 .task-form__tag-input::placeholder {
-  color: var(--tf-text-secondary);
+  color: var(--color-placeholder);
+  opacity: 1;
 }
 
 .task-form__tag-input:focus {
@@ -394,7 +397,8 @@
 }
 
 .task-form__details-input::placeholder {
-  color: var(--tf-text-secondary);
+  color: var(--color-placeholder);
+  opacity: 1;
 }
 
 .task-form__details-input:focus {
@@ -463,9 +467,9 @@
   font-size: 0.82rem;
   font-weight: 500;
   font-family: inherit;
-  color: var(--tf-cancel-text);
+  color: var(--color-warning);
   background: color-mix(in srgb, var(--color-warning) 10%, transparent);
-  border: none;
+  border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
   border-radius: 6px;
   cursor: pointer;
   transition: background-color var(--transition-normal), color var(--transition-normal);
