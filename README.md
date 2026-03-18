@@ -54,7 +54,7 @@ TaskDial uses [PrideVer](https://pridever.org): `PROUD.DEFAULT.SHAME`
 
 ### v1.6.0 — 2026-03-18
 
-Light mode contrast improvements across toggles, placeholders, completed tasks, the breaks bar, and pill backgrounds. Pomodoro break colours now adapt to light mode. Tap targets enlarged for touch devices. Onboarding spotlight animation smoothed.
+Light mode is much easier to read: labels, placeholders, toggles, and buttons that were too faint are now clearly visible. Pomodoro break colours look right in light mode too. Several buttons are easier to tap on mobile. The welcome tour highlight now glides between steps instead of jumping.
 
 ### v1.5.3 — 2026-03-18
 

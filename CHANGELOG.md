@@ -7,9 +7,9 @@ All notable changes to TaskDial are documented here. TaskDial uses [PrideVer](ht
 ### v1.6.0 — 2026-03-18
 
 - **Light mode is easier to read**: several elements that were too faint to read comfortably have been made more visible. Toggle switches now have a clearly visible track. Duration and tag placeholders ("Task name...", "e.g. admin, deep work") are properly readable. Completed tasks are dimmed less aggressively. The breaks segment in the Day Breakdown bar is now visible. Duration preset chips and tag filter pills stand out from the page background. The "Add to Backlog" button has a visible border so it reads as a button.
-- **Pomodoro break colours readable in light mode**: the green and purple colours used for short and long break phases were designed for dark backgrounds. They now switch to deeper, more readable shades when you're using the app in light mode.
-- **Tap targets enlarged**: the task actions (…) button, week navigation arrows, and settings toggles now meet the recommended minimum size for touch interfaces, making them easier to tap on phones and tablets.
-- **Onboarding walkthrough animation smoothed**: the spotlight that highlights each element during the tour now moves more smoothly between steps.
+- **Pomodoro break colours now look right in light mode**: the green and purple colours for short and long breaks were designed for dark backgrounds. They now switch to deeper shades when you're using the light theme, so they're clearly readable.
+- **Small buttons are easier to tap on mobile**: the task actions (…) button, the week navigation arrows, and settings toggles were smaller than they should be on touch screens. They've all been made easier to hit with a finger.
+- **The welcome tour moves more smoothly**: the highlight that follows each step during the first-run tour now glides between elements instead of jumping.
 
 ---
 
