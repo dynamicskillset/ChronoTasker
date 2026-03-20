@@ -7,6 +7,7 @@ PLAN.md
 STATE.md
 .claude/settings.local.json
 .DS_Store
+.kin/
 node_modules/
 dist/
 .env
